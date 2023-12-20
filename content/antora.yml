@@ -1,12 +1,12 @@
 name: modules
-title: Tony antora title
+title: 'OpenShift Platform Plus:  A Security-Focused, Multi-Cluster, Kubernetes Solution'
 version: master
 nav:
   - modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
-    lab_name: "I'm the lab_name var"
+    lab_name: 'OpenShift Platform Plus:  A Security-Focused, Multi-Cluster, Kubernetes Solution'
     release-version: master
     page-pagination: true
     my_var: "foo - this is an asciidoc attribute from `content/antora.yml`"

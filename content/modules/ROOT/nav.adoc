@@ -1,8 +1,17 @@
 
-* xref:module-02.adoc[1. RPM Native Container]
-** xref:module-02.adoc#repositories[Repositories]
-** xref:module-02.adoc#software[Software]
+* xref:module-01.adoc[1. Red Hat Advanced Cluster Management for Kubernetes]
+** xref:module-01.adoc#introduction[Introduction to RHACM]
+** xref:module-01.adoc#getting-started[Getting Started with RHACM]
+** xref:module-01.adoc#hosted-control-planes[Introducing Hosted Control Planes]
+** xref:module-01.adoc#create-manage-cluster[Create and Manage Clusters]
+** xref:module-01.adoc#deploying-applications[Deploying Applications to Managed Clusters in RHACM]
+** xref:module-01.adoc#creating-an-application[Creating an Application Deployment Policy]
+** xref:module-01.adoc#policy-driven-governance[Policy Driven Governance]
 
-* xref:module-03.adoc[2. GitHub Sourced Container]
-** xref:module-03.adoc#prerequisites[Install Prerequisites]
-** xref:module-03.adoc#container[Enable Container]
+* xref:module-02.adoc[2. Red Hat Advanced Cluster Security for Kubernetes]
+** xref:module-02.adoc#introduction[Introduction to RHACS]
+** xref:module-02.adoc#prereqs[Lab Setup]
+** xref:module-02.adoc#explore-console-vuln[Explore Console and Vulnerabilities]
+
+* xref:module-03.adoc[3. Red Hat Quay]
+** xref:module-03.adoc#introduction[Introduction]

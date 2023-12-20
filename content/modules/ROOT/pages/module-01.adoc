@@ -1,0 +1,230 @@
+[[introduction]]
+
+= Module 01: Cluster and Lifecycle Management
+
+In this session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM).
+
+Participants will walk through these 3 major use cases:
+
+- Multi-Cluster Lifecycle
+* Centrally manage, create, update, and delete Kubernetes clusters.
+* Search, find and modify any kubernetes resource across the entire domain.
+* Quickly troubleshoot and resolve issues across your federated domain.
+
+- Advanced Application Lifecycle
+* Easily deploy applications at scale leveraging GitOps.
+* See applications work real time from multiple sources.
+* Quickly visualize application relationships across clusters and those that span clusters.
+
+- Policy Driven Governance
+* Centrally set and enforce policies for security, applications, and infrastructure.
+* Quickly visualize detailed auditing on configuration of apps and clusters.
+* Leverage Policy Generator to generate policies at scale.
+
+Lets get started!
+
+[[getting-started]]
+
+== Working with Kubernetes Clusters and Cluster Lifecycle
+
+At a high level Cluster Lifecycle management is about creating, upgrading, and destroying and importing clusters in a multi cloud environment, whether they may be traditional OpenShift Clusters, managed environments like ROSA or ARO, or specialized cluster deployments like Hosted Control Planes or Single-Node OpenShift.
+
+In the demo console where you have all the credentials, you will find the OCP Console URL, Username and Password, AWS credentials, Access Key ID, Secret Access Key, and the Base DNS Domain.
+
+- To get started, switch over to the OpenShift Console https://console-openshift-console.apps.cluster-pbpsm.pbpsm.sandbox1327.opentlc.com
+- Remember that the login is *kubeadmin* and the password is: *dd3aF-yuHGT-janMV-Aq7gr*
+
+Once you have logged in to OpenShift Console, Navigate to the Cluster drop down menu and then select All Clusters this will bring you to the RHACM interface. 
+
+image::001-local-cluster.png[Cluster Selection Menu]
+
+In this interface you will see 2 clusters available, the first cluster is a Hosted Control Plane Cluster called *development*.
+
+image::002-cluster-view.png[View of Clusters Listed]
+
+[[hosted-control-planes]]
+
+== Introducing Hosted Control Planes
+
+Hosted Control Planes is a form factor of Red Hat OpenShift Container platform, but it follows a distinct architectural model.
+In standalone OpenShift, the control plane and data plane are coupled in terms of locality. A dedicated group of nodes hosts the control plane with a minimum number to ensure a quorum and the network stack is shared. While functional, this approach may not always meet customers' diverse use cases, especially when it comes to multi-cluster scale deployments.
+To address this, Red Hat provides hosted control planes in addition to standalone OpenShift. Hosted Control Planes is based on the upstream Red Hat project HyperShift which can be thought of as a middleware for hosting OpenShift control planes at scale. This deployment model helps solve concerns in regard to cost and time to provision, as well as providing a strong separation between management and workloads.
+
+Hosted Control Planes for Red Hat OpenShift decouple the control plane from the data plane:
+
+- It provides network domain separation between control-plane and workloads.
+- Offers a shared interface for fleet administrators and Site Reliability Engineers (SREs) to operate multiple clusters easily.
+- Treats the control plane like any other workload, enabling administrators to use the same stack to monitor, secure, and operate their applications while managing the control plane.
+
+The decoupling of the Control Plane and Data Plane introduces multiple potential benefits and paves the way for a Hybrid-cloud approach. Below are possibilities that Hosted Control Plane as a technology enables:
+
+- Trust Segmentation & Human Error Reduction: Management plane for control planes and cloud credentials separate from the end-user cluster. A separate network of management from the workload. Furthermore, with the control-plane managed, it is harder for users to basically shoot themselves in the foot and destroy their own clusters since they won’t be seeing the CP resources in the first place.
+- Cheaper Control Planes: You can host \~7-21 control planes into the same three machines you were using for 1 control plane. And run \~1000 control planes on 150 nodes. Thus you run most densely on existing hardware. Which also makes HA clusters cheaper.
+- Immediate Clusters: Since the control plane consists of pods being launched on OpenShift, you are not waiting for machines to provision.
+- Kubernetes Managing Kubernetes: Having control-plane as Kubernetes workloads immediately unlocks for free all the features of Kubernetes such as HPA/VPA, cheap HA in the form of replicas, control-plane Hibernation now that control-plane is represented as deployments, pods, etc.
+- Infra Component Isolation: Registries, HAProxy, Cluster Monitoring, Storage Nodes, and other infra type components are allowed to be pushed out to the tenant’s cloud provider account isolating their usage of those to just themselves.
+- Increased Life Cycle Options: You can upgrade the consolidated control planes out of cycle from the segmented worker nodes, including embargoed CVEs.
+- Future Mixed Management & Workers IaaS: Although it is not in the solution today, we feel we could get to running the control plane on a different IaaS provider than the workers faster under this architecture
+- Heterogeneous Arch Clusters: We can more easily run control planes on one CPU chip type (ie x86) and the workers on a different one (ie ARM or even Power/Z).
+- Easier Multi-Cluster Management: More centralized multi-cluster management which results in fewer external factors influencing the cluster status and consistency
+- Cross Cluster Delivery Benefits: As we look to have more and more layered offerings such as service mesh, server-less, pipelines, and other span multiple clusters, having a concept of externalized control planes may make delivering such solutions easier.
+- Easy Operability: Think about SREs. Instead of chasing down cluster control-planes, they would now have a central-pane of glass where they could debug and navigate their way even to cluster dataplanes. Centralized operations, less Time To Resolution (TTR), and higher productivity become low-hanging fruits.
+
+You will also find a second cluster called *local-cluster*. This cluster is the hub where the Advanced Cluster Management For Kubernetes, and Advanced Cluster Security for Kubernetes resides.
+
+Feel free to navigate the cluster’s interface and explore the different day 2 actions you can perform in the cluster.
+
+[[create-manage-cluster]]
+
+== Creating A Cluster
+
+Red Hat Advanced Cluster Management for Kubernetes makes it quite easy to deploy and manage additional clusters. While simplicity is often a winning formula when it comes to deployments of Red Hat OpenShift with methods such as IPI and the Assisted Installer, RHACM takes this to a whole new level with just a few clicks through the cluster creation wizard.
+
+From the Clusters screen we can see how easy it is to deploy a new cluster.
+
+Click on the *Create cluster* button in the center of the screen:
+
+image::003-create-cluster.png[Create Cluster]
+
+You will notice that there is an Option for AWS and it’s already highlighted that we have saved credentials. We will use this to deploy our new cluster, but feel free to explore this window and see other cluster types that are available. 
+
+When you are ready, click on the AWS button.
+
+image::004-aws-credentials.png[AWS Credentials]
+
+You will see two options for the control plane type: 
+
+.Hosted Control Plane
+.Standalone
+
+The *development* cluster that we have provisioned is an example of a Hosted Control Plane cluster, which we explained the benefits of in detail in the link:module-01.html#hosted-control-planes[Introducing Hosted Control Planes] section above. 
+
+For our lab, We will be using the Standalone cluster option. Click on that option, and you will be presented with a menu that allows you to customize the cluster. 
+
+Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.14.6*. 
+
+Click on *Next* to continue.
+
+image::005-create-cluster-details.png[Create Cluster Details]
+
+On the next screen You can customize the AWS region, the CPU architecture, and the number of nodes to deploy in the control plane and worker pools. 
+
+Click on *Next* to proceed.
+
+image::006-create-cluster-nodepools.png[Create Cluster NodePools]
+
+The next screen allows you to configure networking type to use and it's associated  variables. 
+
+Click on *Next* to proceed.
+
+image::007-create-cluster-networking.png[Create Cluster Networking]
+
+The next couple of screens allow for additional customization, configuring a proxy, creating private AWS configurations, and pre-configuring automation functions with Ansible Automation Platform. 
+
+Click *Next* on each screen to proceed to the final *Review and Create* screen.
+
+You will see a description of the cluster you are creating, click the blue *Create* button to start the deployment process.
+
+image::008-create-cluster-summary-create.png[Create Cluster Summary Page]
+
+If you click on *Clusters* in the left menu bar you will be returned to the original cluster view screen but you can see that our new cluster is now in the creating stage.
+
+image::009-view-new-cluster.png[View New Cluster]
+
+NOTE: The deployment of a full cluster will take approximately 45 minutes to complete, the primary purpose of this part of the lab was to demonstrate how easy it is to deploy clusters. We will continue the lab working with the infrastructure already in place.
+
+[[deploying-applications]]
+
+== Deploying Applications to Managed Clusters in RHACM
+
+Your environment came preloaded with an existing Hosted Control Plane cluster hosted in AWS called *development*, we will be deploying an application to this cluster.
+
+Application Lifecycle functionality in RHACM provides the processes that are used to manage application resources on your managed clusters. This allows you to define a single or multi-cluster application using Kubernetes specifications, but with additional automation of the deployment and lifecycle management of resources to individual clusters. An application designed to run on a single cluster is straightforward and something you ought to be familiar with from working with OpenShift fundamentals. A multi-cluster application allows you to orchestrate the deployment of these same resources to multiple clusters, based on a set of rules you define for which clusters run the application components.
+
+This table describes the different components that the Application Lifecycle model in RHACM is composed of:
+
+|============
+|*Resource*|*Purpose*
+|Channel|Defines a place where deployable resources are stored, such as an object store, Kubernetes namespace, Helm repository, or GitHub repository.
+|Subscription|Definitions that identify deployable resources available in a Channel resource that are to be deployed to a target cluster.
+|PlacementRule|Defines the target clusters where subscriptions deploy and maintain the application. It is composed of Kubernetes resources identified by the Subscription resource and pulled from the location defined in the Channel resource.
+|Application|A way to group the components here into a more easily viewable single resource. An Application resource typically references a Subscription resource.
+|============
+
+These are all Kubernetes custom resources, defined by a Custom Resource Definition (CRD), that are created for you when RHACM is installed. By creating these as Kubernetes native objects, you can interact with them the same way you would with a Pod. For instance, running oc get application retrieves a list of deployed RHACM applications just as oc get pods retrieves a list of deployed Pods.
+
+This may seem like a lot of extra resources to manage in addition to the deployables that actually make up your application. However, they make it possible to automate the composition, placement, and overall control of your applications when you are deploying to many clusters. With a single cluster, it is easy to log in and run oc create -f…, but if you need to do that on a dozen clusters, you want to make sure you do not make a mistake or accidentally omit a cluster, and you need a way to schedule and orchestrate updates to your applications. Leveraging the Application Lifecycle Builder in RHACM allows you to easily manage multi-cluster applications.
+
+[[creating-an-application]]
+
+== Creating an Application Deployment Policy
+
+=== Prerequisite Steps
+
+- Navigate to *Infrastructure*, and *Clusters*.
+- Click on the *development* cluster.
+- Click on the *Actions* dropdown and select *Edit Labels* button under *Labels*.
+- Verify that the *rhdp_usage=development* label exists in the cluster. If the label doesn't exist, create it.
+
+image::010-labels.png[Cluster Labels]
+
+=== Deploying an Application
+
+- Navigate to *Applications* from the left side menu.
+- Click *Create application, select Subscription*.
+- Enter the following information:
+* Name: rocket-chat
+* Namespace: rocket-chat
+* Under repository types, select the GIT repository
+* URL: https://github.com/levenhagen/rocketchat-acm
+* Branch: main
+* Path: rocketchat
+- Under *Select clusters* for application deployment, verify that *Deploy application resources only on clusters matching specified labels* is selected.
+- Enter the following information:
+* Cluster set: default
+* Label: rhdp_usage
+* Value: development
+- Verify all of the information is correct and click *Create*.
+
+It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
+
+image::011-application-topology.png[Application Topology]
+
+Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Book Import application with several books available.
+
+image::012-application-route.png[Application Route]
+
+Feel free to experiment with the application at your leisure.
+
+Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
+
+[[governance-risk-compliance]]
+
+== Governance, Risk, and Compliance
+
+Now that you have a cluster and a deployed application, you need to make sure that they do not drift from their original configurations. This kind of drift is a serious problem, because it can happen from benign and benevolent fixes and changes, as well as malicious activities that you might not notice but can cause significant problems. The solution that RHACM provides for this is the Governance, Risk, and Compliance, or GRC, functionality.
+
+=== Review GRC Functionality
+
+Enterprises must meet internal standards for software engineering, secure engineering, resiliency, security, and regulatory compliance for workloads hosted on private, multi and hybrid clouds. Red Hat Advanced Cluster Management for Kubernetes governance provides an extensible policy framework for enterprises to introduce their own security policies.
+
+The governance lifecycle is based on defined policies, processes, and procedures to manage security and compliance from a central interface page. 
+
+View the following diagram of the governance architecture:
+
+image::013-grc-diagram.png[Governance, Risk, Compliance Diagram]
+
+Use the Red Hat Advanced Cluster Management for Kubernetes security policy framework to create and manage policies. Kubernetes custom resource definition instances are used to create policies.
+
+Each Red Hat Advanced Cluster Management policy can have at least one or more templates. For more details about the policy elements, view the Policy YAML table section.
+
+[[create-grc-policies]]
+
+== Creating Policies in RHACM
+
+In order to assist in the creation and management of Red Hat Advanced Cluster Management for Kubernetes policies we use the policy generator tool. This tool, along with GitOps, greatly simplifies the distribution of Kubernetes resource objects to managed OpenShift or Kubernetes clusters through RHACM policies.
+
+=== Prerequisites
+
+To deploy policies with subscriptions, complete the following steps:
+
