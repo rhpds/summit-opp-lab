@@ -1,6 +1,4 @@
-[[introduction]]
-
-= Module 01: Cluster and Lifecycle Management
+== Module 01: Red Hat Advanced Cluster Management for Kubernetes
 
 In this session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM).
 
@@ -23,7 +21,7 @@ Participants will walk through these 3 major use cases:
 
 Lets get started!
 
-[[getting-started]]
+[[cluster-lifecycle]]
 
 == Working with Kubernetes Clusters and Cluster Lifecycle
 
@@ -34,7 +32,9 @@ In the demo console where you have all the credentials, you will find the OCP Co
 - To get started, switch over to the OpenShift Console https://console-openshift-console.apps.cluster-pbpsm.pbpsm.sandbox1327.opentlc.com
 - Remember that the login is *kubeadmin* and the password is: *dd3aF-yuHGT-janMV-Aq7gr*
 
-Once you have logged in to OpenShift Console, Navigate to the Cluster drop down menu and then select All Clusters this will bring you to the RHACM interface. 
+Once you have logged in to OpenShift Console, navigate to the *Cluster* drop down menu and then select *All Clusters*. 
+
+This will bring you to the RHACM interface. 
 
 image::001-local-cluster.png[Cluster Selection Menu]
 
@@ -76,7 +76,7 @@ Feel free to navigate the cluster’s interface and explore the different day 2 
 
 [[create-manage-cluster]]
 
-== Creating A Cluster
+== Create and Manage Clusters
 
 Red Hat Advanced Cluster Management for Kubernetes makes it quite easy to deploy and manage additional clusters. While simplicity is often a winning formula when it comes to deployments of Red Hat OpenShift with methods such as IPI and the Assisted Installer, RHACM takes this to a whole new level with just a few clicks through the cluster creation wizard.
 
@@ -198,9 +198,9 @@ Feel free to experiment with the application at your leisure.
 
 Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
 
-[[governance-risk-compliance]]
+[[policy-driven-governance]]
 
-== Governance, Risk, and Compliance
+== Policy Driven Governance
 
 Now that you have a cluster and a deployed application, you need to make sure that they do not drift from their original configurations. This kind of drift is a serious problem, because it can happen from benign and benevolent fixes and changes, as well as malicious activities that you might not notice but can cause significant problems. The solution that RHACM provides for this is the Governance, Risk, and Compliance, or GRC, functionality.
 
@@ -226,5 +226,176 @@ In order to assist in the creation and management of Red Hat Advanced Cluster Ma
 
 === Prerequisites
 
-To deploy policies with subscriptions, complete the following steps:
+To deploy policies with subscriptions, you will need to bind the *open-cluster-management:subscription-admin* ClusterRole to the user creating the subscription.
 
+To do this, complete the following steps:
+
+- Navigate to the *Governance* tab.
+- On the top tabs, click on *Policies*.
+- Click *Create Policy*.
+- On the top switch the toggle to *Display the YAML*.
+
+image::014-policy-toggle.png[Display the YAML]
+
+- Copy the following YAML excerpt and paste it in the screen:
+
+[source,yaml]
+----
+
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-configure-subscription-admin-hub
+  annotations:
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+spec:
+  remediationAction: inform
+  disabled: false
+  policy-templates:
+- objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: policy-configure-subscription-admin-hub
+        spec:
+          remediationAction: inform
+          severity: low
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: ClusterRole
+                metadata:
+                  name: open-cluster-management:subscription-admin
+                rules:
+                - apiGroups:
+                  - app.k8s.io
+                  resources:
+                  - applications
+                  verbs:
+                  - '*'
+                - apiGroups:
+                  - apps.open-cluster-management.io
+                  resources:
+                  - '*'
+                  verbs:
+                  - '*'
+                - apiGroups:
+                  - ""
+                  resources:
+                  - configmaps
+                  - secrets
+                  - namespaces
+                  verbs:
+                  - '*'
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: ClusterRoleBinding
+                metadata:
+                  name: open-cluster-management:subscription-admin
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                  name: open-cluster-management:subscription-admin
+                subjects:
+                - apiGroup: rbac.authorization.k8s.io
+                  kind: User
+                  name: kube:admin
+                - apiGroup: rbac.authorization.k8s.io
+                  kind: User
+                  name: system:admin
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-configure-subscription-admin-hub
+placementRef:
+  name: placement-policy-configure-subscription-admin-hub
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-configure-subscription-admin-hub
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-policy-configure-subscription-admin-hub
+spec:
+  clusterConditions:
+  - status: "True"
+    type: ManagedClusterConditionAvailable
+  clusterSelector:
+    matchExpressions:
+      - {key: name, operator: In, values: ["local-cluster"]}
+
+----
+
+- Enter a namespace to place the policy, the *default* namespace is OK to use.
+- Click *Next* till the end and then click on *Submit*.
+- Allow a few moments for the policy to propagate to the *local-cluster / RHACM Hub Cluster*.
+- Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy.
+- Under the actions dropdown, select *Enforced*. This will enforce the policy, wait until the green checkmark is displayed.
+
+image::015-enforce-governance-policy.png[Enforce the Governance Policy]
+
+=== Using Policy Generator
+
+This Policy Generator description will create 2 configuration policies:
+
+- *openshift-gitops-installed*: The goal of the first policy is to inform if the OpenShift GitOps operator is installed on managed clusters.
+- *kubeadmin-removed*: The goal of the second policy is to inform if the kubeadmin user is removed from managed clusters.
+
+NOTE: Both policies are informative only, and we will only execute them manually to demonstrate how to resolve issues.
+
+In order to deliver these policies we will need to leverage the RHACM Application Engine and the GitOps Subscription model.
+
+- Navigate to *Applications*.
+- Click *Create application, select Subscription*.
+- Enter the following information:
+* Name: policy-generator
+* Namespace: policy-generator
+* Under repository types, select the GIT repository
+* URL: https://github.com/levenhagen/demo-policygenerator.git
+* Branch: main
+- Verify that *Deploy only to local cluster* is selected using label name equals any of local-cluster and cluster set to be default.
+- Verify all the information is correct, click *Create*.
+
+It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
+
+image::016-governance-topology.png[Governance Topology]
+
+- Navigate to the *Governance* tab.
+- Click on the *Policies* tab.
+- Verify that you see two policies and that their *Cluster Violations* count is one.
+* openshift-gitops-installed
+* kubeadmin-removed
+
+image::017-policies-list.png[Governance Policies List]
+
+Now that the policies have been created for us leveraging the Policy Generator Engine let’s go ahead and enforce them:
+
+- On the *openshift-gitops-installed* policy, click on the ellipses and set policy to *Enforce*.
+
+image::018-policies-enforce-red.png[Enforce the Policy]
+
+- Click the *Enforce* button to verify.
+- Wait a few minutes and you will see that the *Cluster Violations* will go from *red* to *green*.
+
+image::019-policies-enforce-green.png[Policy Enforced]
+
+- Click on the policy and slect *Results* to veify that the gitops operator has been installed.
+
+CAUTION: Feel free to repeat the steps with the *kubeadmin-removed* policy, however if you enforce this you won’t be able to continue this lab and access that cluster through the console as the only account created on these clusters is Kubeadmin.
+
+Now you have successfully created a Policy leveraging the Policy Generator to scan your clusters, if you would like to play with other policies please visit the Policy Repo for more Policies you can test out.
+
+[[acm-conclusion]]
+
+== Conclusion
+
+In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy applications and manage policies across clusters, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM elab environment, or continue on to the next portion of the lab.

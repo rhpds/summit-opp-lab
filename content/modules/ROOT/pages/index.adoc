@@ -6,7 +6,7 @@ In this lab, we aim to demonstrate the value-add available to customers from pur
 
 == OpenShift Platform Plus Components
 
-=== Red Hat Advanced Cluster Security for Kubernetes (RHACS)
+=== Red Hat Advanced Cluster Management for Kubernetes (RHACM)
 
 Red Hat Advanced Cluster Management for Kubernetes is a multi-cluster management solution that helps organizations manage their Kubernetes clusters and applications across hybrid and multicloud environments. It provides a unified management console, policy-based governance, observability, and automation capabilities, helping to simplify and streamline Kubernetes management operations.
 
@@ -18,7 +18,7 @@ In this workshop we will demonstrate the value of RHACM with the following activ
 
 === Red Hat Advanced Cluster Security for Kubernetes (RHACS)
 
-Red Hat Quay is a security-focused and scalable private registry platform for managing content across globally distributed datacenter and cloud environments. It provides a single and resilient content repository for delivering containerized software to development and production across Red Hat OpenShift® and Kubernetes clusters. Red Hat Quay is a distributed and highly available container image registry for your enterprise.
+Red Hat Advanced Cluster Security for Kubernetes is a Kubernetes-native security platform that equips you to build, deploy, and run cloud-native applications with more security. The solution helps protect containerized Kubernetes workloads in all major clouds and hybrid platforms, including Red Hat OpenShift, Amazon Elastic Kubernetes Service (EKS), Microsoft Azure Kubernetes Service (AKS), and Google Kubernetes Engine (GKE).
 
 In this workshop we will demonstrate the value of RHACS with the following activities:
 
@@ -40,17 +40,19 @@ In this workshop we will demonstrate the value of Quay with the following activi
 
 Red Hat OpenShift Data Foundation—previously Red Hat OpenShift Container Storage—is software-defined storage for containers. Red Hat OpenShift Data Foundation helps teams develop and deploy applications quickly and efficiently across clouds.
 
-[NOTE] In this workshop we will not use ODF explicitly, but it will be used as the primary backing storage for our Quay registry, and any other applications we deploy in the cluster that need persistent storage.
+NOTE: In this workshop we will not use ODF explicitly, but it will be used as the primary backing storage for our Quay registry, and any other applications we deploy in the cluster that need persistent storage.
 
 == Environment Overview
 
 You will be interacting with an OpenShift 4 cluster that is running on Amazon Web Services. This cluster will act as a central hub for the actions you are performing in your environment.
 The basics of the OpenShift 4 installation have been completed in advance. The OpenShift cluster is essentially set to all defaults and looks like the following:
 
-.3 master nodes
-.3-4 worker nodes
-.1 bastion host
+. Three master nodes
+. Three or Four worker nodes
+. One bastion host
 
 In addition you will have an additional working cluster provisioned with Hosted Control Planes in AWS, and be able to deploy your own cluster as a part of the lab tasks. 
 
-Homeroom is a solution that provides this integrated lab guide, terminal, and web console pane. It is actually running inside the cluster that you will be interacting with.
+Homeroom is a solution that provides this integrated lab guide, terminal, and web console pane. 
+
+It is actually running inside the cluster that you will be interacting with.

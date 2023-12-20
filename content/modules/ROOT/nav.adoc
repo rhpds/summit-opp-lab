@@ -1,12 +1,13 @@
 
 * xref:module-01.adoc[1. Red Hat Advanced Cluster Management for Kubernetes]
-** xref:module-01.adoc#introduction[Introduction to RHACM]
-** xref:module-01.adoc#getting-started[Getting Started with RHACM]
+** xref:module-01.adoc#cluster-lifecycle[Working with Kubernetes Clusters and Cluster Lifecycle]
 ** xref:module-01.adoc#hosted-control-planes[Introducing Hosted Control Planes]
 ** xref:module-01.adoc#create-manage-cluster[Create and Manage Clusters]
 ** xref:module-01.adoc#deploying-applications[Deploying Applications to Managed Clusters in RHACM]
 ** xref:module-01.adoc#creating-an-application[Creating an Application Deployment Policy]
 ** xref:module-01.adoc#policy-driven-governance[Policy Driven Governance]
+** xref:module-01.adoc#create-grc-policies[Creating GRC Policies in RHACM]
+** xref:module-01.adoc#acm-conclusion[Conclusion]
 
 * xref:module-02.adoc[2. Red Hat Advanced Cluster Security for Kubernetes]
 ** xref:module-02.adoc#introduction[Introduction to RHACS]
