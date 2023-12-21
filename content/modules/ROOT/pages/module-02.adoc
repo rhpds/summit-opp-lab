@@ -1,149 +1,262 @@
-= Building an Application with rpms
+== Module 02: Red Hat Advanced Cluster Security for Kubernetes
 
-== Downloading the UBI
+In this session, participants will learn how to work with Red Hat Advanced Cluster Security for Kubernetes (RHACS).
 
-In this lab, you will be installing software into the container 
-image running as an interactive application. To do this you will
-need `yum`, but do not need `systemd` for managing services within the
-container environment.  For that reason, you will be using the *Standard*
-UBI image (as opposed to the Minimal or Multi-service images).
+The goal of the tasks in this part of the OpenShift Platform Plus lab  is to take you through the RHACS console/user interface and to observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to affect pods at both deployment and runtime. 
 
-Using the "buildah from" command will download and meld the container image. This particular image we are using is the Red Hat Universal Base Image or UBI. From the ourput of the command, you will notice that we are pulling down the latest one, which is for RHEL 9. 
+If you have questions at any time, please don’t hesitate to ask!
 
-. Execute the  download the Standard UBI
-image from Red Hat's registry.
+=== RHACS Basics
 
-+
+RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
+
+The RHACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
+
+These security features represent any developer or administrator’s primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
+
+=== RHACS Features
+
+Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensive Kubernetes security that includes the following use cases:
+
+- *Visibility:* See your entire landscape of images, registries, containers, deployments, and runtime behavior.
+- *Vulnerability* Management: Identify and remediate vulnerabilities in container images and Kubernetes across the entire software development life cycle.
+- *Compliance:* Audit your systems against CIS Benchmarks, NIST, PCI, and HIPAA, with interactive dashboards and one-click audit reports.
+- *Network Segmentation:* Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
+- *Risk Profiling:* See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
+- *Configuration Management:* Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
+- *Threat Detection:* Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
+- *Incident Response:* Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
+
+[[lab-setup]]
+
+== Lab Setup
+
+To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
+
+NOTE: This step is mandatory, you must deploy these applications into your cluster in order to work through the lab exercises.
+
+The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
+
+Please complete the following steps to configure your lab environment
+
+- Click the button to run the command in the terminal.
+
 [source,sh,role=execute]
 ----
-buildah from registry.access.redhat.com/ubi9/ubi
+git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
+export TUTORIAL_HOME="$(pwd)/acs-workshop"
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
 ----
 
-[#repositories]
-== Installing Repositories
-In this lab, you are going to containerize a software package that is already
-packaged in RPM format and stored in the Extra Packages for Enterprise Linux
-(EPEL) repository.
+CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
 
-Software often has requirements for prerequisite software that must be installed
-on the machine for it to work properly.  `yum` will resolve those
-dependencies for you, as long as it can locate the required packages in
-repositories defined on the machine.  The Red Hat Universal Base Image (UBI)
-downloaded in the previous step has access to some Red Hat Enterprise Linux
-repositories.  However, the target package for the lab is from EPEL.  
+- To ensure the deployment was successful, run the following command and ensure that the applications are up and running.
 
-. In the command below, `buildah` is going to run a command on the
-`ubi-working-container` image.  The `--` indicates that the command should be
-executed from within the container, which means the results will be applied into
-the container image.  Lastly, you are providing the `yum` command to install a
-package that defines all of the repositories from EPEL, `epel-release-latest-9`.
 
-+
-[source,bash]
+[source,sh,role=execute]
 ----
-buildah run ubi-working-container -- yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+kubectl get deployments -l demo=acs -A
 ----
 
+The output should look similar to this:
 
-. You can verify that the above command did not install the RPM on the host system.
-
-+
-[source,bash]
+[source,texinfo,subs="attributes"]
 ----
-rpm -q epel-release
-----
-
-NOTE: If your repository configurations are not distributed as an RPM, but instead as
-individual `.repo` files, you could use the `buildah copy` command to copy
-files from the host operating system into the container image.  You will see
-an example of using `buildah copy` later in this lab.
-
-[#software]
-== Installing Software
-
-
-. Now that the yum repositories are defined within the container, execute 
-another `yum install`, within the container, to install the target
-software: `moon-buggy`.
-
-+
-[source,bash]
-----
-buildah run ubi-working-container -- yum -y install moon-buggy
+NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+backend        api-server         1/1     1            1           0d
+frontend       asset-cache        1/1     1            1           0d
+log4shell      log4shell-app      3/3     3            3           0d
+medical        reporting          1/1     1            1           0d
+operations     jump-host          1/1     1            1           0d
+payments       visa-processor     1/1     1            1           0d
+spring4shell   spring4shell-app   3/3     3            3           0d
 ----
 
+If all of the applications are up and running, feel free to proceed to the next stage. If they are not running, rerun the command set, or ask a proctor for assistance.
 
-== Committing the Container Image
+[[con-vuln]]
 
-. At this point, the container is configured.  It is time to transition from a
-working container into a committed image.  In the command below, you will use
-the `buildah` command to commit the working container to an image called:
-`moon-buggy`.
+== Introducing the RHACS console and Vulnerability Management
 
-+
-[source,bash]
-----
-buildah commit ubi-working-container moon-buggy
-----
+The first section of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
 
-+
-. The output of `podman image list` should confirm the image was created.
+=== Accessing the RHACS Console
 
-+
-[source,bash]
-----
-podman image list
-----
+In this section, you will confirm that you can connect to the RHACS portal. 
+
+The following information will be available in the the main lab screen:
+
+- The RHACS admin Credentials
+- The URL for the RHACS portal
+
+=== Logging into the RHACS Console
+
+- From the main lab page, click the URL for the RHACS web console to head to the console's login page.
+
+image::201-lab-environment.png[Lab Environment]
+
+NOTE: You may get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also considered best practice to integrate the application with your authentication server.
+
+- Click through the warning page to get to the RHACS console login page.
+
+image::202-cert-warning.png[Certificate Warning]
+
+image::203-login-page.png[Login Page]
+
+- Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the RHACS console URL *(HINT: The Username is always admin)*.
+
+image::204-admin-login.png[Admin Login]
+
+- Ensure you maintain access to the console and keep your tab open for the future lab sections.
+
+image::205-rhacs-dashboard.png[RHACS Dashboard]
+
+[[nav-con]]
+
+== Navigating the RHACS Console
+
+In this section, you familiarize yourself with the RHACS portal, including its tabs, search capabilities and dashboard functionality.
+
+The RHACS dashboard has four main sections:
+
+. Top Bar
+. Global Search
+. Navigation Menu
+. Dashboard
+
+image::206-numbered-dashboard.png[Numbered Dashboard]
+
+=== Top Bar
+
+The top bar contains the following functionality: 
+
+- Global Search 
+- Command-line tools 
+- Cluster Health 
+- Documentation 
+- API Reference 
+- Enable Dark/Light Mode 
+- Logged-in user account
+
+image::207-top-bar.png[Top Bar]
+
+=== Global Search
+
+The ability to instantly find resources is essential to safeguard your cluster. Utilize the RHACS search feature to find relevant resources faster.
+
+For example, you can use it to find deployments exposed to a newly published CVE or all deployments with external network exposure.
+
+A search query consists of two parts:
+
+- An attribute that identifies the resource type you want to search for.
+- A search term that finds the matching resource.
+
+For example, to find all violations in the *visa-processor* deployment, the search query is *Deployment:visa-processor*.
+
+image::209-search-syntax.png[Search Syntax]
+
+In this search query, Deployment is the attribute, and visa-processor is the search term.
+
+NOTE: When using the search functionality you must click the provided info from the dropdown. RHACS maintains a library of searchable assets to help you search faster. If CVE or deployment cannot be searched it is most likely because the resource is not in the cluster or incorrectly typed.
 
 
-== Deploy the Container
+=== Local Page Filtering
 
-Now the software has been installed and a new container image created.  It is
-time to spawn a runtime of the container image and validate the software.  The
-software we are using is a command line command.  
+You can use local page filtering from within all views in the RHACS portal. Local page filtering works similarly to the global search, but only relevant attributes are available. You can select the search bar to show all available attributes for a specific view.
 
-. When you `run` the container,
-it will be in interactive (`-it`) mode, based on the `moon-buggy` container
-image and the command run interactively will be `/usr/bin/moon-buggy`.
+=== Common Search Queries
 
-+
-[source,bash]
-----
-podman run -it moon-buggy /usr/bin/moon-buggy
-----
+Here are some common search queries you can try in the RHACS search bar if you’d like to test its functionality.
 
-+
-[source,textinfo]
-----
+|============
+|Query|Example|Purpose
+|CVE:<CVE_number>|CVE:CVE-2018-11776|Finding deployments that are affected by a specific CVE
+|Privileged:<true_or_false>|Privileged:true|Finding privileged running deployments
+|Exposure Level:<level>|Exposure Level:External|Finding deployments that have external network exposure
+|============
 
-<<< OUTPUT ABRIDGED >>>
-               MM     MM   OOOOO    OOOOO   NN     N
-               M M   M M  O     O  O     O  N N    N
-               M  M M  M  O     O  O     O  N  N   N
-               M   M   M  O     O  O     O  N   N  N
-               M       M  O     O  O     O  N    N N
-               M       M   OOOOO    OOOOO   N     NN
+NOTE: This is just a sample of the types of queries you can use to analyze your environment in RHACS. For additional examples of search queries, please see the RHACS documentation.
 
-                     BBBBBB   U     U   GGGGG    GGGGG   Y     Y
-                     B     B  U     U  G     G  G     G   Y   Y
-                     BBBBBB   U     U  G        G          Y Y
-                     B     B  U     U  G   GGG  G   GGG     Y
-                     B     B  U     U  G     G  G     G    Y
-                     BBBBBB    UUUUU    GGGGG    GGGGG   YY
+=== Navigation Menu
 
-<<< OUTPUT ABRIDGED >>>
-----
+image::210-nav-menu.png[Navigation Menu]
 
-. You can now play the Moon Buggy game, which is a text-based version of the
-popular Moon Patrol.  When you are finished, use the `q` command to quit the
-game, which will terminate the container.
+The left-hand navigation menu provides access to each of the security use cases, as well as product configuration to integrate RHACS with your existing tooling. The navigation menu has the following items:
 
-+
-Alternatively, you can use `podman` to kill the running container from
-*Terminal 2*.
+- Dashboard: Summary view of your environment
+- Network Graph: Configured and actual network flows and the creation of Network Policies to implement network segmentation
+- Violations: Events that do not match the defined security policies
+- Compliance: Several industry and regulatory security standards, such as PCI DSS
+- Vulnerability Management: Information about known vulnerabilities affecting your environment, including deployed workloads and infrastructure, risk acceptance and reporting.
+- Configuration Management: Identification of potential misconfigurations that can lead to security issues
+- Risk: Risks affecting your environment, such as suspicious executions
+- Platform Configuration: RHACS configuration, policy management and integration details, including;
+* Clusters
+* Policy Management
+* Integrations
+* Access Control
+* System Configuration
+* System Health
 
-+
-[source,bash]
-----
-podman kill $(podman ps | grep -v CONTAINER | cut -f1 -d" " )
-----
+=== Dashboard 
+
+The Red Hat Advanced Cluster Security for Kubernetes (RHACS) Dashboard provides quick access to the data you need. It contains additional navigation shortcuts and actionable widgets that are easy to filter and customize so that you can focus on the data that matters most to you. You can view information about levels of risk in your environment, compliance status, policy violations, and common vulnerabilities and exposures (CVEs) in images.
+
+image::211-dashboard-center.png[Center Dashboard]
+
+=== Navigating the Main Dashboard
+
+The main Dashboard is your place to look at the vulnerabilities, risk, compliance, and policy violations across your clusters and namespaces. This section addresses all of the functionality in the main Dashboard to help you navigate it more effectively in the future.
+
+The dashboard can be broken down into three main sections:
+
+. The Status Bar
+. The Dashboard Filter
+. The Actionable Widgets
+
+image::212-three-dashboards.png[Three Dashboard Sections]
+
+=== The Status Bar
+
+The Status Bar provides at-a-glance numerical counters for critical resources. The counters reflect what is visible with your current access scope, defined by the roles associated with your user profile. 
+
+These counters are clickable, providing fast access to the desired list view pages as follows:
+
+|============
+|Counter|Destination
+|Clusters|Platform Configuration -> Clusters
+|Nodes|Configuration Management -> Applications & Infrastructure -> Nodes
+|Violations|Violations Main Menu
+|Deployments|Configuration Management -> Applications & Infrastructure -> Deployments
+|Images|Vulnerability Management -> Dashboard -> Images
+|Secrets|Configuration Management -> Applications & Infrastructure -> Secrets
+|============
+
+=== The Dashboard Filter 
+
+The Dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope.
+
+NOTE: The Dashboard filter does not affect the Status Bar and when no clusters or namespaces are selected, the view automatically switches to All.
+
+image::213-dashboard-filter.png[Dashboard Filter]
+
+image::214-dashboard-dropdown.png[Dashboard Drop-down]
+
+=== Actionable Widgets
+
+If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities.
+
+You can customize the information displayed on the dashboard by default in order to find the items that you consider most important to your deployments and your business' security.
+
+[[vuln-mgmt]]
+
+== The Vunerability Management Dashboard
+
+
+
+
+
+
+
+

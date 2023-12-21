@@ -10,9 +10,10 @@
 ** xref:module-01.adoc#acm-conclusion[Conclusion]
 
 * xref:module-02.adoc[2. Red Hat Advanced Cluster Security for Kubernetes]
-** xref:module-02.adoc#introduction[Introduction to RHACS]
-** xref:module-02.adoc#prereqs[Lab Setup]
-** xref:module-02.adoc#explore-console-vuln[Explore Console and Vulnerabilities]
+** xref:module-02.adoc#lab-setup[Lab Setup]
+** xref:module-02.adoc#con-vuln[Introducing the RHACS Console and Vulnerability Management]
+** xref:module-02.adoc#nav-con[Navigate the Console]
+** xref:module-02.adoc#vuln-mgmt[Vulnerability Management]
 
 * xref:module-03.adoc[3. Red Hat Quay]
 ** xref:module-03.adoc#introduction[Introduction]
