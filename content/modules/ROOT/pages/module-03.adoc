@@ -1,1 +1,128 @@
-= Red Hat Quay
+= Module 03: Red Hat Quay
+
+In this session, participants will learn how to install and configure Quay, included as a part of OpenShift Platform Plus to host images in a private registry.
+
+The goal of this portion of the lab is to show the value that Quay provides for local image management, and also how OpenShift Data Foundation can be used to provide peristent storage for applications deployed in the cluster, such as image repositories.
+
+If you have questions at any time, please don’t hesitate to ask!
+
+[[quay-install]]
+
+== Installing Red Hat Quay
+
+The Quay operator can be installed from the OperatorHub available in OpenShift Platform Plus. 
+
+. On our *local-cluster*, open the *Operators* menu on the left and click on *OperatorHub*.
++
+image::301-operatorhub-quay.png[OperatorHub Quay]
++
+. Type *Quay* in the search bar, and select the option for *Red Hat Quay*.
++
+image::302-install-quay.png[Install Quay]
++
+. Click the *Install* button and follow the default prompts.
++
+image::303-default-options.png[Quay Default Options]
++
+. Once the operator is installed, click on the *Create Instance* button under Quay Registry.
++
+image::304-create-quay-instance.png[Create Instance]
++
+NOTE: For the purposes of our lab we can accept the default options and do a basic installation of Red Hat Quay, but in a real world example you may want to customize your install.
++
+image::305-default-install.png[Default Quay Install]
++
+. Once it is installed successfully, we can check the *Resources* under the instance.
++
+image::306-quay-resources.png[Quay Resources]
+
+[[configure-registry]]
+
+== Configuring Your Registry
+
+Now that Quay is installed, we need to configure it to be able to host our images.
+
+. We can find the Quay url from the output of the following CLI command:
++
+[source,sh,role=execute]
+----
+oc get route -n openshift-operators 
+----
++
+NOTE: Look for the route with Quay in it's name, you can set it as an environment variable, or fill it in manually to the commands that follow.
++
+[source,sh,role=execute]
+----
+export QUAY_URL=<quay_url> 
+----
++
+. After opening the Quay UI, click on *Create Account* and fill in your account details.
++
+image::307-quay-create-account.png[Create Quay Account]
++
+. Using the workshop terminal, login to quay using the podman cli as shown below:
++
+[source,sh,role=execute]
+----
+podman login $QUAY_URL 
+----
+
+NOTE: Use the credentials you just created to complete the login process.
+
+[[working-images]]
+
+== Working With Images
+
+For a simple task of working with Quay we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ubi image.
+
+. Pull the ubi image with the following cli command:
++
+[source,sh,role=execute]
+----
+podman pull registry.access.redhat.com/ubi8/ubi:8.9-1028
+----
++
+. After we have a copy of the ubi image downloaded locally we can tag it and push it to our private registry using the following commands:
++
+[source,sh,role=execute]
+----
+podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/admin/ubi:8.98.9-1028
+----
++
+[source,sh,role=execute]
+----
+podman push $QUAY_URL/admin/ubi:8.9 --remove-signatures
+----
++
+. Once the image is successfully pushed, we can browse the Quay UI to validate it.
++
+image::308-uploaded-image.png[Uploaded Image]
++
+. We can do a simple test with our newly pushed image by pulling it and running an *Echo* command.
++
+[source,sh,role=execute]
+----
+podman run $QUAY_URL/admin/ubi:8.9 echo Hello
+----
++
+. After the container runs, we can view the process with the following command:
++
+[source,sh,role=execute]
+----
+podman ps -a 
+----
+
+[[security-score]]
+
+== Security Scoring
+
+Red Hat Quay can also help with securing our environments by providing a score for any images uploaded to our private registry.
+
+image::309-quay-security-score.png[Quay Security Score]
+
+NOTE: As of this lab writing this value may differ from the image scores provided by RHACS, however these two values will be synchronized beginning with updated releases in February 2024. (So it's possible this will be the case by the time you participate in this lab). 
+
+== Conclusion
+
+We hope you have enjoyed this lab exploring many of the features added when upgrading an OpenShift Container Platform subscription to OpenShift Platform Plus. At this time you have completed the tasks assigned in this lab, and you may freely explore the lab environment with the time you have remaining.
+

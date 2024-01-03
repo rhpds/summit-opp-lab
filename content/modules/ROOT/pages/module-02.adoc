@@ -615,39 +615,11 @@ oc new-project test
 oc run nonsense --image=test-nonsense:latest
 ----
 
-RHACS evaluates the policy and the Kubernetes admission controller rejects the new deployment:
+RHACS evaluates the policy and performs the default behavior by informing on the violation by the Kubernetes admission controller, creating a logged event.
 
-[source,texinfo,subs="attributes"]
-----
-Error from server (Failed currently enforced policies from StackRox): admission webhook "policyeval.stackrox.io" denied the request:
-The attempted operation violated 1 enforced policy, described below:
-Policy: Images with no scans
-- Description:
-    - Alert on deployments with images that have not been scanned
-- Rationale:
-    - Without a scan, there be no vulnerability information for this image
-- Remediation:
-    - Configure the appropriate registry and scanner integrations so that StackRox can
-      obtain scans for your images.
-- Violations:
-    - Image in container 'nonsense' has not been scanned
+image::248a-inform-action.png[Default Inform Action]
 
-In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
-----
-
-If RHACS is deployed without the admission controller webhook, RHACS still enforces the policy and scales down the deployment to 0 replicas:
-
-[source,sh,role=execute]
-----
-oc get events
-----
-
-[source,texinfo,subs="attributes"]
-----
-26s    Normal    ScalingReplicaSet      Deployment   Scaled up replica set ubuntu-5bdbf595b8 to 1
-25s    Warning   RHACS enforcement   Deployment   Deployment violated RHACS policy "Images with no scans" and was scaled down
-25s    Normal    ScalingReplicaSet      Deployment   Scaled down replica set ubuntu-5bdbf595b8 to 0
-----
+In our next section we will discuss how to configure RHACS to block container actions at either deploy-time or runtime.
 
 === Enforce Deploy-Time Policy on Misuse of Environment Variables
 
