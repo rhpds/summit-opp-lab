@@ -423,3 +423,512 @@ image::232-policy-mgmt-details.png[Policy Management Details]
 
 == Introduction to Network Segmentation
 
+Network Segmentation works by controlling how traffic flows among the parts. You may stop the traffic in one part from reaching another or limit the flow by traffic type, source, destination, and many other criteria. How you decide to segment your network is called a segmentation policy.
+
+Segmentation improves cybersecurity by limiting how far an attack can spread. For example, segmentation keeps a malware outbreak in one section from affecting systems in another.
+
+Using Kubernetes network policies in OpenShift, you can restrict open network paths for isolation and prevent lateral movement by attackers.
+
+=== Kubernetes Network Policies
+
+A Kubernetes network policy specifies how groups of pods are allowed to communicate with each other and with other network endpoints. These network policies are configured as YAML files. However, it is often hard to identify, just by looking at these files alone, whether the applied network policies achieve the desired network topology. Red Hat Advanced Cluster Security for Kubernetes (RHACS) gathers the defined network policies from your orchestrator and provides functionality to make these policies easier to use.
+
+Kubernetes Network Polices in RHACS make it easy for security focused users to:
+
+- Examine namespace and deployment details
+- Switch from the active view to the allowed connections view
+- Use the network policy simulator
+- Fix PCI compliance in the microservices demo application
+
+=== Explore Network Graphs
+
+The network graph combines a flow diagram, a firewall diagram, and a firewall rule builder in one view.
+
+. From the left, navigate to the Network Graph tab:
++
+image::233-network-graph-menu.png[Network Graph Menu]
++
+. In the upper left, there is a cluster menu. Select the production cluster, the backend namespace, and all the deployments associated with the namespace.
++
+image::234-network-namespace.png[Network Namespace/Deployments]
++
+. You can easily navigate between any of the clusters connected to RHACS.
+. The default view, *Active*, shows actual traffic for the past hour between the deployments in the namespaces.
+. You can change the time frame (in the upper left corner of the menu) and review the legend (in the bottom left corner).
+. Click on the *backend-atlas* deployment to get a sidebar to appear.
++
+image::235-backend-atlas.png[Backend-Atlas Analysis]
+
+=== Analyze the Network Traffic
+
+The *Details* section outlines the Network Security, Deployment configuration, and Exposed ports giving you useful information about the deployment’s security.
+
+The *Flows* section highlights the current network flows associated with the deployment.
+
+The *Baselines* section highlights the baseline network flows that ACS has recorded.
+
+The *Network Policies* section highlights if there are any network policies associated with the deployment.
+
+. In the *Flows* box at the upper right, add the *API-server* flow to the network baseline.
+
+image::236-add-to-baseline.png[Add to Baseline]
+
+Adding network activity accomplishes a similar goal as adding runtime activity that we like. By doing this, we can tell ACS what policy should be crafted around. You can create policies that inform you on anomalous traffic in the future.
+
+=== Examine Namespace and Deployment Details
+
+In the complete network graph, deployment names are not visible. Details of their flows and baselines are available when you zoom in on them. You can also view network flow details by hovering over the connecting lines.
+
+. Scroll or pinch to zoom in on the *payments* namespace. As you zoom in, the namespace boxes show the individual deployment names.
+. Click the dot representing the *visa-processor* deployment.
+- Selecting a deployment brings up details of the types of traffic observed, including source or destination and ports:
++
+image::237-visa-processor-aflows.png[Visa Processor Anomalous Flows]
++
+NOTE: Your *Anomalous Flows* list may be different.
++
+- Here, you can create a baseline for the active flows and trigger alerts for anomalous flows.
+- You can also switch to the *Network Policies* tab to investigate and download them.
+- The *Details* tab has general information about the deployment. 
++
+. Click away from the box to close it and see the whole network graph.
+
+[[net-pol-gen]]
+
+== Use Network Policy Generator
+
+OpenShift defaults to no egress or ingress restrictions on namespaces. This may be useful for proof of concepts, but it conflicts with best practices required under several compliance standards. The network policy simulator is designed to help solve this problem quickly and accurately by using the history of observed traffic to build firewall rules.
+
+- At the top right, click Network Policy Generator.
++
+image::238-network-policy-generator.png[Network Policy Generator]
++
+. Click the *Generate and simulate network policies* button.
++
+image::239-gen-sim-pol.png[Generate and Simulate Network Policies]
++
+. It will generate YAML for applying a new firewall policy based on the current environment.
++
+image::240-net-pol-yaml.png[Network Policy YAML]
+
+The firewall rules you are generating are not proprietary, but OpenShift-native NetworkPolicy objects. This feature, more than any other, illustrates the philosophy that RHACS represents: security through platform-native features with fixes supplied as configuration for OpenShift.
+
+Implementing stronger security through declarative statements avoids the **anti-pattern** of having configuration rules in a separate system. This code becomes part of your application, ensuring the consistency of a **single source of truth** for your codebase. This approach also reduces operational risk because there is no proprietary firewall in your cluster or in your pods that could fail, causing an application outage.
+
+RHACS leverages the firewall that is already in your OpenShift cluster. Throughout the product, you see this approach: **fix it in the code; leverage the platform**. 
+
+In our next next section we will demonstrate this functionality through examples of policy violations.
+
+[[fix-pci]]
+
+== Fix PCI Compliance in Microservices Demo Application
+
+[quote,PCI-DSS website,https://www.pcisecuritystandards.org]
+____
+The best way to maximize cardholder data security is to continuously monitor and enforce the use of controls specified in the PCI Data Security Standard.
+____
+
+RHACS continuously monitors and enforces policies and is aware of PCI-DSS compliance standards.
+
+In this section, you bring the *microservices-demo* application closer to compliance with RHACS.
+
+. Zoom in to the microservices-demo namespace, select one of the deployments, and examine the deployment details (on the right side):
++
+image::241-microservices-demo.png[Microservices Demo]
++
+. From the left, navigate to the *Compliance* page.
+. In the upper right, click *SCAN ENVIRONMENT*:
++
+image::242-compliance-dashboard.png[Compliance Dashboard]
++
+. On the top of the Compliance page, click Namespaces to see a report of compliance scores by namespace.
+. At the top, use the filter bar to restrict the view to the Namespace: *microservices-demo*.
+. Examine the results to see that the microservices-demo namespace has approximately 64% compliance for PCI, but with some significant gaps, especially on Control section 1, which addresses network isolation:
++
+image::243-filter-pci-64.png[Filter Microservices Demo 64%]
++
+. After you note the current compliance level, return to the Network Graph page. Next, you generate some network policies to improve the compliance score on the PCI benchmark.
+. At the top, use the filter bar to narrow the view to Namespace: *microservices-demo*. The network graph changes focus to only the *microservices-demo* namespace.
+. Click Network Policy Simulator and then Generate and simulate network policies:
++
+image::244-network-pol-sim.png[Network Policy Simulator]
++
+. Click *Apply Network Policies*.
+. Refresh and expect to see that the deployments in the *microservices-demo* namespace are *blue*, indicating that they have network policies applied. The PCI compliance score increases for the *microservices-demo* namespace, because those network policies meet the requirements for isolation of retail applications that handle cardholder data.
+. Navigate back to *Compliance* and click *Scan Environment*. After the compliance scan completes, you can see that the *PCI score* has increased.
+. Enter Namespace: *microservices-demo* into the filter bar to restrict the view to the microservices-demo namespace.
+. Examine the results to see that the *microservices-demo* namespace has approximately 79% compliance for PCI:
++
+image::245-filter-pci-79.png[Filter Microservices Demo 79%]
+
+RHACS makes it easy to analyze the network security of your OpenShift clusters and helps you take advantage of OpenShift’s built-in firewall protections.
+
+To support network policy enforcement, you used Red Hat Advanced Cluster Security for Kubernetes to do the following:
+
+- Examine the network and individual deployments in the network graph
+- Create network policies in the network policy simulator
+- Apply network policies with the generator
+- Bring deployments closer to PCI DSS compliance by implementing appropriate network policies
+
+[[deploy-enforce]]
+
+== Introduction to Deploy-Time Policy Enforcement
+
+In this lab, you explore how Red Hat Advanced Cluster Security for Kubernetes (RHACS) can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+There are two approaches to enforcing deploy-time policies in RHACS:
+
+- In clusters with **listen** and **enforce** AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
+- In clusters where the enforcement option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
+
+In this lab, the enforcement action output that is documented assumes that the AdmissionController deployment is created with the listen and enforce options enabled.
+
+- Prevent unscanned images from deployment
+- Prevent misuse of environment variables at deploy time
+
+== Prevent Unscanned Images from Deployment
+
+RHACS can block the deployment of container images that were not scanned for vulnerabilities either by the RHACS Scanner or other, third-party vulnerability scanners. Enforcing the use of vulnerability scanning is an important part of general security practices and in industry and regulatory standards like NIST 800-190, PCI-DSS, and HIPAA.
+
+=== Configure Admission Controller
+
+Using admission controller enforcement for image-based scanning requires enabling the AdmissionController deployment and configuring it to contact image scanners.
+
+. Verify that admission controller and image scanning are set up properly by navigating to Platform Configuration → Clusters → Production and verifying that the following settings are enabled:
++
+image::246-settings-enabled.png[Verify Settings Enabled]
++
+image::247-dynamic-config.png[Dynamic Configuration]
++
+NOTE: Before configuring this lab, be aware that enforcing this policy blocks all deployments that use images for which RHACS Central cannot retrieve results. For more information, review the RHACS help for Scanner and Image Registries.
++
+. Navigate to Platform Configuration → Policy Management, find the Images with no scans policy through the filter, and select it to open the side panel.
++
+image::248-image-noscan.png[Images with No Scans]
++
+. On the first page, click Edit and enable the policy. This policy rejects attempts to deploy an image that has no scanning status.
+. On your student VM, use Kubernetes to deploy a deliberately nonsensical image with no scans:
+
+[source,sh,role=execute]
+----
+oc new-project test
+oc run nonsense --image=test-nonsense:latest
+----
+
+RHACS evaluates the policy and the Kubernetes admission controller rejects the new deployment:
+
+[source,texinfo,subs="attributes"]
+----
+Error from server (Failed currently enforced policies from StackRox): admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+Policy: Images with no scans
+- Description:
+    - Alert on deployments with images that have not been scanned
+- Rationale:
+    - Without a scan, there be no vulnerability information for this image
+- Remediation:
+    - Configure the appropriate registry and scanner integrations so that StackRox can
+      obtain scans for your images.
+- Violations:
+    - Image in container 'nonsense' has not been scanned
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
+----
+
+If RHACS is deployed without the admission controller webhook, RHACS still enforces the policy and scales down the deployment to 0 replicas:
+
+[source,sh,role=execute]
+----
+oc get events
+----
+
+[source,texinfo,subs="attributes"]
+----
+26s    Normal    ScalingReplicaSet      Deployment   Scaled up replica set ubuntu-5bdbf595b8 to 1
+25s    Warning   RHACS enforcement   Deployment   Deployment violated RHACS policy "Images with no scans" and was scaled down
+25s    Normal    ScalingReplicaSet      Deployment   Scaled down replica set ubuntu-5bdbf595b8 to 0
+----
+
+=== Enforce Deploy-Time Policy on Misuse of Environment Variables
+
+In this section, you explore using RHACS to prevent the deployment of applications that mishandle sensitive data (such as account keys, certificates, or passwords).
+
+Container-based microservices applications face challenges when providing sensitive information like passwords to running containers. For example, an e-commerce application may have an order status microservice that needs to read records from a database that requires a username and password to execute queries. It is a critical security practice to keep passwords private.
+
+Unfortunately, several methods for distributing secrets that have come into common use fail to protect sensitive content or restrict access to secrets. One of these insecure methods is to store sensitive data in the clear in Kubernetes deployment YAML files. This section demonstrates how RHACS can bring this misuse to light and encourage a developer to use a proper secrets management method.
+
+RHACS also has a separate feature for visibility into the Kubernetes Secrets feature, a method for distributing secrets to deployments natively in Kubernetes. For more information, see the RHACS documentation.
+
+This section demonstrates two separate enforcement points for policies: at build time (perhaps as part of a CI/CD job) and at deployment time in a Kubernetes cluster.
+
+. Create the following Deployment manifest on your student VM:
++
+[source,sh,role=execute]
+----
+cat << EOF >$HOME/secrets.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:18.04
+        env:
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "abcdefg"
+EOF
+----
++
+. In the Platform Configuration → Policy Management page of the RHACS web console, locate the *Environment Variable Contains Secret* policy.
+. Click the *Actions* drop down and enable the policy. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
+. Supply the file containing this YAML to roxctl on your student VM to run the Deployment check:
++
+[source,sh,role=execute]
+----
+roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file ./secrets.yaml --insecure-skip-tls-verify
+----
++
+. Among the policy violations, review the output and expect to see the following:
++
+[source,texinfo,subs="attributes"]
+----
+Policy check results for deployments: [ubuntu]
+(TOTAL: 5, LOW: 2, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| Environment Variable Contains  |   HIGH   |       X       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
+|             Secret             |          |               |            |   environment variables that   |   'AWS_SECRET_ACCESS_KEY' is   |    environment variables to    |
+|                                |          |               |            |        contain 'SECRET'        | present in container 'ubuntu'  |    orchestrator secrets or     |
+|                                |          |               |            |                                |                                |  your security team's secret   |
+|                                |          |               |            |                                |                                |      management solution.      |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| No resource requests or limits |  MEDIUM  |       -       |   ubuntu   | Alert on deployments that have | - CPU limit set to 0 cores for |    Specify the requests and    |
+|           specified            |          |               |            |  containers without resource   |       container 'ubuntu'       |  limits of CPU and Memory for  |
+|                                |          |               |            |      requests and limits       |                                |        your deployment.        |
+|                                |          |               |            |                                |  - CPU request set to 0 cores  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                | - Memory limit set to 0 MB for |                                |
+|                                |          |               |            |                                |       container 'ubuntu'       |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                |  - Memory request set to 0 MB  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Pod Service Account Token    |  MEDIUM  |       -       |   ubuntu   |  Protect pod default service   |    - Deployment mounts the     |              Add               |
+|     Automatically Mounted      |          |               |            | account tokens from compromise |    service account tokens.     | `automountServiceAccountToken: |
+|                                |          |               |            |   by minimizing the mounting   |                                |   false` or a value distinct   |
+|                                |          |               |            |     of the default service     | - Namespace has name 'default' |     from 'default' for the     |
+|                                |          |               |            |  account token to only those   |                                |    `serviceAccountName` key    |
+|                                |          |               |            |     pods whose application     |  - Service Account is set to   |    to the deployment's Pod     |
+|                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
+|                                |          |               |            |        Kubernetes API.         |                                |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
+|  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
+|          Been Created          |          |               |            |                                |                                |         the root user          |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
+|             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
+|                                |          |               |            |     Debian/Ubuntu package      |            1.6.14)             |  --force-all debconf dpkg` in  |
+|                                |          |               |            |    management system in the    |                                | the image build for production |
+|                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
+|                                |          |               |            |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |            |                                |       1.19.0.5ubuntu2.3)       |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:   A total of 5 policies have been violated
+ERROR:  failed policies found: 1 policies violated that are failing the check
+ERROR:  Policy "Environment Variable Contains Secret" within Deployment "ubuntu" - Possible remediation: "Migrate your secrets from environment variables to orchestrator secrets or your security team's secret management solution."
+ERROR:  checking deployment failed after 3 retries: failed policies found: 1 policies violated that are failing the check
+----
++
+In a CI/CD pipeline service, this output is available to the developer via the job’s console output, and the job fails because of this failed roxctl check.
++
+If a developer were to bypass the CI/CD checks, or deploy manually without any build-time controls, RHACS can still enforce policies at deployment time. RHACS does this by using policy evaluation and admission controller enforcement.
++
+. To see this in action, deploy the secrets file:
++
+[source,sh,role=execute]
+----
+oc create -f secrets.yaml
+----
++
+[source,texinfo,subs="attributes"]
+----
+Error from server (Failed currently enforced policies from StackRox): error when creating "secrets.yaml": admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+
+Policy: Environment Variable Contains Secret
+- Description:
+    - Alert on deployments with environment variables that contain 'SECRET'
+- Rationale:
+    - Using secrets in environment variables may allow inspection into your secrets
+      from the host or even through the orchestrator UI.
+- Remediation:
+    - Migrate your secrets from environment variables to orchestrator secrets or your
+      security team's secret management solution.
+- Violations:
+    - Environment variable 'AWS_SECRET_ACCESS_KEY' is present in container 'ubuntu'
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
+----
+
+In this lab, you explored how RHACS can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+You saw how to use the AdmissionController with the listen and enforce options enabled to reject deployments that violate policy.
+
+In clusters where the enforcement option is disabled, you saw how RHACS scales pod replicas to zero for deployments that violate policy.
+
+[[runtime-enforce]]
+
+== Introduction to Runtime Policy Enforcement
+
+RHACS observes container processes and collects this information to enable you to craft policies to prevent behavior that you don’t like. This information can also create baseline policy configurations that the user can update.
+
+The example below demonstrates how security may want to block a package manager from downloading any packages to the container. This runtime enforcement option is the first in the process of shifting left. After runtime enforcement, you will want to stop the package manager from being used in the container altogether.
+
+=== Prevent Execution of Package Manager Binary
+
+Package managers like apt (Ubuntu), apk (Alpine), or yum/dnf (RedHat) are binary software components used to manage and update installed software on a Linux® host system. They are used extensively to manage running virtual machines. But using a package manager to install or remove software on a running container violates the immutable principle of container operation.
+
+This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift® to terminate the pod for enforcement. Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state where the container is operating. Furthermore, because a runtime policy may detect only part of an attacker’s activity inside a container, removing the container avoids the attack.
+
+=== Enable Enforcement of Policy
+
+. Navigate to *Platform Configuration → Policy Management* and find the *Ubuntu Package Manager Execution* policy.
+. On the *Policy Management* page, type *Policy + Ubuntu* into the filter bar at the top.
+. Select the policy *Ubuntu Package Manager Execution*.
+. Click the *Actions* button then click *Edit policy*.
+. Select the *Policy Behavior* tab.
+. Enable runtime enforcement by clicking the *inform and enforce* button.
+. Configure enforcement behavior by selecting *Enforce at Runtime*.
++
+image::249-enforce-runtime.png[Enforce Runtime Policy]
++
+. Click save.
+
+IMPORTANT: Make sure to save the policy changes! If you do not save the policy the process will not be blocked!
+
+=== Testing the Configured Policy
+
+Next, we will use tmux to watch OpenShift events while running the test, so you can see how RHACS enforces the policy at runtime.
+
+. On your student VM, start tmux with two panes:
++
+[source,sh,role=execute]
+----
+tmux new-session \; split-window -v \; attach
+----
++
+. Next, run a watch on OpenShift events in the first shell pane:
++
+[source,sh,role=execute]
+----
+oc get events -w
+----
++
+. Press *Ctrl+b, o* to switch to the next pane. (Ctrl+b THEN o)
+. Run a temporary Ubuntu OS image using the tmp-shell application:
++
+[source,sh,role=execute]
+----
+oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
+----
++
+NOTE: After the cluster pulls the image and starts the pod, expect to see a Linux command shell as shown.
++
+[source,texinfo,subs="attributes"]
+----
+If you don't see a command prompt, try pressing enter.
+root@tmp-shell:/#
+----
++
+. Run the package manager in this shell:
++
+[source,sh,role=execute]
+----
+apt update
+----
++
+. Examine the output and expect to see that the package manager attempts to perform an update operation:
++
+[source,texinfo,subs="attributes"]
+----
+Get:1 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
+0% [1 InRelease 14.2 kB/242 kB 6%] [Connecting to security.ubuntu.com (2620:2d:4000:1::16)]Sess
+ion ended, resume using 'oc attach tmp-shell -c tmp-shell -i -t' command when the pod is running
+No resources found
+----
++
+. Examine the oc get events tmux pane (The pane on the bottom), and note that it shows that RHACS detected the package manager invocation and deleted the pod:
++
+[source,texinfo,subs="attributes"]
+----
+0s          Normal    Scheduled              pod/tmp-shell   Successfully assigned tok-00-project/tmp-shell to ip-10-0-239-17.us-east-2.compute.internal
+0s          Normal    AddedInterface         pod/tmp-shell   Add eth0 [10.128.1.130/23] from openshift-sdn
+0s          Normal    Pulled                 pod/tmp-shell   Container image "ubuntu:18.04" already present on machine
+0s          Normal    Created                pod/tmp-shell   Created container tmp-shell
+0s          Normal    Started                pod/tmp-shell   Started container tmp-shell
+0s          Warning   StackRox enforcement   pod/tmp-shell   A pod (tmp-shell) violated StackRox policy "Ubuntu Package Manager Execution" and was killed
+0s          Normal    Killing                pod/tmp-shell   Stopping container tmp-shell
+----
++
+NOTE: After about 30 seconds you can see the pod is deleted.
++
+. In your tmux shell pane, note that your shell session has terminated and that you are returned to the student VM command line.
++
+NOTE: You can always type exit into the terminal or reload the terminal using the button on the top right of the workshop environment.
++
+[source,texinfo,subs="attributes"]
+----
+[~] $ oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
+If you don't see a command prompt, try pressing enter.
+root@tmp-shell:/# apt update
+Get:1 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
+0% [1 InRelease 14.2 kB/242 kB 6%] [Connecting to security.ubuntu.com (2620:2d:4002:1::102)]Session ended, resume using 'oc attach tmp-shell -
+c tmp-shell -i -t' command when the pod is running
+No resources found
+[~] $
+----
+
+Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged!
+
+[[report-resolve]]
+
+== Report and Resolve Violations
+
+At this point, any attacker using a shell to install software is now disconnected from the environment. A complete record of the event is available on the *Violations* page.
+
+. Navigate to the *Violations* page.
+. Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
+. Click the most recent violation and explore the list of the violation events:
++
+image::250-violations.png[Violations Menu]
++
+If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration, and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
++
+After this issue is addressed, in this case by the RHACS product using the runtime enforcement action, you can remove it from the list by marking it as *Resolved*.
++
+. Lastly, hover over the violation in the list to see the resolution options and resolve this issue as operator error.
+
+image::251-resolve-violation.png[Resolve Violations]
+
+For more information about integration with SIEM tools, see the RHACS help documentation on external tools.
+
+Congratulations! You successfully stopped packages from being downloaded to the host by setting a runtime enforcement policy.
+
+== Conclusion
+
+In summary, we made use of the features provided by Red Hat Advanced Cluster Security for Kubernetes to display potential security violations in your cluster in a central dashboard. We also used the default tools to examine known image vulnerabilities and network communication and segmentation in our cluster. Lastly we crafted both deploy-time and runtime policies to help prevent malicious events from occurring in our cluster. Hopefully this lab has helped demonstrate to you the immense value provided by RHACS and OpenShift Platform Plus. Please feel free to continue and explore the RHACS lab environment, or continue on to the next portion of the lab at your leisure.

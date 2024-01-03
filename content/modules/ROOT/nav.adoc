@@ -16,6 +16,11 @@
 ** xref:module-02.adoc#vuln-mgmt[Vulnerability Management]
 ** xref:module-02.adoc#policy-mgmt[Policy Management]
 ** xref:module-02.adoc#network-seg[Introduction to Network Segmentation]
+** xref:module-02.adoc#net-pol-gen[Use Network Policy Generator]
+** xref:module-02.adoc#fix-pci[Fix PCI Compliance in Microservices Demo Application]
+** xref:module-02.adoc#deploy-enforce[Introduction to Deploy-Time Policy Enforcement]
+** xref:module-02.adoc#runtime-enforce[Introduction to Runtime Policy Enforcement]
+** xref:module-02.adoc#report-resolve[Report and Resolve Violations]
 
 
 * xref:module-03.adoc[3. Red Hat Quay]
