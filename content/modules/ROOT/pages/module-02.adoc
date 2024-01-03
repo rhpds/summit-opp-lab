@@ -247,16 +247,179 @@ image::214-dashboard-dropdown.png[Dashboard Drop-down]
 
 If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities.
 
-You can customize the information displayed on the dashboard by default in order to find the items that you consider most important to your deployments and your business' security.
+With these widgets, you can customize the information displayed on the dashboard by default in order to find the items that you consider most important to your deployments and your business' security.
 
 [[vuln-mgmt]]
 
-== The Vunerability Management Dashboard
+== The Vulnerability Management Dashboard
+
+Let us continue by looking at our primary use case for RHACS and that is the Vulnerability Management features and dashboard, a familiar topic for most security teams.
+
+IMPORTANT: The locations and size of your panels may vary depending on your screen size and zoom.
+
+NOTE: For the following section, please note that the order in which the images appear or the number of components affected may vary depending on versions and other applications running in the cluster.
+
+. Click the *Vulnerability Management (1.0)* tab, and then select *Dashboard*
++
+image::215-vuln-dashboard.png[Vulnerability Management Dashboard]
++
+The dashboard provides several important vulnerability breakdowns such as:
++
+- Top risky deployments/images
+- Recently detected image vulnerabilities
+- Most common image vulnerabilities
++
+More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. RHACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container’s configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
++
+image::216-top-risky.png[Riskiest Deployments]
++
+. Above the *Risky Deployments* section, there are buttons to link you to all policies, CVEs, and images, and a menu to bring you to reports by cluster, namespace, deployment, and component. The vulnerability dashboard can be filtered by clicking the Fixable CVSS score button.
++
+image::217-policy-buttons.png[Top Policy Buttons]
++
+. Locate the *Top Riskiest Images* panel. Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the *log4shell* exploit in your cluster and block that container from being pushed in the future.
++
+image::218-riskiest-images.png[Riskiest Images]
++
+. In the *Top Riskiest Images* panel, click on the *VIEW ALL* button.
++
+The images in this dashboard are listed here in order of RISK, based on the number and severity of the vulnerabilities present in the components in the images
++
+Notice which images are more exposed. Not only can we see the number of CVEs affecting the images, but which of them are fixable? We can also see:
++
+- Creation date
+- Scan time
+- Image OS
+- Image status
+- How many deployments are using the vulnerable image
+- The total components in the image
++
+. Next, find and click on the image *visa-processor:latest-v2*. You will review the images' components and violations.
++
+image::219-visa-proc.png[Visa Processor Image]
++
+NOTE: If you cannot find the visa-processor:latest-v2 image, use the search bar to filter for the specific image you want.
++
+If you click the search bar, you will be shown the different labels you can search by. Click Image and type visa until the correct image comes up.
++
+You can use this method of searching in all search bars within the RHACS dashboard.
++
+image::220-search-bar.png[Search Bar]
++
+You can move on to the next section only when the dashboard displays the image below.
++
+image::221-image-info.png[Image Info]
 
 
+=== RHACS Vulnerability Scanner
+
+RHACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The Image Summary provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
+
+- In the DETAILS & METADATA → Image OS panel, the information you see there tells you that this image has a severe security problem - the base image was imported several years ago (Debian 8 - 2015).
+- At the top of the page is the warning that CVE data is stale - that this image has a base OS version whose distribution has stopped providing security information and likely stopped publishing security fixes.
+- Scroll down the page. In the Image Findings section, you find the details of the image vulnerabilities. There are 535 fixable vulnerabilities in the cluster (at the time of the creation of this workshop.)
++
+image::222-fix-vulns.png[Fixable Vulnerabilities]
++
+- Above the Image Findings section, click on the *Dockerfile* tab:
++
+image::223-dockerfile.png[Dockerfile View]
++
+The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, RHACS will display newly discovered CVEs.
+
+*Now let's put this UI to the test with a real use case!*
 
 
+=== log4shell CVE Vulnerability Analysis
+
+It is time to find the components that have the log4shell vulnerability in your cluster. Zero day and high priority vulnerabilities need to be triaged quickly. The log4shell vulnerability provides a great example of how security teams can assess a vulnerability's impact quickly and effectively.
+
+Check out the Red Hat advisory for more details:
+
+. Head back to the *Top Riskiest Images* Dashboard. (Vulnerability Management → Top Riskiest Images)
++
+image::224-riskiest-images2.png[Riskiest Images]
++
+. Search for the log4shell vulnerability using its CVE number (*CVE-2021-44228*)
++
+image::225-log4shell-search.png[log4shell Search]
++
+- How many images are affected by the vulnerability?
+- How many deployments contain the vulnerability?
+- Why do you think the risk priority is where it is?
+- Should the risk priority be higher? Or lower?
+
+NOTE: The log4shell CVE is very serious - scoring 10/10 - and is fixable.
+
+Luckily there is only *ONE* image being affected by this vulnerability (2 deployments), so you could go directly to the source and fix all three deployments in one opportunity.
+
+*How would your DevSecOps team address this vulnerability?*
 
 
+=== Relating Image CVEs with Kubernetes Configuration Properties
 
+All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? RHACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
+
+The first *risk factor* - is the vulnerable component in a running deployment.
+
+. Click on the *Risk* panel to continue.
++
+image::226-risk-panel.png[Risk Panel]
++
+Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why we must ask ourselves, is it down to a priority of 12 in this example now?
++
+image::227-log4shell-risk.png[Log4Shell Risk]
++
+. Click on the log4shell deployment and review the risk indicators.
++
+image::228-log4shell-info.png[Log4Shell Info]
++
+. Next, click on the visa-processor deployment and review its risk indicators. What do you think made the visa-processor deployment #1 in this example?
++
+image::229-visa-processor.png[Visa Processor Info]
++
+Factors that play into the overall score are in the risk indicators section. These include, but are not limited to:
++
+- Policy Violations
+- Image Vulnerabilities
+- Service Configuration
+- Service Reachability
+- Components Useful for Attackers
+- Number of Components in an Image
+- Image Freshness
+- RBAC Configuration
+
+A primary reason for the visa-processor deployment to be ranked so high is that it is an ancient image (older than the log4shell app). A good indicator of risk is that the older an image is, the more likely it will have a significant exploitable vulnerability.
+
+We will leave it to you to make your own risk assessments in the future. 
+
+Now, let us move along to enforcing a log4shell policy and stopping future deployments containing the vulnerability.
+
+[[policy-mgmt]]
+
+== Policy Management
+
+RHACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - RHACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature, to improve security in a measurable way from now on.
+
+We want to use runtime incidents and vulnerabilities as a learning opportunity to improve security going forward by constraining how our containers can act. We achieve this by creating policies and implementing them early in the CI/CD process.
+
+As we move into this next section, lets focus on identifying and enforcing a runtime policy in the cluster. For the upcoming example, we will focus on stopping the Ubuntu package manager from being run on pods in our cluster.
+
+. On the left-hand side of the application, click the *Platform Configuration* tab and select *Policy Management*.
++
+image::230-policy-mgmt-dashboard.png[Policy Management Dashboard]
++
+. Filter through the policies to find *Ubuntu Package Manager Execution* or use the search bar to select by *category*.
++
+image::231-policy-search.png[Policy Management Search]
++
+. Once you have found the policy *Ubuntu Package Manager Execution*, click on it to learn more.
++
+image::232-policy-mgmt-details.png[Policy Management Details]
++
+. If you click the actions button, you will see how easy it is to edit, clone, export or disable these policies. We also recommended cloning the policies and adding or removing specific filters as you need them.
+
+[[network-seg]]
+
+== Introduction to Network Segmentation
 

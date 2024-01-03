@@ -14,6 +14,9 @@
 ** xref:module-02.adoc#con-vuln[Introducing the RHACS Console and Vulnerability Management]
 ** xref:module-02.adoc#nav-con[Navigate the Console]
 ** xref:module-02.adoc#vuln-mgmt[Vulnerability Management]
+** xref:module-02.adoc#policy-mgmt[Policy Management]
+** xref:module-02.adoc#network-seg[Introduction to Network Segmentation]
+
 
 * xref:module-03.adoc[3. Red Hat Quay]
 ** xref:module-03.adoc#introduction[Introduction]
