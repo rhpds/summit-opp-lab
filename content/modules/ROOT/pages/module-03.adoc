@@ -4,6 +4,8 @@ In this session, participants will learn how to install and configure Quay, incl
 
 The goal of this portion of the lab is to show the value that Quay provides for local image management, and also how OpenShift Data Foundation can be used to provide peristent storage for applications deployed in the cluster, such as image repositories.
 
+IMPORTANT: Several of the following tasks require use of the CLI, and should be run from the *Bastion* host in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
+
 If you have questions at any time, please don’t hesitate to ask!
 
 [[quay-install]]
@@ -49,7 +51,7 @@ Now that Quay is installed, we need to configure it to be able to host our image
 oc get route -n openshift-operators 
 ----
 +
-NOTE: Look for the route with Quay in it's name, you can set it as an environment variable, or fill it in manually to the commands that follow.
+NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, or fill it in manually to the commands that follow.
 +
 [source,sh,role=execute]
 ----
@@ -58,22 +60,34 @@ export QUAY_URL=<quay_url>
 +
 . After opening the Quay UI, click on *Create Account* and fill in your account details.
 +
+NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later.
++
 image::307-quay-create-account.png[Create Quay Account]
 +
-. Using the workshop terminal, login to quay using the podman cli as shown below:
+. Once we have created our quay login we can create our first repository by clicking the *Create New Repository* button.
 +
-[source,sh,role=execute]
-----
-podman login $QUAY_URL 
-----
+image::308-create-repo.png[Create Quay Repo]
++
+. We can name this repository *rh1-lab* and make it public or private so we can choose who has access to it.
++
+image::309-name-repo.png[Name Quay Repo]
 
-NOTE: Use the credentials you just created to complete the login process.
+NOTE: In addition to creating a repository in the Quay console, we can create one by pushing an image and defining the repository name on the command line. We will do this in our next lab step.
 
 [[working-images]]
 
 == Working With Images
 
-For a simple task of working with Quay we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ubi image.
+For a simple task to demonstrate the functionality of Quay, we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ubi image.
+
+. Using the terminal on the bastion host, login to quay using the podman cli as shown below:
++
+[source,sh,role=execute]
+----
+podman login $QUAY_URL 
+----
++
+NOTE: Use the credentials you just created to complete the login process.
 
 . Pull the ubi image with the following cli command:
 +
@@ -86,23 +100,38 @@ podman pull registry.access.redhat.com/ubi8/ubi:8.9-1028
 +
 [source,sh,role=execute]
 ----
-podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/admin/ubi:8.98.9-1028
+podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/admin/ubi/ubi:8.9
 ----
 +
 [source,sh,role=execute]
 ----
-podman push $QUAY_URL/admin/ubi:8.9 --remove-signatures
+podman push $QUAY_URL/admin/ubi/ubi:8.9 --remove-signatures
 ----
 +
 . Once the image is successfully pushed, we can browse the Quay UI to validate it.
 +
-image::308-uploaded-image.png[Uploaded Image]
+. Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created ubi one.
++
+image::310-quay-repos.png[Quay Repositories]
 +
 . We can do a simple test with our newly pushed image by pulling it and running an *Echo* command.
 +
 [source,sh,role=execute]
 ----
-podman run $QUAY_URL/admin/ubi:8.9 echo Hello
+podman run $QUAY_URL/admin/ubi/ubi:8.9 echo Hello
+----
++
+[source,texinfo,subs="attributes"]
+----
+[demo-user@bastion ~]$ podman run $QUAY_URL/admin/ubi/ubi:8.9 echo Hello
+Trying to pull quay-registry-quay-openshift-operators.apps.cluster-tww6x.tww6x.sandbox916.opentlc.com/admin/ubi/u
+bi:8.9...
+Getting image source signatures
+Copying blob b4e744f5f131 done
+Copying config 86b358a425 done
+Writing manifest to image destination
+Storing signatures
+Hello
 ----
 +
 . After the container runs, we can view the process with the following command:
@@ -112,17 +141,42 @@ podman run $QUAY_URL/admin/ubi:8.9 echo Hello
 podman ps -a 
 ----
 
-[[security-score]]
+[[security-scan]]
 
-== Security Scoring
+== Security Scanning
 
-Red Hat Quay can also help with securing our environments by providing a score for any images uploaded to our private registry.
+Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
 
-image::309-quay-security-score.png[Quay Security Score]
+We can use the following procedure to check the security scan results for our UBI image we just uploaded.
 
-NOTE: As of this lab writing this value may differ from the image scores provided by RHACS, however these two values will be synchronized beginning with updated releases in February 2024. (So it's possible this will be the case by the time you participate in this lab). 
+. Click on the ubi repository and once inside click on the tags button on the left.
++
+image::311-image-tags.png[Image Tag Menu]
++
+NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
++
+. By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
++
+image::312-quay-sec-scan.png[Quay Security Scan]
++
+NOTE: The ubi image we are using in this lab shows 36 medium vulnerabilities, and 187 total when you hover over it at the time of this lab's creation.
++
+. Click on the list of vulnerabilities to see a more detailed view.
++
+image::313-security-details.png[Image Security Details] 
++
+. Click the packages button on the left menu to see which specific packages in the image are affected by what vulnerabilities.
++
+image::314-image-packages.png[Image Packages]
++
+Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
+
+
+IMPORTANT: As of the creation date of this lab the list of vulnerabilties and the scores assigned to the images may differ from those provided by the image scanning tools available in Red Hat Advanced Cluster Security for Kuberenetes. Beginning with updated versions to be released in Spring of 2024 these values will begin to coalesce. It's entirely possible this will be the case by the time you participate in this lab, if you attempt to replicate outside of this lab environment. 
 
 == Conclusion
 
-We hope you have enjoyed this lab exploring many of the features added when upgrading an OpenShift Container Platform subscription to OpenShift Platform Plus. At this time you have completed the tasks assigned in this lab, and you may freely explore the lab environment with the time you have remaining.
+We hope you have enjoyed this lab using Red Hat Quay to create and host your own repository, upload and use an image, and examine the image for security vulnerabilites. 
+Overall this lab has been dedicated to exploring many of the features added when upgrading an OpenShift Container Platform subscription to OpenShift Platform Plus. 
+At this time you have completed all of the tasks assigned in this lab, and you may freely explore the lab environment with the time you have remaining.
 
