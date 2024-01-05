@@ -29,8 +29,9 @@ At a high level Cluster Lifecycle management is about creating, upgrading, and d
 
 In the demo console where you have all the credentials, you will find the OCP Console URL, Username and Password, AWS credentials, Access Key ID, Secret Access Key, and the Base DNS Domain.
 
-- To get started, switch over to the OpenShift Console https://console-openshift-console.apps.cluster-pbpsm.pbpsm.sandbox1327.opentlc.com
+- To get started, switch over to the OpenShift Console tab.
 - Remember that the login is *kubeadmin* and the password is: *dd3aF-yuHGT-janMV-Aq7gr*
+- Also, if you want to work with the cluster in the terminal, you will need to perform an 'oc login' command with the login info and token available in the console.
 
 Once you have logged in to OpenShift Console, navigate to the *Cluster* drop down menu and then select *All Clusters*. 
 
