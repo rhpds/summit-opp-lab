@@ -72,6 +72,13 @@ The OpenShift API is available at: {openshift_api_url}
 
 The `oc` command line utility is available for download at: {openshift_client_download_url}
 
+You can authenticate to the cluster in the terminal using the *oc login* command, like so:
+
+[source,sh,role=execute,subs="attributes"]
+----
+oc login -u kubeadmin -p {openshift_kubeadmin_password} {openshift_api_url}
+----
+
 === RHACS Console Access
 
 Your RHACS Console is available at: {acs_route}

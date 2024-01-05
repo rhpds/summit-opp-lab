@@ -28,5 +28,3 @@
 ** xref:module-03.adoc#configure-registry[Configuring Your Registry]
 ** xref:module-03.adoc#working-images[Working With Images]
 ** xref:module-03.adoc#security-scan[Security-Scanning]
-
-
