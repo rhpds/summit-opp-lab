@@ -238,11 +238,11 @@ image::114-policy-toggle.png[Display the YAML]
 
 [source,yaml]
 ----
-
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: policy-configure-subscription-admin-hub
+  namespace: ""
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -251,7 +251,7 @@ spec:
   remediationAction: inform
   disabled: false
   policy-templates:
-- objectDefinition:
+    - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
@@ -267,26 +267,26 @@ spec:
                 metadata:
                   name: open-cluster-management:subscription-admin
                 rules:
-                - apiGroups:
-                  - app.k8s.io
-                  resources:
-                  - applications
-                  verbs:
-                  - '*'
-                - apiGroups:
-                  - apps.open-cluster-management.io
-                  resources:
-                  - '*'
-                  verbs:
-                  - '*'
-                - apiGroups:
-                  - ""
-                  resources:
-                  - configmaps
-                  - secrets
-                  - namespaces
-                  verbs:
-                  - '*'
+                  - apiGroups:
+                      - app.k8s.io
+                    resources:
+                      - applications
+                    verbs:
+                      - "*"
+                  - apiGroups:
+                      - apps.open-cluster-management.io
+                    resources:
+                      - "*"
+                    verbs:
+                      - "*"
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - configmaps
+                      - secrets
+                      - namespaces
+                    verbs:
+                      - "*"
             - complianceType: musthave
               objectDefinition:
                 apiVersion: rbac.authorization.k8s.io/v1
@@ -294,42 +294,46 @@ spec:
                 metadata:
                   name: open-cluster-management:subscription-admin
                 roleRef:
+                  name: open-cluster-management:subscription-admin
                   apiGroup: rbac.authorization.k8s.io
                   kind: ClusterRole
-                  name: open-cluster-management:subscription-admin
                 subjects:
-                - apiGroup: rbac.authorization.k8s.io
-                  kind: User
-                  name: kube:admin
-                - apiGroup: rbac.authorization.k8s.io
-                  kind: User
-                  name: system:admin
+                  - name: kube:admin
+                    apiGroup: rbac.authorization.k8s.io
+                    kind: User
+                  - name: system:admin
+                    apiGroup: rbac.authorization.k8s.io
+                    kind: User
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-configure-subscription-admin-hub
+  name: policy-configure-subscription-admin-hub-placement
+  namespace: ""
 placementRef:
-  name: placement-policy-configure-subscription-admin-hub
+  name: policy-configure-subscription-admin-hub-placement
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-configure-subscription-admin-hub
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
+  - name: policy-configure-subscription-admin-hub
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
+kind: Placement
 metadata:
-  name: placement-policy-configure-subscription-admin-hub
+  name: policy-configure-subscription-admin-hub-placement
+  namespace: ""
 spec:
   clusterConditions:
-  - status: "True"
-    type: ManagedClusterConditionAvailable
+    - status: "True"
+      type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-      - {key: name, operator: In, values: ["local-cluster"]}
-
+      - key: name
+        operator: In
+        values:
+          - local-cluster
 ----
 
 - Enter a namespace to place the policy, the *default* namespace is OK to use.
