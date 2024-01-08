@@ -320,7 +320,7 @@ subjects:
     apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
-kind: Placement
+kind: PlacementRule
 metadata:
   name: policy-configure-subscription-admin-hub-placement
   namespace: ""
