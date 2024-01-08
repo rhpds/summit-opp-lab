@@ -59,7 +59,7 @@ It is actually running inside the cluster that you will be interacting with.
 
 === OpenShift Console Access
 
-Your OpenShift cluster console is available at: {openshift_console_url}
+Your OpenShift cluster console is available at: {openshift_console_url}[OpenShift Console,window=_blank]
 
 You can access the workshop at: https://dashboard-lab-ocp-cns.{openshift_cluster_ingress_domain}
 
