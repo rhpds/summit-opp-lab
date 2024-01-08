@@ -27,11 +27,11 @@ Lets get started!
 
 At a high level Cluster Lifecycle management is about creating, upgrading, and destroying and importing clusters in a multi cloud environment, whether they may be traditional OpenShift Clusters, managed environments like ROSA or ARO, or specialized cluster deployments like Hosted Control Planes or Single-Node OpenShift.
 
-NOTE: Please reference the introduction page to find the credentials required to login to your lab environment are found on the intro page.
+NOTE: Please reference the introduction page to find the credentials required to login to your lab environment.
 
-Once you have logged in to OpenShift Console, navigate to the *Cluster* drop down menu and then select *All Clusters*. 
+Once you have logged in to OpenShift Console, you will find yourself on the RHACM interface.  
 
-This will bring you to the RHACM interface. 
+If not, then navigate to the *Cluster* drop down menu and then select *All Clusters*. 
 
 image::101-local-cluster.png[Cluster Selection Menu]
 
@@ -98,7 +98,7 @@ The *development* cluster that we have provisioned is an example of a Hosted Con
 
 For our lab, We will be using the Standalone cluster option. Click on that option, and you will be presented with a menu that allows you to customize the cluster. 
 
-Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.14.6*. 
+Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.14.7*. 
 
 Click on *Next* to continue.
 
