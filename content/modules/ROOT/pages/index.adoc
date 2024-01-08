@@ -81,7 +81,7 @@ oc login -u kubeadmin -p {openshift_kubeadmin_password} {openshift_api_url}
 
 === RHACS Console Access
 
-Your RHACS Console is available at: {acs_route}
+Your RHACS Console is available at: {acs_route}[window=blank]
 
 Administrator login is available with:
 
