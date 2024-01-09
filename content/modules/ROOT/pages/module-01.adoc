@@ -33,11 +33,11 @@ Once you have logged in to OpenShift Console, you will find yourself on the RHAC
 
 If not, then navigate to the *Cluster* drop down menu and then select *All Clusters*. 
 
-image::101-local-cluster.png[Cluster Selection Menu]
+image::101-local-cluster.png[link=self, Cluster Selection Menu]
 
 In this interface you will see 2 clusters available, the first cluster is a Hosted Control Plane Cluster called *development*.
 
-image::102-cluster-view.png[View of Clusters Listed]
+image::102-cluster-view.png[link=self, View of Clusters Listed]
 
 [[hosted-control-planes]]
 
@@ -81,13 +81,13 @@ From the Clusters screen we can see how easy it is to deploy a new cluster.
 
 Click on the *Create cluster* button in the center of the screen:
 
-image::103-create-cluster.png[Create Cluster]
+image::103-create-cluster.png[link=self, Create Cluster]
 
 You will notice that there is an Option for AWS and it’s already highlighted that we have saved credentials. We will use this to deploy our new cluster, but feel free to explore this window and see other cluster types that are available. 
 
 When you are ready, click on the AWS button.
 
-image::104-aws-credentials.png[AWS Credentials]
+image::104-aws-credentials.png[link=self, AWS Credentials]
 
 You will see two options for the control plane type: 
 
@@ -102,19 +102,19 @@ Name your cluster *demo-cluster*, and select *default* for the cluster set. Last
 
 Click on *Next* to continue.
 
-image::105-create-cluster-details.png[Create Cluster Details]
+image::105-create-cluster-details.png[link=self, Create Cluster Details]
 
 On the next screen You can customize the AWS region, the CPU architecture, and the number of nodes to deploy in the control plane and worker pools. 
 
 Click on *Next* to proceed.
 
-image::106-create-cluster-nodepools.png[Create Cluster NodePools]
+image::106-create-cluster-nodepools.png[link=self, Create Cluster NodePools]
 
 The next screen allows you to configure networking type to use and it's associated  variables. 
 
 Click on *Next* to proceed.
 
-image::107-create-cluster-networking.png[Create Cluster Networking]
+image::107-create-cluster-networking.png[link=self, Create Cluster Networking]
 
 The next couple of screens allow for additional customization, configuring a proxy, creating private AWS configurations, and pre-configuring automation functions with Ansible Automation Platform. 
 
@@ -122,11 +122,11 @@ Click *Next* on each screen to proceed to the final *Review and Create* screen.
 
 You will see a description of the cluster you are creating, click the blue *Create* button to start the deployment process.
 
-image::108-create-cluster-summary-create.png[Create Cluster Summary Page]
+image::108-create-cluster-summary-create.png[link=self, Create Cluster Summary Page]
 
 If you click on *Clusters* in the left menu bar you will be returned to the original cluster view screen but you can see that our new cluster is now in the creating stage.
 
-image::109-view-new-cluster.png[View New Cluster]
+image::109-view-new-cluster.png[link=self, View New Cluster]
 
 NOTE: The deployment of a full cluster will take approximately 45 minutes to complete, the primary purpose of this part of the lab was to demonstrate how easy it is to deploy clusters. We will continue the lab working with the infrastructure already in place.
 
@@ -163,7 +163,7 @@ This may seem like a lot of extra resources to manage in addition to the deploya
 - Click on the *Actions* dropdown and select *Edit Labels* button under *Labels*.
 - Verify that the *rhdp_usage=development* label exists in the cluster. If the label doesn't exist, create it.
 
-image::110-labels.png[Cluster Labels]
+image::110-labels.png[link=self, Cluster Labels]
 
 === Deploying an Application
 
@@ -185,11 +185,11 @@ image::110-labels.png[Cluster Labels]
 
 It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
 
-image::111-application-topology.png[Application Topology]
+image::111-application-topology.png[link=self, Application Topology]
 
 Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Book Import application with several books available.
 
-image::112-application-route.png[Application Route]
+image::112-application-route.png[link=self, Application Route]
 
 Feel free to experiment with the application at your leisure.
 
@@ -209,7 +209,7 @@ The governance lifecycle is based on defined policies, processes, and procedures
 
 View the following diagram of the governance architecture:
 
-image::113-grc-diagram.png[Governance, Risk, Compliance Diagram]
+image::113-grc-diagram.png[link=self, Governance, Risk, Compliance Diagram]
 
 Use the Red Hat Advanced Cluster Management for Kubernetes security policy framework to create and manage policies. Kubernetes custom resource definition instances are used to create policies.
 
@@ -232,7 +232,7 @@ To do this, complete the following steps:
 - Click *Create Policy*.
 - On the top switch the toggle to *Display the YAML*.
 
-image::114-policy-toggle.png[Display the YAML]
+image::114-policy-toggle.png[link=self, Display the YAML]
 
 - Copy the following YAML excerpt and paste it in the screen:
 
@@ -342,7 +342,7 @@ spec:
 - Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy.
 - Under the actions dropdown, select *Enforce*. This will enforce the policy, wait until the green checkmark is displayed.
 
-image::115-enforce-governance-policy.png[Enforce the Governance Policy]
+image::115-enforce-governance-policy.png[link=self, Enforce the Governance Policy]
 
 === Using Policy Generator
 
@@ -373,7 +373,7 @@ In order to deliver these policies we will need to leverage the RHACM Applicatio
 
 It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
 
-image::116-governance-topology.png[Governance Topology]
+image::116-governance-topology.png[link=self, Governance Topology]
 
 - Navigate to the *Governance* tab.
 - Click on the *Policies* tab.
@@ -381,18 +381,18 @@ image::116-governance-topology.png[Governance Topology]
 * openshift-gitops-installed
 * kubeadmin-removed
 
-image::117-policies-list.png[Governance Policies List]
+image::117-policies-list.png[link=self, Governance Policies List]
 
 Now that the policies have been created for us leveraging the Policy Generator Engine let’s go ahead and enforce them:
 
 - On the *openshift-gitops-installed* policy, click on the ellipses and set policy to *Enforce*.
 
-image::118-policies-enforce-red.png[Enforce the Policy]
+image::118-policies-enforce-red.png[link=self, Enforce the Policy]
 
 - Click the *Enforce* button to verify.
 - Wait a few minutes and you will see that the *Cluster Violations* will go from *red* to *green*.
 
-image::119-policies-enforce-green.png[Policy Enforced]
+image::119-policies-enforce-green.png[link=self, Policy Enforced]
 
 - Click on the policy and slect *Results* to veify that the gitops operator has been installed.
 
