@@ -363,7 +363,12 @@ In order to deliver these policies we will need to leverage the RHACM Applicatio
 * Under repository types, select the GIT repository
 * URL: https://github.com/levenhagen/demo-policygenerator.git
 * Branch: main
-- Verify that *Deploy only to local cluster* is selected using label name equals any of local-cluster and cluster set to be default.
+- Verify that it installs only to the local cluster by setting the following values:
+* *Deploy application resources on clusters with all specified labels*
+* Cluster sets: *default*
+* Label: *local-cluster*
+* Operator: *equals any of*
+* Value: *true*
 - Verify all the information is correct, click *Create*.
 
 It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
