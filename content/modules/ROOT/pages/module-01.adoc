@@ -340,7 +340,7 @@ spec:
 - Click *Next* till the end and then click on *Submit*.
 - Allow a few moments for the policy to propagate to the *local-cluster / RHACM Hub Cluster*.
 - Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy.
-- Under the actions dropdown, select *Enforced*. This will enforce the policy, wait until the green checkmark is displayed.
+- Under the actions dropdown, select *Enforce*. This will enforce the policy, wait until the green checkmark is displayed.
 
 image::115-enforce-governance-policy.png[Enforce the Governance Policy]
 
