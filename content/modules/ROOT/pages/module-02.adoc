@@ -4,7 +4,7 @@ In this session, participants will learn how to work with Red Hat Advanced Clust
 
 The goal of the tasks in this part of the OpenShift Platform Plus lab  is to take you through the RHACS console/user interface and to observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to affect pods at both deployment and runtime. 
 
-IMPORTANT: Several of the following tasks require use of the CLI, and should be run from the *Bastion* host in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
+IMPORTANT: Several of the following tasks require use of the CLI. Many like those involving *roxctl* can be run from the user terminal built into the lab. For other tasks, you may need to SSH over to the *Bastion* host provided in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
 
 If you have questions at any time, please don’t hesitate to ask!
 
