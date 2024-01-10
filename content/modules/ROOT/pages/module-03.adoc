@@ -16,27 +16,27 @@ The Quay operator can be installed from the OperatorHub available in OpenShift P
 
 . On our *local-cluster*, open the *Operators* menu on the left and click on *OperatorHub*.
 +
-image::301-operatorhub-quay.png[link=self, OperatorHub Quay]
+image::301-operatorhub-quay.png[link=self, window=blank, OperatorHub Quay]
 +
 . Type *Quay* in the search bar, and select the option for *Red Hat Quay*.
 +
-image::302-install-quay.png[link=self, Install Quay]
+image::302-install-quay.png[link=self, window=blank, Install Quay]
 +
 . Click the *Install* button and follow the default prompts.
 +
-image::303-default-options.png[link=self, Quay Default Options]
+image::303-default-options.png[link=self, window=blank, Quay Default Options]
 +
 . Once the operator is installed, click on the *Create Instance* button under Quay Registry.
 +
-image::304-create-quay-instance.png[link=self, Create Instance]
+image::304-create-quay-instance.png[link=self, window=blank, Create Instance]
 +
 NOTE: For the purposes of our lab we can accept the default options and do a basic installation of Red Hat Quay, but in a real world example you may want to customize your install.
 +
-image::305-default-install.png[link=self, Default Quay Install]
+image::305-default-install.png[link=self, window=blank, Default Quay Install]
 +
 . Once it is installed successfully, we can check the *Resources* under the instance.
 +
-image::306-quay-resources.png[link=self, Quay Resources]
+image::306-quay-resources.png[link=self, window=blank, Quay Resources]
 
 [[configure-registry]]
 
@@ -62,15 +62,15 @@ export QUAY_URL=<quay_url>
 +
 NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later.
 +
-image::307-quay-create-account.png[link=self, Create Quay Account]
+image::307-quay-create-account.png[link=self, window=blank, Create Quay Account]
 +
 . Once we have created our quay login we can create our first repository by clicking the *Create New Repository* button.
 +
-image::308-create-repo.png[link=self, Create Quay Repo]
+image::308-create-repo.png[link=self, window=blank, Create Quay Repo]
 +
 . We can name this repository *rh1-lab* and make it public or private so we can choose who has access to it.
 +
-image::309-name-repo.png[link=self, Name Quay Repo]
+image::309-name-repo.png[link=self, window=blank, Name Quay Repo]
 
 NOTE: In addition to creating a repository in the Quay console, we can create one by pushing an image and defining the repository name on the command line. We will do this in our next lab step.
 
@@ -112,7 +112,7 @@ podman push $QUAY_URL/admin/ubi/ubi:8.9 --remove-signatures
 +
 . Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created ubi one.
 +
-image::310-quay-repos.png[link=self, Quay Repositories]
+image::310-quay-repos.png[link=self, window=blank, Quay Repositories]
 +
 . We can do a simple test with our newly pushed image by pulling it and running an *Echo* command.
 +
@@ -151,23 +151,23 @@ We can use the following procedure to check the security scan results for our UB
 
 . Click on the ubi repository and once inside click on the tags button on the left.
 +
-image::311-image-tags.png[link=self, Image Tag Menu]
+image::311-image-tags.png[link=self, window=blank, Image Tag Menu]
 +
 NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
 +
 . By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
 +
-image::312-quay-sec-scan.png[link=self, Quay Security Scan]
+image::312-quay-sec-scan.png[link=self, window=blank, Quay Security Scan]
 +
 NOTE: The ubi image we are using in this lab shows 36 medium vulnerabilities, and 187 total when you hover over it at the time of this lab's creation.
 +
 . Click on the list of vulnerabilities to see a more detailed view.
 +
-image::313-security-details.png[link=self, Image Security Details] 
+image::313-security-details.png[link=self, window=blank, Image Security Details] 
 +
 . Click the packages button on the left menu to see which specific packages in the image are affected by what vulnerabilities.
 +
-image::314-image-packages.png[link=self, Image Packages]
+image::314-image-packages.png[link=self, window=blank, Image Packages]
 +
 Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
