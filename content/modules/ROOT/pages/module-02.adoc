@@ -96,23 +96,23 @@ The following information will be available in the the main lab screen:
 
 - From the main lab page, click the URL for the RHACS web console to head to the console's login page.
 
-image::201-lab-environment.png[link=self, window=blank, Lab Environment]
+image::201-lab-environment.png[link=self, window=blank, width=100%, Lab Environment]
 
 NOTE: You may get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also considered best practice to integrate the application with your authentication server.
 
 - Click through the warning page to get to the RHACS console login page.
 
-image::202-cert-warning.png[link=self, window=blank, Certificate Warning]
+image::202-cert-warning.png[link=self, window=blank, width=100%, Certificate Warning]
 
-image::203-login-page.png[link=self, window=blank, Login Page]
+image::203-login-page.png[link=self, window=blank, width=100%, Login Page]
 
 - Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the RHACS console URL *(HINT: The Username is always admin)*.
 
-image::204-admin-login.png[link=self, window=blank, Admin Login]
+image::204-admin-login.png[link=self, window=blank, width=100%, Admin Login]
 
 - Ensure you maintain access to the console and keep your tab open for the future lab sections.
 
-image::205-rhacs-dashboard.png[link=self, window=blank, RHACS Dashboard]
+image::205-rhacs-dashboard.png[link=self, window=blank, width=100%, RHACS Dashboard]
 
 [[nav-con]]
 
@@ -127,7 +127,7 @@ The RHACS dashboard has four main sections:
 . Navigation Menu
 . Dashboard
 
-image::206-numbered-dashboard.png[link=self, window=blank, Numbered Dashboard]
+image::206-numbered-dashboard.png[link=self, window=blank, width=100%, Numbered Dashboard]
 
 === Top Bar
 
@@ -141,7 +141,7 @@ The top bar contains the following functionality:
 - Enable Dark/Light Mode 
 - Logged-in user account
 
-image::207-top-bar.png[link=self, window=blank, Top Bar]
+image::207-top-bar.png[link=self, window=blank, width=100%, Top Bar]
 
 === Global Search
 
@@ -156,7 +156,7 @@ A search query consists of two parts:
 
 For example, to find all violations in the *visa-processor* deployment, the search query is *Deployment:visa-processor*.
 
-image::209-search-syntax.png[link=self, window=blank, Search Syntax]
+image::209-search-syntax.png[link=self, window=blank, width=100%, Search Syntax]
 
 In this search query, Deployment is the attribute, and visa-processor is the search term.
 
@@ -182,7 +182,7 @@ NOTE: This is just a sample of the types of queries you can use to analyze your 
 
 === Navigation Menu
 
-image::210-nav-menu.png[link=self, window=blank, Navigation Menu]
+image::210-nav-menu.png[link=self, window=blank, width=100%, Navigation Menu]
 
 The left-hand navigation menu provides access to each of the security use cases, as well as product configuration to integrate RHACS with your existing tooling. The navigation menu has the following items:
 
@@ -205,7 +205,7 @@ The left-hand navigation menu provides access to each of the security use cases,
 
 The Red Hat Advanced Cluster Security for Kubernetes (RHACS) Dashboard provides quick access to the data you need. It contains additional navigation shortcuts and actionable widgets that are easy to filter and customize so that you can focus on the data that matters most to you. You can view information about levels of risk in your environment, compliance status, policy violations, and common vulnerabilities and exposures (CVEs) in images.
 
-image::211-dashboard-center.png[link=self, window=blank, Center Dashboard]
+image::211-dashboard-center.png[link=self, window=blank, width=100%, Center Dashboard]
 
 === Navigating the Main Dashboard
 
@@ -217,7 +217,7 @@ The dashboard can be broken down into three main sections:
 . The Dashboard Filter
 . The Actionable Widgets
 
-image::212-three-dashboards.png[link=self, window=blank, Three Dashboard Sections]
+image::212-three-dashboards.png[link=self, window=blank, width=100%, Three Dashboard Sections]
 
 === The Status Bar
 
@@ -241,9 +241,9 @@ The Dashboard includes a top-level filter that applies simultaneously to all wid
 
 NOTE: The Dashboard filter does not affect the Status Bar and when no clusters or namespaces are selected, the view automatically switches to All.
 
-image::213-dashboard-filter.png[link=self, window=blank, Dashboard Filter]
+image::213-dashboard-filter.png[link=self, window=blank, width=100%, Dashboard Filter]
 
-image::214-dashboard-dropdown.png[link=self, window=blank, Dashboard Drop-down]
+image::214-dashboard-dropdown.png[link=self, window=blank, width=100%, Dashboard Drop-down]
 
 === Actionable Widgets
 
@@ -263,7 +263,7 @@ NOTE: For the following section, please note that the order in which the images 
 
 . Click the *Vulnerability Management (1.0)* tab, and then select *Dashboard*
 +
-image::215-vuln-dashboard.png[link=self, window=blank, Vulnerability Management Dashboard]
+image::215-vuln-dashboard.png[link=self, window=blank, width=100%, Vulnerability Management Dashboard]
 +
 The dashboard provides several important vulnerability breakdowns such as:
 +
@@ -273,15 +273,15 @@ The dashboard provides several important vulnerability breakdowns such as:
 +
 More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. RHACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container’s configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
 +
-image::216-top-risky.png[link=self, window=blank, Riskiest Deployments]
+image::216-top-risky.png[link=self, window=blank, width=100%, Riskiest Deployments]
 +
 . Above the *Risky Deployments* section, there are buttons to link you to all policies, CVEs, and images, and a menu to bring you to reports by cluster, namespace, deployment, and component. The vulnerability dashboard can be filtered by clicking the Fixable CVSS score button.
 +
-image::217-policy-buttons.png[link=self, window=blank, Top Policy Buttons]
+image::217-policy-buttons.png[link=self, window=blank, width=100%, Top Policy Buttons]
 +
 . Locate the *Top Riskiest Images* panel. Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the *log4shell* exploit in your cluster and block that container from being pushed in the future.
 +
-image::218-riskiest-images.png[link=self, window=blank, Riskiest Images]
+image::218-riskiest-images.png[link=self, window=blank, width=100%, Riskiest Images]
 +
 . In the *Top Riskiest Images* panel, click on the *VIEW ALL* button.
 +
@@ -298,7 +298,7 @@ Notice which images are more exposed. Not only can we see the number of CVEs aff
 +
 . Next, find and click on the image *visa-processor:latest-v2*. You will review the images' components and violations.
 +
-image::219-visa-proc.png[link=self, window=blank, Visa Processor Image]
+image::219-visa-proc.png[link=self, window=blank, width=100%, Visa Processor Image]
 +
 NOTE: If you cannot find the visa-processor:latest-v2 image, use the search bar to filter for the specific image you want.
 +
@@ -306,11 +306,11 @@ If you click the search bar, you will be shown the different labels you can sear
 +
 You can use this method of searching in all search bars within the RHACS dashboard.
 +
-image::220-search-bar.png[link=self, window=blank, Search Bar]
+image::220-search-bar.png[link=self, window=blank, width=100%, Search Bar]
 +
 You can move on to the next section only when the dashboard displays the image below.
 +
-image::221-image-info.png[link=self, window=blank, Image Info]
+image::221-image-info.png[link=self, window=blank, width=100%, Image Info]
 
 
 === RHACS Vulnerability Scanner
@@ -321,11 +321,11 @@ RHACS' built-in vulnerability scanner breaks down images into layers and compone
 - At the top of the page is the warning that CVE data is stale - that this image has a base OS version whose distribution has stopped providing security information and likely stopped publishing security fixes.
 - Scroll down the page. In the Image Findings section, you find the details of the image vulnerabilities. There are 535 fixable vulnerabilities in the cluster (at the time of the creation of this workshop.)
 +
-image::222-fix-vulns.png[link=self, window=blank, Fixable Vulnerabilities]
+image::222-fix-vulns.png[link=self, window=blank, width=100%, Fixable Vulnerabilities]
 +
 - Above the Image Findings section, click on the *Dockerfile* tab:
 +
-image::223-dockerfile.png[link=self, window=blank, Dockerfile View]
+image::223-dockerfile.png[link=self, window=blank, width=100%, Dockerfile View]
 +
 The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, RHACS will display newly discovered CVEs.
 
@@ -340,11 +340,11 @@ Check out the Red Hat advisory for more details:
 
 . Head back to the *Top Riskiest Images* Dashboard. (Vulnerability Management (1.0) → Top Riskiest Images)
 +
-image::224-riskiest-images2.png[link=self, window=blank, Riskiest Images]
+image::224-riskiest-images2.png[link=self, window=blank, width=100%, Riskiest Images]
 +
 . Search for the log4shell vulnerability using its CVE number (*CVE-2021-44228*)
 +
-image::225-log4shell-search.png[link=self, window=blank, log4shell Search]
+image::225-log4shell-search.png[link=self, window=blank, width=100%, log4shell Search]
 +
 - How many images are affected by the vulnerability?
 - How many deployments contain the vulnerability?
@@ -366,19 +366,19 @@ The first *risk factor* - is the vulnerable component in a running deployment.
 
 . Click on the *Risk* panel to continue.
 +
-image::226-risk-panel.png[link=self, window=blank, Risk Panel]
+image::226-risk-panel.png[link=self, window=blank, width=100%, Risk Panel]
 +
 Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why we must ask ourselves, is it down to a priority of 12 in this example now?
 +
-image::227-log4shell-risk.png[link=self, window=blank, Log4Shell Risk]
+image::227-log4shell-risk.png[link=self, window=blank, width=100%, Log4Shell Risk]
 +
 . Click on the log4shell deployment and review the risk indicators.
 +
-image::228-log4shell-info.png[link=self, window=blank, Log4Shell Info]
+image::228-log4shell-info.png[link=self, window=blank, width=100%, Log4Shell Info]
 +
 . Next, click on the visa-processor deployment and review its risk indicators. What do you think made the visa-processor deployment #1 in this example?
 +
-image::229-visa-processor.png[link=self, window=blank, Visa Processor Info]
+image::229-visa-processor.png[link=self, window=blank, width=100%, Visa Processor Info]
 +
 Factors that play into the overall score are in the risk indicators section. These include, but are not limited to:
 +
@@ -409,15 +409,15 @@ As we move into this next section, lets focus on identifying and enforcing a run
 
 . On the left-hand side of the application, click the *Platform Configuration* tab and select *Policy Management*.
 +
-image::230-policy-mgmt-dashboard.png[link=self, window=blank, Policy Management Dashboard]
+image::230-policy-mgmt-dashboard.png[link=self, window=blank, width=100%, Policy Management Dashboard]
 +
 . Filter through the policies to find *Ubuntu Package Manager Execution* or use the search bar to select by *category*.
 +
-image::231-policy-search.png[link=self, window=blank, Policy Management Search]
+image::231-policy-search.png[link=self, window=blank, width=100%, Policy Management Search]
 +
 . Once you have found the policy *Ubuntu Package Manager Execution*, click on it to learn more.
 +
-image::232-policy-mgmt-details.png[link=self, window=blank, Policy Management Details]
+image::232-policy-mgmt-details.png[link=self, window=blank, width=100%, Policy Management Details]
 +
 . If you click the actions button, you will see how easy it is to edit, clone, export or disable these policies. We also recommended cloning the policies and adding or removing specific filters as you need them.
 
@@ -448,18 +448,18 @@ The network graph combines a flow diagram, a firewall diagram, and a firewall ru
 
 . From the left, navigate to the Network Graph tab:
 +
-image::233-network-graph-menu.png[link=self, window=blank, Network Graph Menu]
+image::233-network-graph-menu.png[link=self, window=blank, width=100%, Network Graph Menu]
 +
 . In the upper left, there is a cluster menu. Select the production cluster, the backend namespace, and all the deployments associated with the namespace.
 +
-image::234-network-namespace.png[link=self, window=blank, Network Namespace/Deployments]
+image::234-network-namespace.png[link=self, window=blank, width=100%, Network Namespace/Deployments]
 +
 . You can easily navigate between any of the clusters connected to RHACS.
 . The default view, *Active*, shows actual traffic for the past hour between the deployments in the namespaces.
 . You can change the time frame (in the upper left corner of the menu) and review the legend (in the bottom left corner).
 . Click on the *backend-atlas* deployment to get a sidebar to appear.
 +
-image::235-backend-atlas.png[link=self, window=blank, Backend-Atlas Analysis]
+image::235-backend-atlas.png[link=self, window=blank, width=100%, Backend-Atlas Analysis]
 
 === Analyze the Network Traffic
 
@@ -473,7 +473,7 @@ The *Network Policies* section highlights if there are any network policies asso
 
 . In the *Flows* box at the upper right, add the *API-server* flow to the network baseline.
 
-image::236-add-to-baseline.png[link=self, window=blank, Add to Baseline]
+image::236-add-to-baseline.png[link=self, window=blank, width=100%, Add to Baseline]
 
 Adding network activity accomplishes a similar goal as adding runtime activity that we like. By doing this, we can tell ACS what policy should be crafted around. You can create policies that inform you on anomalous traffic in the future.
 
@@ -485,7 +485,7 @@ In the complete network graph, deployment names are not visible. Details of thei
 . Click the dot representing the *visa-processor* deployment.
 - Selecting a deployment brings up details of the types of traffic observed, including source or destination and ports:
 +
-image::237-visa-processor-aflows.png[link=self, window=blank, Visa Processor Anomalous Flows]
+image::237-visa-processor-aflows.png[link=self, window=blank, width=100%, Visa Processor Anomalous Flows]
 +
 NOTE: Your *Anomalous Flows* list may be different.
 +
@@ -503,15 +503,15 @@ OpenShift defaults to no egress or ingress restrictions on namespaces. This may 
 
 - At the top right, click Network Policy Generator.
 +
-image::238-network-policy-generator.png[link=self, window=blank, Network Policy Generator]
+image::238-network-policy-generator.png[link=self, window=blank, width=100%, Network Policy Generator]
 +
 . Click the *Generate and simulate network policies* button.
 +
-image::239-gen-sim-pol.png[link=self, window=blank, Generate and Simulate Network Policies]
+image::239-gen-sim-pol.png[link=self, window=blank, width=100%, Generate and Simulate Network Policies]
 +
 . It will generate YAML for applying a new firewall policy based on the current environment.
 +
-image::240-net-pol-yaml.png[link=self, window=blank, Network Policy YAML]
+image::240-net-pol-yaml.png[link=self, window=blank, width=100%, Network Policy YAML]
 
 The firewall rules you are generating are not proprietary, but OpenShift-native NetworkPolicy objects. This feature, more than any other, illustrates the philosophy that RHACS represents: security through platform-native features with fixes supplied as configuration for OpenShift.
 
@@ -536,24 +536,24 @@ In this section, you bring the *microservices-demo* application closer to compli
 
 . Zoom in to the microservices-demo namespace, select one of the deployments, and examine the deployment details (on the right side):
 +
-image::241-microservices-demo.png[link=self, window=blank, Microservices Demo]
+image::241-microservices-demo.png[link=self, window=blank, width=100%, Microservices Demo]
 +
 . From the left, navigate to the *Compliance* page.
 . In the upper right, click *SCAN ENVIRONMENT*:
 +
-image::242-compliance-dashboard.png[link=self, window=blank, Compliance Dashboard]
+image::242-compliance-dashboard.png[link=self, window=blank, width=100%, Compliance Dashboard]
 +
 . On the top of the Compliance page, click Namespaces to see a report of compliance scores by namespace.
 . At the top, use the filter bar to restrict the view to the Namespace: *microservices-demo*.
 . Examine the results to see that the microservices-demo namespace has approximately 64% compliance for PCI, but with some significant gaps, especially on Control section 1, which addresses network isolation:
 +
-image::243-filter-pci-64.png[link=self, window=blank, Filter Microservices Demo 64%]
+image::243-filter-pci-64.png[link=self, window=blank, width=100%, Filter Microservices Demo 64%]
 +
 . After you note the current compliance level, return to the Network Graph page. Next, you generate some network policies to improve the compliance score on the PCI benchmark.
 . At the top, use the filter bar to narrow the view to Namespace: *microservices-demo*. The network graph changes focus to only the *microservices-demo* namespace.
 . Click Network Policy Simulator and then Generate and simulate network policies:
 +
-image::244-network-pol-sim.png[link=self, window=blank, Network Policy Simulator]
+image::244-network-pol-sim.png[link=self, window=blank, width=100%, Network Policy Simulator]
 +
 . Click *Apply Network Policies*.
 . Refresh and expect to see that the deployments in the *microservices-demo* namespace are *blue*, indicating that they have network policies applied. The PCI compliance score increases for the *microservices-demo* namespace, because those network policies meet the requirements for isolation of retail applications that handle cardholder data.
@@ -561,7 +561,7 @@ image::244-network-pol-sim.png[link=self, window=blank, Network Policy Simulator
 . Enter Namespace: *microservices-demo* into the filter bar to restrict the view to the microservices-demo namespace.
 . Examine the results to see that the *microservices-demo* namespace has approximately 79% compliance for PCI:
 +
-image::245-filter-pci-79.png[link=self, window=blank, Filter Microservices Demo 79%]
+image::245-filter-pci-79.png[link=self, window=blank, width=100%, Filter Microservices Demo 79%]
 
 RHACS makes it easy to analyze the network security of your OpenShift clusters and helps you take advantage of OpenShift’s built-in firewall protections.
 
@@ -598,15 +598,15 @@ Using admission controller enforcement for image-based scanning requires enablin
 
 . Verify that admission controller and image scanning are set up properly by navigating to Platform Configuration → Clusters → Production and verifying that the following settings are enabled:
 +
-image::246-settings-enabled.png[link=self, window=blank, Verify Settings Enabled]
+image::246-settings-enabled.png[link=self, window=blank, width=100%, Verify Settings Enabled]
 +
-image::247-dynamic-config.png[link=self, window=blank, Dynamic Configuration]
+image::247-dynamic-config.png[link=self, window=blank, width=100%, Dynamic Configuration]
 +
 NOTE: Before configuring this lab, be aware that enforcing this policy blocks all deployments that use images for which RHACS Central cannot retrieve results. For more information, review the RHACS help for Scanner and Image Registries.
 +
 . Navigate to Platform Configuration → Policy Management, find the Images with no scans policy through the filter, and select it to open the side panel.
 +
-image::248-image-noscan.png[link=self, window=blank, Images with No Scans]
+image::248-image-noscan.png[link=self, window=blank, width=100%, Images with No Scans]
 +
 . On the first page, click Edit and enable the policy. This policy rejects attempts to deploy an image that has no scanning status.
 . On your student VM, use Kubernetes to deploy a deliberately nonsensical image with no scans:
@@ -621,7 +621,7 @@ RHACS evaluates the policy and performs the default behavior by informing on the
 
 We can check this by clicking on the *Violations* menu on the left hand side.
 
-image::248a-violation-log.png[link=self, window=blank, Violation Log]
+image::248a-violation-log.png[link=self, window=blank, width=100%, Violation Log]
 
 In our next section we will discuss how to configure RHACS to block container actions at either deploy-time or runtime.
 
@@ -791,7 +791,7 @@ This policy demonstrates how RHACS detects and avoids a runtime violation, using
 . Enable runtime enforcement by clicking the *inform and enforce* button.
 . Configure enforcement behavior by selecting *Enforce at Runtime*.
 +
-image::249-enforce-runtime.png[link=self, window=blank, Enforce Runtime Policy]
+image::249-enforce-runtime.png[link=self, window=blank, width=100%, Enforce Runtime Policy]
 +
 . Click save.
 
@@ -891,7 +891,7 @@ At this point, any attacker using a shell to install software is now disconnecte
 . Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
 . Click the most recent violation and explore the list of the violation events:
 +
-image::250-violations.png[link=self, window=blank, Violations Menu]
+image::250-violations.png[link=self, window=blank, width=100%, Violations Menu]
 +
 If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration, and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
 +
@@ -899,7 +899,7 @@ After this issue is addressed, in this case by the RHACS product using the runti
 +
 . Lastly, hover over the violation in the list to see the resolution options and resolve this issue as operator error.
 
-image::251-resolve-violation.png[link=self, window=blank, Resolve Violations]
+image::251-resolve-violation.png[link=self, window=blank, width=100%, Resolve Violations]
 
 For more information about integration with SIEM tools, see the RHACS help documentation on external tools.
 
