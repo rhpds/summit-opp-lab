@@ -368,7 +368,7 @@ The first *risk factor* - is the vulnerable component in a running deployment.
 +
 image::226-risk-panel.png[link=self, window=blank, width=100%, Risk Panel]
 +
-Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why we must ask ourselves, is it down to a priority of 12 in this example now?
+Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why, we must ask ourselves, is it scored differently in this dashboard?
 +
 image::227-log4shell-risk.png[link=self, window=blank, width=100%, Log4Shell Risk]
 +
@@ -477,27 +477,9 @@ image::236-add-to-baseline.png[link=self, window=blank, width=100%, Add to Basel
 
 Adding network activity accomplishes a similar goal as adding runtime activity that we like. By doing this, we can tell ACS what policy should be crafted around. You can create policies that inform you on anomalous traffic in the future.
 
-=== Examine Namespace and Deployment Details
-
-In the complete network graph, deployment names are not visible. Details of their flows and baselines are available when you zoom in on them. You can also view network flow details by hovering over the connecting lines.
-
-. Scroll or pinch to zoom in on the *payments* namespace. As you zoom in, the namespace boxes show the individual deployment names.
-. Click the dot representing the *visa-processor* deployment.
-- Selecting a deployment brings up details of the types of traffic observed, including source or destination and ports:
-+
-image::237-visa-processor-aflows.png[link=self, window=blank, width=100%, Visa Processor Anomalous Flows]
-+
-NOTE: Your *Anomalous Flows* list may be different.
-+
-- Here, you can create a baseline for the active flows and trigger alerts for anomalous flows.
-- You can also switch to the *Network Policies* tab to investigate and download them.
-- The *Details* tab has general information about the deployment. 
-+
-. Click away from the box to close it and see the whole network graph.
-
 [[net-pol-gen]]
 
-== Use Network Policy Generator
+== Use the Network Policy Generator
 
 OpenShift defaults to no egress or ingress restrictions on namespaces. This may be useful for proof of concepts, but it conflicts with best practices required under several compliance standards. The network policy simulator is designed to help solve this problem quickly and accurately by using the history of observed traffic to build firewall rules.
 
@@ -519,57 +501,90 @@ Implementing stronger security through declarative statements avoids the **anti-
 
 RHACS leverages the firewall that is already in your OpenShift cluster. Throughout the product, you see this approach: **fix it in the code; leverage the platform**. 
 
-In our next next section we will demonstrate this functionality through examples of policy violations.
+In our next next section we will see how applying a policy affects the compliance score of an application.
 
-[[fix-pci]]
+[[update-comp]]
 
-== Fix PCI Compliance in Microservices Demo Application
+== Update Compliance for Applications
 
 [quote,PCI-DSS website,https://www.pcisecuritystandards.org]
 ____
 The best way to maximize cardholder data security is to continuously monitor and enforce the use of controls specified in the PCI Data Security Standard.
 ____
 
-RHACS continuously monitors and enforces policies and is aware of PCI-DSS compliance standards.
+RHACS continuously monitors and enforces policies and is aware of PCI-DSS and other compliance standards.
 
-In this section, you bring the *microservices-demo* application closer to compliance with RHACS.
+In this section, you bring the *visa-processor* application closer to compliance with RHACS.
 
-. Zoom in to the microservices-demo namespace, select one of the deployments, and examine the deployment details (on the right side):
+. Select the *Namespaces* drop-down menu, and click on the *payments* namespace. 
+. Using the *Deployments* drop-down, select the *visa-processor* deployment. 
+. Highlight the *visa-processor* pod, and and examine the deployment details on the right side:
 +
-image::241-microservices-demo.png[link=self, window=blank, width=100%, Microservices Demo]
+image::241-visa-processor-details.png[link=self, window=blank, width=100%, Visa Processor Details]
 +
 . From the left, navigate to the *Compliance* page.
-. In the upper right, click *SCAN ENVIRONMENT*:
+. In the upper right, click *Scan Environment*:
 +
 image::242-compliance-dashboard.png[link=self, window=blank, width=100%, Compliance Dashboard]
 +
-. On the top of the Compliance page, click Namespaces to see a report of compliance scores by namespace.
-. At the top, use the filter bar to restrict the view to the Namespace: *microservices-demo*.
-. Examine the results to see that the microservices-demo namespace has approximately 64% compliance for PCI, but with some significant gaps, especially on Control section 1, which addresses network isolation:
+NOTE: You can use this opportunity to take a break and explore the various interactive graphs on the Compliance Dashboard.
 +
-image::243-filter-pci-64.png[link=self, window=blank, width=100%, Filter Microservices Demo 64%]
+. On the top of the Compliance page, click *namespaces (scanned)* to see a report of compliance scores by namespace.
+. At the top, use the filter bar to restrict the view to the Namespace: *payments*.
+. Examine the results to see that the payments namespace has approximately 45% compliance for PCI.
 +
-. After you note the current compliance level, return to the Network Graph page. Next, you generate some network policies to improve the compliance score on the PCI benchmark.
-. At the top, use the filter bar to narrow the view to Namespace: *microservices-demo*. The network graph changes focus to only the *microservices-demo* namespace.
-. Click Network Policy Simulator and then Generate and simulate network policies:
+image::243-filter-pci-45.png[link=self, window=blank, width=100%, Filter Payments Namespace Demo 45%]
 +
-image::244-network-pol-sim.png[link=self, window=blank, width=100%, Network Policy Simulator]
+. Click on the summary line to get a breakout of the current compliance statistics for this namespace. 
+. Scroll down and view the various compliance standards. 
+. There are some significant gaps on PCI-DSS compliance. Click on *View Standard* to see that there are practically no policies applied in *Control Section 1*, which addresses network isolation.
 +
-. Click *Apply Network Policies*.
-. Refresh and expect to see that the deployments in the *microservices-demo* namespace are *blue*, indicating that they have network policies applied. The PCI compliance score increases for the *microservices-demo* namespace, because those network policies meet the requirements for isolation of retail applications that handle cardholder data.
-. Navigate back to *Compliance* and click *Scan Environment*. After the compliance scan completes, you can see that the *PCI score* has increased.
-. Enter Namespace: *microservices-demo* into the filter bar to restrict the view to the microservices-demo namespace.
-. Examine the results to see that the *microservices-demo* namespace has approximately 79% compliance for PCI:
+image::243a-control-section-one.png[link=self, window=blank, width=100%, Control Section One]
 +
-image::245-filter-pci-79.png[link=self, window=blank, width=100%, Filter Microservices Demo 79%]
+. After you note the current compliance level, return to the Network Graph page by clicking on *Network -> Network Graph* in the left side menu.
+. At the top, use the filter bar to narrow the view to Namespace: *payments*. The network graph changes focus to only the *payments* namespace.
+. Click *Network policy generator* in the upper-right corner, followed by and then *Generate and simulate network policies*
+. This generates a sample yaml to create a default network policy for this namespace. 
++
+NOTE: Take notice of the *red shield and X* icon on each pod within the payments namespace, noting there is no network policy currently in place.
++
+. Click the clipboard button to copy the yaml.
++
+image::244-network-pol-gen-yaml.png[link=self, window=blank, width=100%, Network Policy Generator Yaml]]
++
+. On your lab terminal use the text editor *vi* to create a new file named network-policy-generator.yaml
+. Hit *i* for insert mode, and paste the contents of your network policy yaml into the file.
+. Hit the *esc* key to leave edit mode, and type *:wq* to write and quit, and press enter.
+. Apply the network policy.
++
+[source,sh,role=execute]
+----
+oc apply -f network-policy-generator.yaml
+----
++
+image::244a-terminal-net-pol.png[link=self, window=blank, width=100%, Terminal Network Policy]
++
+. Refresh the browser window where you have RHACS open, and you will see that the pods in the payments namespace now have a *gold shield icon* indicating that they have ingress network policies applied. 
++
+image::244b-ingress-policy.png[link=self, window=blank, width=100%, Golden Ingress Policy]
++
+. Navigate back to *Compliance* and click *Scan Environment*.
+. Click on *namespaces (scanned)* and search for the Namespace: *payments* in the filter bar.
+. Examine the results to see that the *payments* namespace has increased to approximately 60% compliance for PCI.
++
+image::245-filter-pci-60.png[link=self, window=blank, width=100%, Filter Payments Namespace 60%]
++
+. Like before we can click on this to get a more detailed view, and if we scroll down to the PCI-DSS graph and click on *View Standard* we can see the new rules applied to *Control Section 1*.
++
+image::245a-Control-Section-One-Update.png[link=self, window=blank, width=100%, Control Section One Update]
+
 
 RHACS makes it easy to analyze the network security of your OpenShift clusters and helps you take advantage of OpenShift’s built-in firewall protections.
 
 To support network policy enforcement, you used Red Hat Advanced Cluster Security for Kubernetes to do the following:
 
 - Examine the network and individual deployments in the network graph
-- Create network policies in the network policy simulator
-- Apply network policies with the generator
+- Create network policies in the network policy generator that can be easily applied
 - Bring deployments closer to PCI DSS compliance by implementing appropriate network policies
 
 [[deploy-enforce]]
@@ -667,7 +682,7 @@ EOF
 ----
 +
 . In the Platform Configuration → Policy Management page of the RHACS web console, locate the *Environment Variable Contains Secret* policy.
-. Click the *Actions* drop down and enable the policy. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
+. Click the *Actions* drop down and verify the policy is enabled, or enabled it if not. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
 . Supply the file containing this YAML to roxctl on your student VM to run the Deployment check:
 +
 [source,sh,role=execute]
