@@ -49,15 +49,16 @@ git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
 export TUTORIAL_HOME="$(pwd)/acs-workshop"
 kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
 kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
+export ROX_CENTRAL_ADDRESS={acs_route}
 ----
 
 CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
 
-- To ensure the deployment was successful, run the following command and ensure that the applications are up and running.
-
+- To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
 
 [source,sh,role=execute]
 ----
+echo $ROX_CENTRAL_ADDRESS
 kubectl get deployments -l demo=acs -A
 ----
 
@@ -65,6 +66,7 @@ The output should look similar to this:
 
 [source,texinfo,subs="attributes"]
 ----
+{acs_route}
 NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 backend        api-server         1/1     1            1           0d
 frontend       asset-cache        1/1     1            1           0d
