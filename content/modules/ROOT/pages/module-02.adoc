@@ -156,12 +156,13 @@ A search query consists of two parts:
 
 For example, to find all violations in the *visa-processor* deployment, the search query is *Deployment:visa-processor*.
 
-image::209-search-syntax.png[link=self, window=blank, width=100%, Search Syntax]
-
 In this search query, Deployment is the attribute, and visa-processor is the search term.
 
-NOTE: When using the search functionality you must click the provided info from the dropdown. RHACS maintains a library of searchable assets to help you search faster. If CVE or deployment cannot be searched it is most likely because the resource is not in the cluster or incorrectly typed.
+NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the next attribute you would like to enter. Results will appear once there are matches to the entered query.
 
+image::209-search-syntax.png[link=self, window=blank, width=100%, Search Syntax]
+
+NOTE: RHACS maintains a library of searchable assets to help you search faster, they will appear in a drop-down list, and you can click on them to enter them as well. If a specific CVE or deployment cannot be found, please confirm the spelling of the asset name, or that it is correctly deployed in the cluster. 
 
 === Local Page Filtering
 
