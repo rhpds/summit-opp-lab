@@ -43,7 +43,7 @@ Please complete the following steps to configure your lab environment
 
 - Click the button to run the command in the terminal.
 
-[source,sh,role=execute]
+[source,sh,subs="attributes",role=execute]
 ----
 git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
 export TUTORIAL_HOME="$(pwd)/acs-workshop"
@@ -56,7 +56,7 @@ CAUTION: These commands download and apply a significant number of manifests to 
 
 - To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
 
-[source,sh,role=execute]
+[source,sh,subs="attributes",role=execute]
 ----
 echo $ROX_CENTRAL_ADDRESS
 kubectl get deployments -l demo=acs -A
