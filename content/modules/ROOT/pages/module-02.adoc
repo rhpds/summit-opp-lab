@@ -29,65 +29,9 @@ Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensi
 - *Threat Detection:* Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
 - *Incident Response:* Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
-[[lab-setup]]
-
-== Lab Setup
-
-To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
-
-NOTE: This step is mandatory, you must deploy these applications into your cluster in order to work through the lab exercises.
-
-The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
-
-Please complete the following steps to configure your lab environment
-
-- Click the button to run the command in the terminal.
-
-[source,sh,subs="attributes",role=execute]
-----
-git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
-export TUTORIAL_HOME="$(pwd)/acs-workshop"
-kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
-kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
-export ROX_CENTRAL_ADDRESS={acs_route}
-----
-
-CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
-
-- To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
-
-[source,sh,subs="attributes",role=execute]
-----
-echo $ROX_CENTRAL_ADDRESS
-kubectl get deployments -l demo=acs -A
-----
-
-The output should look similar to this:
-
-[source,texinfo,subs="attributes"]
-----
-{acs_route}
-NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-backend        api-server         1/1     1            1           0d
-frontend       asset-cache        1/1     1            1           0d
-log4shell      log4shell-app      3/3     3            3           0d
-medical        reporting          1/1     1            1           0d
-operations     jump-host          1/1     1            1           0d
-payments       visa-processor     1/1     1            1           0d
-spring4shell   spring4shell-app   3/3     3            3           0d
-----
-
-If all of the applications are up and running, feel free to proceed to the next stage. If they are not running, rerun the command set, or ask a proctor for assistance.
-
-[[con-vuln]]
-
-== Introducing the RHACS console and Vulnerability Management
-
-The first section of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
-
 === Accessing the RHACS Console
 
-In this section, you will confirm that you can connect to the RHACS portal. 
+In this section, you will confirm that you can connect to the RHACS portal.
 
 The following information will be available in the the main lab screen:
 
@@ -116,9 +60,93 @@ image::204-admin-login.png[link=self, window=blank, width=100%, Admin Login]
 
 image::205-rhacs-dashboard.png[link=self, window=blank, width=100%, RHACS Dashboard]
 
+[[lab-setup]]
+
+== Lab Setup
+
+To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
+
+NOTE: This step is mandatory, you must deploy these applications into your cluster in order to work through the lab exercises.
+
+The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
+
+Please complete the following steps to configure your lab environment
+
+- Click the button to run the command in the terminal.
+
+[source,sh,subs="attributes",role=execute]
+----
+git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
+export TUTORIAL_HOME="$(pwd)/acs-workshop"
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
+export ROX_CENTRAL_ADDRESS={acs_route}
+----
+
+CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
+
+- You will also need to create a token for login with the *roxctl* cli for later lab steps, this will be uniquely generated in your RHACS web console.
+
+- Follow these instructions:
+* Navigate to browser window with the RHACS portal open.
+* Go to *Platform Configuration* --> *Integrations*.
+* Scroll down to the *Authentication Tokens* category, and click *API Token*.
++
+image::205a-generate-api-token.png[link=self, window=blank, width=100%, Generate API Token]
++
+* Click *Generate Token*.
+* Enter a name for the token, and select *Admin* as the role
++
+image::205b-name-api-token.png[link=self, window=blank, width=100%, Name API Token]
++
+* Click the *Generate* button.
+* On the next screen click the copy button, and paste the value into a variable in your student VM.
++
+image::205c-copy-api-token.png[link=self, window=blank, width=100%, Copy API Token]
+
+IMPORTANT: Once you leave this screen, you will not be able to recover the token value.
+
+[source,sh,role=execute]
+----
+export $ROX_API_TOKEN=<api_token>
+----
+
+-  To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
+
+[source,sh,subs="attributes",role=execute]
+----
+echo "The address for ROX Central is: $ROX_CENTRAL_ADDRESS"
+echo "The token for roxctl authentication is: $ROX_API_TOKEN"
+echo "The deployments for the lab are listed below:"
+kubectl get deployments -l demo=acs -A
+----
+
+The output should look similar to this:
+
+[source,texinfo,subs="attributes"]
+----
+The address for ROX Central is: {acs_route}
+The token for roxctl authentication is: 
+The deployments for the lab are listed below:
+NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+backend        api-server         1/1     1            1           0d
+frontend       asset-cache        1/1     1            1           0d
+log4shell      log4shell-app      3/3     3            3           0d
+medical        reporting          1/1     1            1           0d
+operations     jump-host          1/1     1            1           0d
+payments       visa-processor     1/1     1            1           0d
+spring4shell   spring4shell-app   3/3     3            3           0d
+----
+
+If all of the applications are up and running, feel free to proceed to the next stage. If they are not running, rerun the command set, or ask a proctor for assistance.
+
 [[nav-con]]
 
-== Navigating the RHACS Console
+== Introducing the RHACS console and Vulnerability Management
+
+The first section of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
+
+=== Navigating the RHACS Console
 
 In this section, you familiarize yourself with the RHACS portal, including its tabs, search capabilities and dashboard functionality.
 
@@ -685,7 +713,7 @@ EOF
 ----
 +
 . In the Platform Configuration → Policy Management page of the RHACS web console, locate the *Environment Variable Contains Secret* policy.
-. Click the *Actions* drop down and verify the policy is enabled, or enabled it if not. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
+. Click the *Actions* drop down and verify the policy is enabled, or enable it if not. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
 . Supply the file containing this YAML to roxctl on your student VM to run the Deployment check:
 +
 [source,sh,role=execute]
@@ -698,12 +726,12 @@ roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file ./secrets.yaml --inse
 [source,texinfo,subs="attributes"]
 ----
 Policy check results for deployments: [ubuntu]
-(TOTAL: 5, LOW: 2, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+(TOTAL: 6, LOW: 3, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
 
 +--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
 |             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
 +--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
-| Environment Variable Contains  |   HIGH   |       X       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
+| Environment Variable Contains  |   HIGH   |       -       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
 |             Secret             |          |               |            |   environment variables that   |   'AWS_SECRET_ACCESS_KEY' is   |    environment variables to    |
 |                                |          |               |            |        contain 'SECRET'        | present in container 'ubuntu'  |    orchestrator secrets or     |
 |                                |          |               |            |                                |                                |  your security team's secret   |
@@ -730,22 +758,24 @@ Policy check results for deployments: [ubuntu]
 |                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
 |                                |          |               |            |        Kubernetes API.         |                                |                                |
 +--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|        90-Day Image Age        |   LOW    |       -       |   ubuntu   |   Alert on deployments with    | - Container 'ubuntu' has image |   Rebuild your image, push a   |
+|                                |          |               |            |    images that haven't been    | created at 2023-05-30 09:32:09 | new minor version (with a new  |
+|                                |          |               |            |       updated in 90 days       |             (UTC)              |   immutable tag), and update   |
+|                                |          |               |            |                                |                                |    your service to use it.     |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
 |  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
 |  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
 |          Been Created          |          |               |            |                                |                                |         the root user          |
 +--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
 |   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
 |             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
-|                                |          |               |            |     Debian/Ubuntu package      |            1.6.14)             |  --force-all debconf dpkg` in  |
+|                                |          |               |            |     Debian/Ubuntu package      |            1.6.17)             |  --force-all debconf dpkg` in  |
 |                                |          |               |            |    management system in the    |                                | the image build for production |
 |                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
 |                                |          |               |            |                                |   component 'dpkg' (version    |                                |
-|                                |          |               |            |                                |       1.19.0.5ubuntu2.3)       |                                |
+|                                |          |               |            |                                |       1.19.0.5ubuntu2.4)       |                                |
 +--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
-WARN:   A total of 5 policies have been violated
-ERROR:  failed policies found: 1 policies violated that are failing the check
-ERROR:  Policy "Environment Variable Contains Secret" within Deployment "ubuntu" - Possible remediation: "Migrate your secrets from environment variables to orchestrator secrets or your security team's secret management solution."
-ERROR:  checking deployment failed after 3 retries: failed policies found: 1 policies violated that are failing the check
+WARN:   A total of 6 policies have been violated
 ----
 +
 In a CI/CD pipeline service, this output is available to the developer via the job’s console output, and the job fails because of this failed roxctl check.
@@ -785,6 +815,9 @@ You saw how to use the AdmissionController with the listen and enforce options e
 
 In clusters where the enforcement option is disabled, you saw how RHACS scales pod replicas to zero for deployments that violate policy.
 
+IMPORTANT: Once this section is complete, go back and disable enforcement of this policy (set back to inform), else it may affect other actions in the lab.
+
+
 [[runtime-enforce]]
 
 == Introduction to Runtime Policy Enforcement
@@ -819,7 +852,7 @@ IMPORTANT: Make sure to save the policy changes! If you do not save the policy t
 
 Next, we will use tmux to watch OpenShift events while running the test, so you can see how RHACS enforces the policy at runtime.
 
-. On your student VM, start tmux with two panes:
+. On your student VM, ssh over to the *Bastion* host, and start tmux with two panes:
 +
 [source,sh,role=execute]
 ----

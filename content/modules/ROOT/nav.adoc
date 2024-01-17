@@ -11,7 +11,6 @@
 
 * xref:module-02.adoc[2. Red Hat Advanced Cluster Security for Kubernetes]
 ** xref:module-02.adoc#lab-setup[Lab Setup]
-** xref:module-02.adoc#con-vuln[Introducing the RHACS Console and Vulnerability Management]
 ** xref:module-02.adoc#nav-con[Navigate the Console]
 ** xref:module-02.adoc#vuln-mgmt[Vulnerability Management]
 ** xref:module-02.adoc#policy-mgmt[Policy Management]

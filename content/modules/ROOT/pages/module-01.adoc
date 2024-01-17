@@ -187,7 +187,7 @@ It will take a few minutes to deploy the application, click on the *Topology Tab
 
 image::111-application-topology.png[link=self, window=blank, width=100%, Application Topology]
 
-Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Book Import application with several books available.
+Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Rocket Chat application, which is now running in our cluster.
 
 image::112-application-route.png[link=self, window=blank, width=100%, Application Route]
 

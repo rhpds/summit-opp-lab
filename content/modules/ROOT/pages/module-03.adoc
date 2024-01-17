@@ -51,7 +51,7 @@ Now that Quay is installed, we need to configure it to be able to host our image
 oc get route -n openshift-operators 
 ----
 +
-NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, or fill it in manually to the commands that follow.
+NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, to make the syntax below easier to copy/paste, or substitute it manually to the commands that follow.
 +
 [source,sh,role=execute]
 ----
@@ -60,7 +60,12 @@ export QUAY_URL=<quay_url>
 +
 . After opening the Quay UI, click on *Create Account* and fill in your account details.
 +
-NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later.
+NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later. As a sample, we created a user called *admin* and a dummy email account. You may also want to export them as an environment variable to make the syntax later easier to copy/paste.
++
+[source,sh,role=execute]
+----
+export QUAY_USER=<quay_user> 
+----
 +
 image::307-quay-create-account.png[link=self, window=blank, width=100%, Create Quay Account]
 +
@@ -100,12 +105,12 @@ podman pull registry.access.redhat.com/ubi8/ubi:8.9-1028
 +
 [source,sh,role=execute]
 ----
-podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/admin/ubi/ubi:8.9
+podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/$QUAY_USER/ubi/ubi:8.9
 ----
 +
 [source,sh,role=execute]
 ----
-podman push $QUAY_URL/admin/ubi/ubi:8.9 --remove-signatures
+podman push $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 --remove-signatures
 ----
 +
 . Once the image is successfully pushed, we can browse the Quay UI to validate it.
@@ -118,12 +123,12 @@ image::310-quay-repos.png[link=self, window=blank, width=100%, Quay Repositories
 +
 [source,sh,role=execute]
 ----
-podman run $QUAY_URL/admin/ubi/ubi:8.9 echo Hello
+podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
 ----
 +
 [source,texinfo,subs="attributes"]
 ----
-[demo-user@bastion ~]$ podman run $QUAY_URL/admin/ubi/ubi:8.9 echo Hello
+[demo-user@bastion ~]$ podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
 Trying to pull quay-registry-quay-openshift-operators.apps.cluster-tww6x.tww6x.sandbox916.opentlc.com/admin/ubi/u
 bi:8.9...
 Getting image source signatures
