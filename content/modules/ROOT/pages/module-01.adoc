@@ -1,407 +1,187 @@
-== Module 01: Red Hat Advanced Cluster Management for Kubernetes
-
-In this session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM).
-
-Participants will walk through these 3 major use cases:
-
-- Multi-Cluster Lifecycle
-* Centrally manage, create, update, and delete Kubernetes clusters.
-* Search, find and modify any kubernetes resource across the entire domain.
-* Quickly troubleshoot and resolve issues across your federated domain.
-
-- Advanced Application Lifecycle
-* Easily deploy applications at scale leveraging GitOps.
-* See applications work real time from multiple sources.
-* Quickly visualize application relationships across clusters and those that span clusters.
-
-- Policy Driven Governance
-* Centrally set and enforce policies for security, applications, and infrastructure.
-* Quickly visualize detailed auditing on configuration of apps and clusters.
-* Leverage Policy Generator to generate policies at scale.
-
-Lets get started!
-
-[[cluster-lifecycle]]
-
-== Working with Kubernetes Clusters and Cluster Lifecycle
-
-At a high level Cluster Lifecycle management is about creating, upgrading, and destroying and importing clusters in a multi cloud environment, whether they may be traditional OpenShift Clusters, managed environments like ROSA or ARO, or specialized cluster deployments like Hosted Control Planes or Single-Node OpenShift.
-
-NOTE: Please reference the introduction page to find the credentials required to login to your lab environment.
-
-Once you have logged in to OpenShift Console, you will find yourself on the RHACM interface.  
-
-If not, then navigate to the *Cluster* drop down menu and then select *All Clusters*. 
-
-image::101-local-cluster.png[link=self, window=blank, width=100%, Cluster Selection Menu]
-
-In this interface you will see 2 clusters available, the first cluster is a Hosted Control Plane Cluster called *development*.
-
-image::102-cluster-view.png[link=self, window=blank, width=100%, View of Clusters Listed]
-
-[[hosted-control-planes]]
-
-== Introducing Hosted Control Planes
-
-Hosted Control Planes is a form factor of Red Hat OpenShift Container platform, but it follows a distinct architectural model.
-In standalone OpenShift, the control plane and data plane are coupled in terms of locality. A dedicated group of nodes hosts the control plane with a minimum number to ensure a quorum and the network stack is shared. While functional, this approach may not always meet customers' diverse use cases, especially when it comes to multi-cluster scale deployments.
-To address this, Red Hat provides hosted control planes in addition to standalone OpenShift. Hosted Control Planes is based on the upstream Red Hat project HyperShift which can be thought of as a middleware for hosting OpenShift control planes at scale. This deployment model helps solve concerns in regard to cost and time to provision, as well as providing a strong separation between management and workloads.
-
-Hosted Control Planes for Red Hat OpenShift decouple the control plane from the data plane:
-
-- It provides network domain separation between control-plane and workloads.
-- Offers a shared interface for fleet administrators and Site Reliability Engineers (SREs) to operate multiple clusters easily.
-- Treats the control plane like any other workload, enabling administrators to use the same stack to monitor, secure, and operate their applications while managing the control plane.
-
-The decoupling of the Control Plane and Data Plane introduces multiple potential benefits and paves the way for a Hybrid-cloud approach. Below are possibilities that Hosted Control Plane as a technology enables:
-
-- Trust Segmentation & Human Error Reduction: Management plane for control planes and cloud credentials separate from the end-user cluster. A separate network of management from the workload. Furthermore, with the control-plane managed, it is harder for users to basically shoot themselves in the foot and destroy their own clusters since they won’t be seeing the CP resources in the first place.
-- Cheaper Control Planes: You can host \~7-21 control planes into the same three machines you were using for 1 control plane. And run \~1000 control planes on 150 nodes. Thus you run most densely on existing hardware. Which also makes HA clusters cheaper.
-- Immediate Clusters: Since the control plane consists of pods being launched on OpenShift, you are not waiting for machines to provision.
-- Kubernetes Managing Kubernetes: Having control-plane as Kubernetes workloads immediately unlocks for free all the features of Kubernetes such as HPA/VPA, cheap HA in the form of replicas, control-plane Hibernation now that control-plane is represented as deployments, pods, etc.
-- Infra Component Isolation: Registries, HAProxy, Cluster Monitoring, Storage Nodes, and other infra type components are allowed to be pushed out to the tenant’s cloud provider account isolating their usage of those to just themselves.
-- Increased Life Cycle Options: You can upgrade the consolidated control planes out of cycle from the segmented worker nodes, including embargoed CVEs.
-- Future Mixed Management & Workers IaaS: Although it is not in the solution today, we feel we could get to running the control plane on a different IaaS provider than the workers faster under this architecture
-- Heterogeneous Arch Clusters: We can more easily run control planes on one CPU chip type (ie x86) and the workers on a different one (ie ARM or even Power/Z).
-- Easier Multi-Cluster Management: More centralized multi-cluster management which results in fewer external factors influencing the cluster status and consistency
-- Cross Cluster Delivery Benefits: As we look to have more and more layered offerings such as service mesh, server-less, pipelines, and other span multiple clusters, having a concept of externalized control planes may make delivering such solutions easier.
-- Easy Operability: Think about SREs. Instead of chasing down cluster control-planes, they would now have a central-pane of glass where they could debug and navigate their way even to cluster dataplanes. Centralized operations, less Time To Resolution (TTR), and higher productivity become low-hanging fruits.
-
-You will also find a second cluster called *local-cluster*. This cluster is the hub where the Advanced Cluster Management For Kubernetes, and Advanced Cluster Security for Kubernetes resides.
-
-Feel free to navigate the cluster’s interface and explore the different day 2 actions you can perform in the cluster.
-
-[[create-manage-cluster]]
-
-== Create and Manage Clusters
-
-Red Hat Advanced Cluster Management for Kubernetes makes it quite easy to deploy and manage additional clusters. While simplicity is often a winning formula when it comes to deployments of Red Hat OpenShift with methods such as IPI and the Assisted Installer, RHACM takes this to a whole new level with just a few clicks through the cluster creation wizard.
-
-From the Clusters screen we can see how easy it is to deploy a new cluster.
-
-Click on the *Create cluster* button in the center of the screen:
-
-image::103-create-cluster.png[link=self, window=blank, width=100%, Create Cluster]
-
-You will notice that there is an Option for AWS and it’s already highlighted that we have saved credentials. We will use this to deploy our new cluster, but feel free to explore this window and see other cluster types that are available. 
-
-When you are ready, click on the AWS button.
-
-image::104-aws-credentials.png[link=self, window=blank, width=100%, AWS Credentials]
-
-You will see two options for the control plane type: 
-
-.Hosted Control Plane
-.Standalone
-
-The *development* cluster that we have provisioned is an example of a Hosted Control Plane cluster, which we explained the benefits of in detail in the link:module-01.html#hosted-control-planes[Introducing Hosted Control Planes] section above. 
-
-For our lab, We will be using the Standalone cluster option. Click on that option, and you will be presented with a menu that allows you to customize the cluster. 
-
-Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.14.7*. 
-
-Click on *Next* to continue.
-
-image::105-create-cluster-details.png[link=self, window=blank, width=100%, Create Cluster Details]
-
-On the next screen You can customize the AWS region, the CPU architecture, and the number of nodes to deploy in the control plane and worker pools. 
-
-Click on *Next* to proceed.
-
-image::106-create-cluster-nodepools.png[link=self, window=blank, width=100%, Create Cluster NodePools]
-
-The next screen allows you to configure networking type to use and it's associated  variables. 
-
-Click on *Next* to proceed.
-
-image::107-create-cluster-networking.png[link=self, window=blank, width=100%, Create Cluster Networking]
-
-The next couple of screens allow for additional customization, configuring a proxy, creating private AWS configurations, and pre-configuring automation functions with Ansible Automation Platform. 
-
-Click *Next* on each screen to proceed to the final *Review and Create* screen.
-
-You will see a description of the cluster you are creating, click the blue *Create* button to start the deployment process.
-
-image::108-create-cluster-summary-create.png[link=self, window=blank, width=100%, Create Cluster Summary Page]
-
-If you click on *Clusters* in the left menu bar you will be returned to the original cluster view screen but you can see that our new cluster is now in the creating stage.
-
-image::109-view-new-cluster.png[link=self, window=blank, width=100%, View New Cluster]
-
-NOTE: The deployment of a full cluster will take approximately 45 minutes to complete, the primary purpose of this part of the lab was to demonstrate how easy it is to deploy clusters. We will continue the lab working with the infrastructure already in place.
-
-[[deploying-applications]]
-
-== Deploying Applications to Managed Clusters in RHACM
-
-Your environment came preloaded with an existing Hosted Control Plane cluster hosted in AWS called *development*, we will be deploying an application to this cluster.
-
-Application Lifecycle functionality in RHACM provides the processes that are used to manage application resources on your managed clusters. This allows you to define a single or multi-cluster application using Kubernetes specifications, but with additional automation of the deployment and lifecycle management of resources to individual clusters. An application designed to run on a single cluster is straightforward and something you ought to be familiar with from working with OpenShift fundamentals. A multi-cluster application allows you to orchestrate the deployment of these same resources to multiple clusters, based on a set of rules you define for which clusters run the application components.
-
-This table describes the different components that the Application Lifecycle model in RHACM is composed of:
-
-|============
-|*Resource*|*Purpose*
-|Channel|Defines a place where deployable resources are stored, such as an object store, Kubernetes namespace, Helm repository, or GitHub repository.
-|Subscription|Definitions that identify deployable resources available in a Channel resource that are to be deployed to a target cluster.
-|PlacementRule|Defines the target clusters where subscriptions deploy and maintain the application. It is composed of Kubernetes resources identified by the Subscription resource and pulled from the location defined in the Channel resource.
-|Application|A way to group the components here into a more easily viewable single resource. An Application resource typically references a Subscription resource.
-|============
-
-These are all Kubernetes custom resources, defined by a Custom Resource Definition (CRD), that are created for you when RHACM is installed. By creating these as Kubernetes native objects, you can interact with them the same way you would with a Pod. For instance, running oc get application retrieves a list of deployed RHACM applications just as oc get pods retrieves a list of deployed Pods.
-
-This may seem like a lot of extra resources to manage in addition to the deployables that actually make up your application. However, they make it possible to automate the composition, placement, and overall control of your applications when you are deploying to many clusters. With a single cluster, it is easy to log in and run oc create -f…, but if you need to do that on a dozen clusters, you want to make sure you do not make a mistake or accidentally omit a cluster, and you need a way to schedule and orchestrate updates to your applications. Leveraging the Application Lifecycle Builder in RHACM allows you to easily manage multi-cluster applications.
-
-[[creating-an-application]]
-
-== Creating an Application Deployment Policy
-
-=== Prerequisite Steps
-
-- Navigate to *Infrastructure*, and *Clusters*.
-- Click on the *development* cluster.
-- Click on the *Actions* dropdown and select *Edit Labels* button under *Labels*.
-- Verify that the *rhdp_usage=development* label exists in the cluster. If the label doesn't exist, create it.
-
-image::110-labels.png[link=self, window=blank, width=100%, Cluster Labels]
-
-=== Deploying an Application
-
-- Navigate to *Applications* from the left side menu.
-- Click *Create application, select Subscription*.
-- Enter the following information:
-* Name: rocket-chat
-* Namespace: rocket-chat
-* Under repository types, select the GIT repository
-* URL: https://github.com/levenhagen/rocketchat-acm
-* Branch: main
-* Path: rocketchat
-- Under *Select clusters* for application deployment, verify that *Deploy application resources only on clusters matching specified labels* is selected.
-- Enter the following information:
-* Cluster set: default
-* Label: rhdp_usage
-* Value: development
-- Verify all of the information is correct and click *Create*.
-
-It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
-
-image::111-application-topology.png[link=self, window=blank, width=100%, Application Topology]
-
-Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Rocket Chat application, which is now running in our cluster.
-
-image::112-application-route.png[link=self, window=blank, width=100%, Application Route]
-
-Feel free to experiment with the application at your leisure.
-
-Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
-
-[[policy-driven-governance]]
-
-== Policy Driven Governance
-
-Now that you have a cluster and a deployed application, you need to make sure that they do not drift from their original configurations. This kind of drift is a serious problem, because it can happen from benign and benevolent fixes and changes, as well as malicious activities that you might not notice but can cause significant problems. The solution that RHACM provides for this is the Governance, Risk, and Compliance, or GRC, functionality.
-
-=== Review GRC Functionality
-
-Enterprises must meet internal standards for software engineering, secure engineering, resiliency, security, and regulatory compliance for workloads hosted on private, multi and hybrid clouds. Red Hat Advanced Cluster Management for Kubernetes governance provides an extensible policy framework for enterprises to introduce their own security policies.
-
-The governance lifecycle is based on defined policies, processes, and procedures to manage security and compliance from a central interface page. 
-
-View the following diagram of the governance architecture:
-
-image::113-grc-diagram.png[link=self, window=blank, width=100%, Governance, Risk, Compliance Diagram]
-
-Use the Red Hat Advanced Cluster Management for Kubernetes security policy framework to create and manage policies. Kubernetes custom resource definition instances are used to create policies.
-
-Each Red Hat Advanced Cluster Management policy can have at least one or more templates. For more details about the policy elements, view the Policy YAML table section.
-
-[[create-grc-policies]]
-
-== Creating Policies in RHACM
-
-In order to assist in the creation and management of Red Hat Advanced Cluster Management for Kubernetes policies we use the policy generator tool. This tool, along with GitOps, greatly simplifies the distribution of Kubernetes resource objects to managed OpenShift or Kubernetes clusters through RHACM policies.
-
-=== Prerequisites
-
-To deploy policies with subscriptions, you will need to bind the *open-cluster-management:subscription-admin* ClusterRole to the user creating the subscription.
-
-To do this, complete the following steps:
-
-- Navigate to the *Governance* tab.
-- On the top tabs, click on *Policies*.
-- Click *Create Policy*.
-- On the top switch the toggle to *Display the YAML*.
-
-image::114-policy-toggle.png[link=self, window=blank, width=100%, Display the YAML]
-
-- Copy the following YAML excerpt and paste it in the screen:
-
-[source,yaml]
+= Module 01: Red Hat Quay
+
+In this session, participants will learn how to install and configure Quay, included as a part of OpenShift Platform Plus to host images in a private registry.
+
+The goal of this portion of the lab is to show the value that Quay provides for local image management, and also how OpenShift Data Foundation can be used to provide peristent storage for applications deployed in the cluster, such as image repositories.
+
+IMPORTANT: Several of the following tasks require use of the CLI, and should be run from the *Bastion* host in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
+
+If you have questions at any time, please don’t hesitate to ask!
+
+[[quay-install]]
+
+== Installing Red Hat Quay
+
+The Quay operator can be installed from the OperatorHub available in OpenShift Platform Plus. 
+
+. On our *local-cluster*, open the *Operators* menu on the left and click on *OperatorHub*.
++
+image::301-operatorhub-quay.png[link=self, window=blank, width=100%, OperatorHub Quay]
++
+. Type *Quay* in the search bar, and select the option for *Red Hat Quay*.
++
+image::302-install-quay.png[link=self, window=blank, width=100%, Install Quay]
++
+. Click the *Install* button and follow the default prompts.
++
+image::303-default-options.png[link=self, window=blank, width=100%, Quay Default Options]
++
+. Once the operator is installed, click on the *Create Instance* button under Quay Registry.
++
+image::304-create-quay-instance.png[link=self, window=blank, width=100%, Create Instance]
++
+NOTE: For the purposes of our lab we can accept the default options and do a basic installation of Red Hat Quay, but in a real world example you may want to customize your install.
++
+image::305-default-install.png[link=self, window=blank, width=100%, Default Quay Install]
++
+. Once it is installed successfully, we can check the *Resources* under the instance.
++
+image::306-quay-resources.png[link=self, window=blank, width=100%, Quay Resources]
+
+[[configure-registry]]
+
+== Configuring Your Registry
+
+Now that Quay is installed, we need to configure it to be able to host our images.
+
+. We can find the Quay url from the output of the following CLI command:
++
+[source,sh,role=execute]
 ----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  name: policy-configure-subscription-admin-hub
-  namespace: ""
-  annotations:
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-    policy.open-cluster-management.io/categories: CM Configuration Management
-    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
-spec:
-  remediationAction: inform
-  disabled: false
-  policy-templates:
-    - objectDefinition:
-        apiVersion: policy.open-cluster-management.io/v1
-        kind: ConfigurationPolicy
-        metadata:
-          name: policy-configure-subscription-admin-hub
-        spec:
-          remediationAction: inform
-          severity: low
-          object-templates:
-            - complianceType: musthave
-              objectDefinition:
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: ClusterRole
-                metadata:
-                  name: open-cluster-management:subscription-admin
-                rules:
-                  - apiGroups:
-                      - app.k8s.io
-                    resources:
-                      - applications
-                    verbs:
-                      - "*"
-                  - apiGroups:
-                      - apps.open-cluster-management.io
-                    resources:
-                      - "*"
-                    verbs:
-                      - "*"
-                  - apiGroups:
-                      - ""
-                    resources:
-                      - configmaps
-                      - secrets
-                      - namespaces
-                    verbs:
-                      - "*"
-            - complianceType: musthave
-              objectDefinition:
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: ClusterRoleBinding
-                metadata:
-                  name: open-cluster-management:subscription-admin
-                roleRef:
-                  name: open-cluster-management:subscription-admin
-                  apiGroup: rbac.authorization.k8s.io
-                  kind: ClusterRole
-                subjects:
-                  - name: kube:admin
-                    apiGroup: rbac.authorization.k8s.io
-                    kind: User
-                  - name: system:admin
-                    apiGroup: rbac.authorization.k8s.io
-                    kind: User
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  name: policy-configure-subscription-admin-hub-placement
-  namespace: ""
-placementRef:
-  name: policy-configure-subscription-admin-hub-placement
-  kind: PlacementRule
-  apiGroup: apps.open-cluster-management.io
-subjects:
-  - name: policy-configure-subscription-admin-hub
-    kind: Policy
-    apiGroup: policy.open-cluster-management.io
----
-apiVersion: apps.open-cluster-management.io/v1
-kind: PlacementRule
-metadata:
-  name: policy-configure-subscription-admin-hub-placement
-  namespace: ""
-spec:
-  clusterConditions:
-    - status: "True"
-      type: ManagedClusterConditionAvailable
-  clusterSelector:
-    matchExpressions:
-      - key: name
-        operator: In
-        values:
-          - local-cluster
+oc get route -n openshift-operators 
+----
++
+NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, to make the syntax below easier to copy/paste, or substitute it manually to the commands that follow.
++
+[source,sh,role=execute]
+----
+export QUAY_URL=<quay_url> 
+----
++
+. After opening the Quay UI, click on *Create Account* and fill in your account details.
++
+NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later. As a sample, we created a user called *admin* and a dummy email account. You may also want to export them as an environment variable to make the syntax later easier to copy/paste.
++
+[source,sh,role=execute]
+----
+export QUAY_USER=<quay_user> 
+----
++
+image::307-quay-create-account.png[link=self, window=blank, width=100%, Create Quay Account]
++
+. Once we have created our quay login we can create our first repository by clicking the *Create New Repository* button.
++
+image::308-create-repo.png[link=self, window=blank, width=100%, Create Quay Repo]
++
+. We can name this repository *rh1-lab* and make it public or private so we can choose who has access to it.
++
+image::309-name-repo.png[link=self, window=blank, width=100%, Name Quay Repo]
+
+NOTE: In addition to creating a repository in the Quay console, we can create one by pushing an image and defining the repository name on the command line. We will do this in our next lab step.
+
+[[working-images]]
+
+== Working With Images
+
+For a simple task to demonstrate the functionality of Quay, we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ubi image.
+
+. Using the terminal on the bastion host, login to quay using the podman cli as shown below:
++
+[source,sh,role=execute]
+----
+podman login $QUAY_URL 
+----
++
+NOTE: Use the credentials you just created to complete the login process.
+
+. Pull the ubi image with the following cli command:
++
+[source,sh,role=execute]
+----
+podman pull registry.access.redhat.com/ubi8/ubi:8.9-1028
+----
++
+. After we have a copy of the ubi image downloaded locally we can tag it and push it to our private registry using the following commands:
++
+[source,sh,role=execute]
+----
+podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/$QUAY_USER/ubi/ubi:8.9
+----
++
+[source,sh,role=execute]
+----
+podman push $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 --remove-signatures
+----
++
+. Once the image is successfully pushed, we can browse the Quay UI to validate it.
++
+. Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created ubi one.
++
+image::310-quay-repos.png[link=self, window=blank, width=100%, Quay Repositories]
++
+. We can do a simple test with our newly pushed image by pulling it and running an *Echo* command.
++
+[source,sh,role=execute]
+----
+podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
+----
++
+[source,texinfo,subs="attributes"]
+----
+[demo-user@bastion ~]$ podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
+Trying to pull quay-registry-quay-openshift-operators.apps.cluster-tww6x.tww6x.sandbox916.opentlc.com/admin/ubi/u
+bi:8.9...
+Getting image source signatures
+Copying blob b4e744f5f131 done
+Copying config 86b358a425 done
+Writing manifest to image destination
+Storing signatures
+Hello
+----
++
+. After the container runs, we can view the process with the following command:
++
+[source,sh,role=execute]
+----
+podman ps -a 
 ----
 
-- Enter a namespace to place the policy, the *default* namespace is OK to use.
-- Click *Next* till the end and then click on *Submit*.
-- Allow a few moments for the policy to propagate to the *local-cluster / RHACM Hub Cluster*.
-- Navigate back to policies and select the *policy-configure-subscription-admin-hub* policy.
-- Under the actions dropdown, select *Enforce*. This will enforce the policy, wait until the green checkmark is displayed.
+[[security-scan]]
 
-image::115-enforce-governance-policy.png[link=self, window=blank, width=100%, Enforce the Governance Policy]
+== Security Scanning
 
-=== Using Policy Generator
+Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
 
-This Policy Generator description will create 2 configuration policies:
+We can use the following procedure to check the security scan results for our UBI image we just uploaded.
 
-- *openshift-gitops-installed*: The goal of the first policy is to inform if the OpenShift GitOps operator is installed on managed clusters.
-- *kubeadmin-removed*: The goal of the second policy is to inform if the kubeadmin user is removed from managed clusters.
+. Click on the ubi repository and once inside click on the tags button on the left.
++
+image::311-image-tags.png[link=self, window=blank, width=100%, Image Tag Menu]
++
+NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
++
+. By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
++
+image::312-quay-sec-scan.png[link=self, window=blank, width=100%, Quay Security Scan]
++
+NOTE: The ubi image we are using in this lab shows 36 medium vulnerabilities, and 187 total when you hover over it at the time of this lab's creation.
++
+. Click on the list of vulnerabilities to see a more detailed view.
++
+image::313-security-details.png[link=self, window=blank, width=100%, Image Security Details] 
++
+. Click the packages button on the left menu to see which specific packages in the image are affected by what vulnerabilities.
++
+image::314-image-packages.png[link=self, window=blank, width=100%, Image Packages]
++
+Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
-NOTE: Both policies are informative only, and we will only execute them manually to demonstrate how to resolve issues.
 
-In order to deliver these policies we will need to leverage the RHACM Application Engine and the GitOps Subscription model.
-
-- Navigate to *Applications*.
-- Click *Create application, select Subscription*.
-- Enter the following information:
-* Name: policy-generator
-* Namespace: policy-generator
-* Under repository types, select the GIT repository
-* URL: https://github.com/levenhagen/demo-policygenerator.git
-* Branch: main
-- Verify that it installs only to the local cluster by setting the following values:
-* *Deploy application resources on clusters with all specified labels*
-* Cluster sets: *default*
-* Label: *local-cluster*
-* Operator: *equals any of*
-* Value: *true*
-- Verify all the information is correct, click *Create*.
-
-It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
-
-image::116-governance-topology.png[link=self, window=blank, width=100%, Governance Topology]
-
-- Navigate to the *Governance* tab.
-- Click on the *Policies* tab.
-- Verify that you see two policies and that their *Cluster Violations* count is one.
-* openshift-gitops-installed
-* kubeadmin-removed
-
-image::117-policies-list.png[link=self, window=blank, width=100%, Governance Policies List]
-
-Now that the policies have been created for us leveraging the Policy Generator Engine let’s go ahead and enforce them:
-
-- On the *openshift-gitops-installed* policy, click on the ellipses and set policy to *Enforce*.
-
-image::118-policies-enforce-red.png[link=self, window=blank, width=100%, Enforce the Policy]
-
-- Click the *Enforce* button to verify.
-- Wait a few minutes and you will see that the *Cluster Violations* will go from *red* to *green*.
-
-image::119-policies-enforce-green.png[link=self, window=blank, width=100%, Policy Enforced]
-
-- Click on the policy and slect *Results* to veify that the gitops operator has been installed.
-
-CAUTION: Feel free to repeat the steps with the *kubeadmin-removed* policy, however if you enforce this you won’t be able to continue this lab and access that cluster through the console as the only account created on these clusters is Kubeadmin.
-
-Now you have successfully created a Policy leveraging the Policy Generator to scan your clusters, if you would like to play with other policies please visit the Policy Repo for more Policies you can test out.
-
-[[acm-conclusion]]
+IMPORTANT: As of the creation date of this lab the list of vulnerabilties and the scores assigned to the images may differ from those provided by the image scanning tools available in Red Hat Advanced Cluster Security for Kuberenetes. Beginning with updated versions to be released in Spring of 2024 these values will begin to coalesce. It's entirely possible this will be the case by the time you participate in this lab, if you attempt to replicate outside of this lab environment. 
 
 == Conclusion
 
-In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy applications and manage policies across clusters, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM elab environment, or continue on to the next portion of the lab.
+We hope you have enjoyed this lab using Red Hat Quay to create and host your own repository, upload and use an image, and examine the image for security vulnerabilites. 
+Overall this lab has been dedicated to exploring many of the features added when upgrading an OpenShift Container Platform subscription to OpenShift Platform Plus. 
+At this time you have completed all of the tasks assigned in this lab, and you may freely explore the lab environment with the time you have remaining.
+

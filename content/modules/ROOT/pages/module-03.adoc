@@ -1,187 +1,961 @@
-= Module 03: Red Hat Quay
+== Module 03: Red Hat Advanced Cluster Security for Kubernetes
 
-In this session, participants will learn how to install and configure Quay, included as a part of OpenShift Platform Plus to host images in a private registry.
+In this session, participants will learn how to work with Red Hat Advanced Cluster Security for Kubernetes (RHACS).
 
-The goal of this portion of the lab is to show the value that Quay provides for local image management, and also how OpenShift Data Foundation can be used to provide peristent storage for applications deployed in the cluster, such as image repositories.
+The goal of the tasks in this part of the OpenShift Platform Plus lab  is to take you through the RHACS console/user interface and to observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to affect pods at both deployment and runtime. 
 
-IMPORTANT: Several of the following tasks require use of the CLI, and should be run from the *Bastion* host in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
+IMPORTANT: Several of the following tasks require use of the CLI. Many like those involving *roxctl* can be run from the user terminal built into the lab. For other tasks, you may need to SSH over to the *Bastion* host provided in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
 
 If you have questions at any time, please don’t hesitate to ask!
 
-[[quay-install]]
+=== RHACS Basics
 
-== Installing Red Hat Quay
+RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
 
-The Quay operator can be installed from the OperatorHub available in OpenShift Platform Plus. 
+The RHACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
 
-. On our *local-cluster*, open the *Operators* menu on the left and click on *OperatorHub*.
-+
-image::301-operatorhub-quay.png[link=self, window=blank, width=100%, OperatorHub Quay]
-+
-. Type *Quay* in the search bar, and select the option for *Red Hat Quay*.
-+
-image::302-install-quay.png[link=self, window=blank, width=100%, Install Quay]
-+
-. Click the *Install* button and follow the default prompts.
-+
-image::303-default-options.png[link=self, window=blank, width=100%, Quay Default Options]
-+
-. Once the operator is installed, click on the *Create Instance* button under Quay Registry.
-+
-image::304-create-quay-instance.png[link=self, window=blank, width=100%, Create Instance]
-+
-NOTE: For the purposes of our lab we can accept the default options and do a basic installation of Red Hat Quay, but in a real world example you may want to customize your install.
-+
-image::305-default-install.png[link=self, window=blank, width=100%, Default Quay Install]
-+
-. Once it is installed successfully, we can check the *Resources* under the instance.
-+
-image::306-quay-resources.png[link=self, window=blank, width=100%, Quay Resources]
+These security features represent any developer or administrator’s primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
 
-[[configure-registry]]
+=== RHACS Features
 
-== Configuring Your Registry
+Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensive Kubernetes security that includes the following use cases:
 
-Now that Quay is installed, we need to configure it to be able to host our images.
+- *Visibility:* See your entire landscape of images, registries, containers, deployments, and runtime behavior.
+- *Vulnerability* Management: Identify and remediate vulnerabilities in container images and Kubernetes across the entire software development life cycle.
+- *Compliance:* Audit your systems against CIS Benchmarks, NIST, PCI, and HIPAA, with interactive dashboards and one-click audit reports.
+- *Network Segmentation:* Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
+- *Risk Profiling:* See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
+- *Configuration Management:* Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
+- *Threat Detection:* Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
+- *Incident Response:* Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
-. We can find the Quay url from the output of the following CLI command:
+=== Accessing the RHACS Console
+
+In this section, you will confirm that you can connect to the RHACS portal.
+
+The following information will be available in the the main lab screen:
+
+- The RHACS admin Credentials
+- The URL for the RHACS portal
+
+=== Logging into the RHACS Console
+
+- From the main lab page, click the URL for the RHACS web console to head to the console's login page.
+
+image::201-lab-environment.png[link=self, window=blank, width=100%, Lab Environment]
+
+NOTE: You may get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also considered best practice to integrate the application with your authentication server.
+
+- Click through the warning page to get to the RHACS console login page.
+
+image::202-cert-warning.png[link=self, window=blank, width=100%, Certificate Warning]
+
+image::203-login-page.png[link=self, window=blank, width=100%, Login Page]
+
+- Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the RHACS console URL *(HINT: The Username is always admin)*.
+
+image::204-admin-login.png[link=self, window=blank, width=100%, Admin Login]
+
+- Ensure you maintain access to the console and keep your tab open for the future lab sections.
+
+image::205-rhacs-dashboard.png[link=self, window=blank, width=100%, RHACS Dashboard]
+
+[[lab-setup]]
+
+== Lab Setup
+
+To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
+
+NOTE: This step is mandatory, you must deploy these applications into your cluster in order to work through the lab exercises.
+
+The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
+
+Please complete the following steps to configure your lab environment
+
+- Click the button to run the command in the terminal.
+
+[source,sh,subs="attributes",role=execute]
+----
+git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
+export TUTORIAL_HOME="$(pwd)/acs-workshop"
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
+kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
+export ROX_CENTRAL_ADDRESS={acs_route}
+----
+
+CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
+
+- You will also need to create a token for login with the *roxctl* cli for later lab steps, this will be uniquely generated in your RHACS web console.
+
+- Follow these instructions:
+* Navigate to browser window with the RHACS portal open.
+* Go to *Platform Configuration* --> *Integrations*.
+* Scroll down to the *Authentication Tokens* category, and click *API Token*.
++
+image::205a-generate-api-token.png[link=self, window=blank, width=100%, Generate API Token]
++
+* Click *Generate Token*.
+* Enter a name for the token, and select *Admin* as the role
++
+image::205b-name-api-token.png[link=self, window=blank, width=100%, Name API Token]
++
+* Click the *Generate* button.
+* On the next screen click the copy button, and paste the value into a variable in your student VM.
++
+image::205c-copy-api-token.png[link=self, window=blank, width=100%, Copy API Token]
+
+IMPORTANT: Once you leave this screen, you will not be able to recover the token value.
+
+[source,sh,role=execute]
+----
+export $ROX_API_TOKEN=<api_token>
+----
+
+-  To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
+
+[source,sh,subs="attributes",role=execute]
+----
+echo "The address for ROX Central is: $ROX_CENTRAL_ADDRESS"
+echo "The token for roxctl authentication is: $ROX_API_TOKEN"
+echo "The deployments for the lab are listed below:"
+kubectl get deployments -l demo=acs -A
+----
+
+The output should look similar to this:
+
+[source,texinfo,subs="attributes"]
+----
+The address for ROX Central is: {acs_route}
+The token for roxctl authentication is: 
+The deployments for the lab are listed below:
+NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+backend        api-server         1/1     1            1           0d
+frontend       asset-cache        1/1     1            1           0d
+log4shell      log4shell-app      3/3     3            3           0d
+medical        reporting          1/1     1            1           0d
+operations     jump-host          1/1     1            1           0d
+payments       visa-processor     1/1     1            1           0d
+spring4shell   spring4shell-app   3/3     3            3           0d
+----
+
+If all of the applications are up and running, feel free to proceed to the next stage. If they are not running, rerun the command set, or ask a proctor for assistance.
+
+[[nav-con]]
+
+== Introducing the RHACS console and Vulnerability Management
+
+The first section of this lab will focus on navigation and vulnerability management. This work will take place in the UI and require you to use both the dashboard and the lab environment.
+
+=== Navigating the RHACS Console
+
+In this section, you familiarize yourself with the RHACS portal, including its tabs, search capabilities and dashboard functionality.
+
+The RHACS dashboard has four main sections:
+
+. Top Bar
+. Global Search
+. Navigation Menu
+. Dashboard
+
+image::206-numbered-dashboard.png[link=self, window=blank, width=100%, Numbered Dashboard]
+
+=== Top Bar
+
+The top bar contains the following functionality: 
+
+- Global Search 
+- Command-line tools 
+- Cluster Health 
+- Documentation 
+- API Reference 
+- Enable Dark/Light Mode 
+- Logged-in user account
+
+image::207-top-bar.png[link=self, window=blank, width=100%, Top Bar]
+
+=== Global Search
+
+The ability to instantly find resources is essential to safeguard your cluster. Utilize the RHACS search feature to find relevant resources faster.
+
+For example, you can use it to find deployments exposed to a newly published CVE or all deployments with external network exposure.
+
+A search query consists of two parts:
+
+- An attribute that identifies the resource type you want to search for.
+- A search term that finds the matching resource.
+
+For example, to find all violations in the *visa-processor* deployment, the search query is *Deployment:visa-processor*.
+
+In this search query, Deployment is the attribute, and visa-processor is the search term.
+
+NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the next attribute you would like to enter. Results will appear once there are matches to the entered query.
+
+image::209-search-syntax.png[link=self, window=blank, width=100%, Search Syntax]
+
+NOTE: RHACS maintains a library of searchable assets to help you search faster, they will appear in a drop-down list, and you can click on them to enter them as well. If a specific CVE or deployment cannot be found, please confirm the spelling of the asset name, or that it is correctly deployed in the cluster. 
+
+=== Local Page Filtering
+
+You can use local page filtering from within all views in the RHACS portal. Local page filtering works similarly to the global search, but only relevant attributes are available. You can select the search bar to show all available attributes for a specific view.
+
+=== Common Search Queries
+
+Here are some common search queries you can try in the RHACS search bar if you’d like to test its functionality.
+
+|============
+|Query|Example|Purpose
+|CVE:<CVE_number>|CVE:CVE-2018-11776|Finding deployments that are affected by a specific CVE
+|Privileged:<true_or_false>|Privileged:true|Finding privileged running deployments
+|Exposure Level:<level>|Exposure Level:External|Finding deployments that have external network exposure
+|============
+
+NOTE: This is just a sample of the types of queries you can use to analyze your environment in RHACS. For additional examples of search queries, please see the RHACS documentation.
+
+=== Navigation Menu
+
+image::210-nav-menu.png[link=self, window=blank, width=100%, Navigation Menu]
+
+The left-hand navigation menu provides access to each of the security use cases, as well as product configuration to integrate RHACS with your existing tooling. The navigation menu has the following items:
+
+- Dashboard: Summary view of your environment
+- Network Graph: Configured and actual network flows and the creation of Network Policies to implement network segmentation
+- Violations: Events that do not match the defined security policies
+- Compliance: Several industry and regulatory security standards, such as PCI DSS
+- Vulnerability Management: Information about known vulnerabilities affecting your environment, including deployed workloads and infrastructure, risk acceptance and reporting.
+- Configuration Management: Identification of potential misconfigurations that can lead to security issues
+- Risk: Risks affecting your environment, such as suspicious executions
+- Platform Configuration: RHACS configuration, policy management and integration details, including;
+* Clusters
+* Policy Management
+* Integrations
+* Access Control
+* System Configuration
+* System Health
+
+=== Dashboard 
+
+The Red Hat Advanced Cluster Security for Kubernetes (RHACS) Dashboard provides quick access to the data you need. It contains additional navigation shortcuts and actionable widgets that are easy to filter and customize so that you can focus on the data that matters most to you. You can view information about levels of risk in your environment, compliance status, policy violations, and common vulnerabilities and exposures (CVEs) in images.
+
+image::211-dashboard-center.png[link=self, window=blank, width=100%, Center Dashboard]
+
+=== Navigating the Main Dashboard
+
+The main Dashboard is your place to look at the vulnerabilities, risk, compliance, and policy violations across your clusters and namespaces. This section addresses all of the functionality in the main Dashboard to help you navigate it more effectively in the future.
+
+The dashboard can be broken down into three main sections:
+
+. The Status Bar
+. The Dashboard Filter
+. The Actionable Widgets
+
+image::212-three-dashboards.png[link=self, window=blank, width=100%, Three Dashboard Sections]
+
+=== The Status Bar
+
+The Status Bar provides at-a-glance numerical counters for critical resources. The counters reflect what is visible with your current access scope, defined by the roles associated with your user profile. 
+
+These counters are clickable, providing fast access to the desired list view pages as follows:
+
+|============
+|Counter|Destination
+|Clusters|Platform Configuration -> Clusters
+|Nodes|Configuration Management -> Applications & Infrastructure -> Nodes
+|Violations|Violations Main Menu
+|Deployments|Configuration Management -> Applications & Infrastructure -> Deployments
+|Images|Vulnerability Management -> Dashboard -> Images
+|Secrets|Configuration Management -> Applications & Infrastructure -> Secrets
+|============
+
+=== The Dashboard Filter 
+
+The Dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope.
+
+NOTE: The Dashboard filter does not affect the Status Bar and when no clusters or namespaces are selected, the view automatically switches to All.
+
+image::213-dashboard-filter.png[link=self, window=blank, width=100%, Dashboard Filter]
+
+image::214-dashboard-dropdown.png[link=self, window=blank, width=100%, Dashboard Drop-down]
+
+=== Actionable Widgets
+
+If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities.
+
+With these widgets, you can customize the information displayed on the dashboard by default in order to find the items that you consider most important to your deployments and your business' security.
+
+[[vuln-mgmt]]
+
+== The Vulnerability Management Dashboard
+
+Let us continue by looking at our primary use case for RHACS and that is the Vulnerability Management features and dashboard, a familiar topic for most security teams.
+
+IMPORTANT: The locations and size of your panels may vary depending on your screen size and zoom.
+
+NOTE: For the following section, please note that the order in which the images appear or the number of components affected may vary depending on versions and other applications running in the cluster.
+
+. Click the *Vulnerability Management (1.0)* tab, and then select *Dashboard*
++
+image::215-vuln-dashboard.png[link=self, window=blank, width=100%, Vulnerability Management Dashboard]
++
+The dashboard provides several important vulnerability breakdowns such as:
++
+- Top risky deployments/images
+- Recently detected image vulnerabilities
+- Most common image vulnerabilities
++
+More important than fixing any vulnerability is establishing a process to keep container images updated and to prevent the promotion through the pipeline for images with serious, fixable vulnerabilities. RHACS displays this through the *Top Risky Deployments by CVE and CVSS Score* and takes the container’s configuration and vulnerability details to show you the most *at risk* deployments in your cluster.
++
+image::216-top-risky.png[link=self, window=blank, width=100%, Riskiest Deployments]
++
+. Above the *Risky Deployments* section, there are buttons to link you to all policies, CVEs, and images, and a menu to bring you to reports by cluster, namespace, deployment, and component. The vulnerability dashboard can be filtered by clicking the Fixable CVSS score button.
++
+image::217-policy-buttons.png[link=self, window=blank, width=100%, Top Policy Buttons]
++
+. Locate the *Top Riskiest Images* panel. Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the *log4shell* exploit in your cluster and block that container from being pushed in the future.
++
+image::218-riskiest-images.png[link=self, window=blank, width=100%, Riskiest Images]
++
+. In the *Top Riskiest Images* panel, click on the *VIEW ALL* button.
++
+The images in this dashboard are listed here in order of RISK, based on the number and severity of the vulnerabilities present in the components in the images
++
+Notice which images are more exposed. Not only can we see the number of CVEs affecting the images, but which of them are fixable? We can also see:
++
+- Creation date
+- Scan time
+- Image OS
+- Image status
+- How many deployments are using the vulnerable image
+- The total components in the image
++
+. Next, find and click on the image *visa-processor:latest-v2*. You will review the images' components and violations.
++
+image::219-visa-proc.png[link=self, window=blank, width=100%, Visa Processor Image]
++
+NOTE: If you cannot find the visa-processor:latest-v2 image, use the search bar to filter for the specific image you want.
++
+If you click the search bar, you will be shown the different labels you can search by. Click Image and type visa until the correct image comes up.
++
+You can use this method of searching in all search bars within the RHACS dashboard.
++
+image::220-search-bar.png[link=self, window=blank, width=100%, Search Bar]
++
+You can move on to the next section only when the dashboard displays the image below.
++
+image::221-image-info.png[link=self, window=blank, width=100%, Image Info]
+
+
+=== RHACS Vulnerability Scanner
+
+RHACS' built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, or Java. The Image Summary provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
+
+- In the *Details and metadata* → Image Summary panel, the information you see there tells you that this image has a severe security problem - the base image was imported several years ago (Debian 8 - 2015).
+- At the top of the page is the warning that CVE data is stale - that this image has a base OS version whose distribution has stopped providing security information and likely stopped publishing security fixes.
+- Scroll down the page. In the Image Findings section, you find the details of the image vulnerabilities. There are 535 fixable vulnerabilities in the cluster (at the time of the creation of this workshop.)
++
+image::222-fix-vulns.png[link=self, window=blank, width=100%, Fixable Vulnerabilities]
++
+- Above the Image Findings section, click on the *Dockerfile* tab:
++
+image::223-dockerfile.png[link=self, window=blank, width=100%, Dockerfile View]
++
+The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the most recent layers are also several years old. Time is not kind to images and components - as vulnerabilities are discovered, RHACS will display newly discovered CVEs.
+
+*Now let's put this UI to the test with a real use case!*
+
+
+=== log4shell CVE Vulnerability Analysis
+
+It is time to find the components that have the log4shell vulnerability in your cluster. Zero day and high priority vulnerabilities need to be triaged quickly. The log4shell vulnerability provides a great example of how security teams can assess a vulnerability's impact quickly and effectively.
+
+Check out the Red Hat advisory for more details:
+
+. Head back to the *Top Riskiest Images* Dashboard. (Vulnerability Management (1.0) → Top Riskiest Images)
++
+image::224-riskiest-images2.png[link=self, window=blank, width=100%, Riskiest Images]
++
+. Search for the log4shell vulnerability using its CVE number (*CVE-2021-44228*)
++
+image::225-log4shell-search.png[link=self, window=blank, width=100%, log4shell Search]
++
+- How many images are affected by the vulnerability?
+- How many deployments contain the vulnerability?
+- Why do you think the risk priority is where it is?
+- Should the risk priority be higher? Or lower?
+
+NOTE: The log4shell CVE is very serious - scoring 10/10 - and is fixable.
+
+Luckily there is only *ONE* image being affected by this vulnerability (2 deployments), so you could go directly to the source and fix all three deployments in one opportunity.
+
+*How would your DevSecOps team address this vulnerability?*
+
+
+=== Relating Image CVEs with Kubernetes Configuration Properties
+
+All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? RHACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
+
+The first *risk factor* - is the vulnerable component in a running deployment.
+
+. Click on the *Risk* panel to continue.
++
+image::226-risk-panel.png[link=self, window=blank, width=100%, Risk Panel]
++
+Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why, we must ask ourselves, is it scored differently in this dashboard?
++
+image::227-log4shell-risk.png[link=self, window=blank, width=100%, Log4Shell Risk]
++
+. Click on the log4shell deployment and review the risk indicators.
++
+image::228-log4shell-info.png[link=self, window=blank, width=100%, Log4Shell Info]
++
+. Next, click on the visa-processor deployment and review its risk indicators. What do you think made the visa-processor deployment #1 in this example?
++
+image::229-visa-processor.png[link=self, window=blank, width=100%, Visa Processor Info]
++
+Factors that play into the overall score are in the risk indicators section. These include, but are not limited to:
++
+- Policy Violations
+- Image Vulnerabilities
+- Service Configuration
+- Service Reachability
+- Components Useful for Attackers
+- Number of Components in an Image
+- Image Freshness
+- RBAC Configuration
+
+A primary reason for the visa-processor deployment to be ranked so high is that it is an ancient image (older than the log4shell app). A good indicator of risk is that the older an image is, the more likely it will have a significant exploitable vulnerability.
+
+We will leave it to you to make your own risk assessments in the future. 
+
+Now, let us move along to enforcing a log4shell policy and stopping future deployments containing the vulnerability.
+
+[[policy-mgmt]]
+
+== Policy Management
+
+RHACS has many built-in policies to detect activity related to attacker goals: gain a foothold, maintain a presence, move laterally, and exfiltrate data. The continuous runtime monitoring observes all container activity and will automatically respond to events with appropriate enforcement and notification. However, that would be missing out on an opportunity - RHACS wants to go one step further, to take advantage of containers' ephemeral, immutable nature, to improve security in a measurable way from now on.
+
+We want to use runtime incidents and vulnerabilities as a learning opportunity to improve security going forward by constraining how our containers can act. We achieve this by creating policies and implementing them early in the CI/CD process.
+
+As we move into this next section, lets focus on identifying and enforcing a runtime policy in the cluster. For the upcoming example, we will focus on stopping the Ubuntu package manager from being run on pods in our cluster.
+
+. On the left-hand side of the application, click the *Platform Configuration* tab and select *Policy Management*.
++
+image::230-policy-mgmt-dashboard.png[link=self, window=blank, width=100%, Policy Management Dashboard]
++
+. Filter through the policies to find *Ubuntu Package Manager Execution* or use the search bar to select by *category*.
++
+image::231-policy-search.png[link=self, window=blank, width=100%, Policy Management Search]
++
+. Once you have found the policy *Ubuntu Package Manager Execution*, click on it to learn more.
++
+image::232-policy-mgmt-details.png[link=self, window=blank, width=100%, Policy Management Details]
++
+. If you click the actions button, you will see how easy it is to edit, clone, export or disable these policies. We also recommended cloning the policies and adding or removing specific filters as you need them.
+
+[[network-seg]]
+
+== Introduction to Network Segmentation
+
+Network Segmentation works by controlling how traffic flows among the parts. You may stop the traffic in one part from reaching another or limit the flow by traffic type, source, destination, and many other criteria. How you decide to segment your network is called a segmentation policy.
+
+Segmentation improves cybersecurity by limiting how far an attack can spread. For example, segmentation keeps a malware outbreak in one section from affecting systems in another.
+
+Using Kubernetes network policies in OpenShift, you can restrict open network paths for isolation and prevent lateral movement by attackers.
+
+=== Kubernetes Network Policies
+
+A Kubernetes network policy specifies how groups of pods are allowed to communicate with each other and with other network endpoints. These network policies are configured as YAML files. However, it is often hard to identify, just by looking at these files alone, whether the applied network policies achieve the desired network topology. Red Hat Advanced Cluster Security for Kubernetes (RHACS) gathers the defined network policies from your orchestrator and provides functionality to make these policies easier to use.
+
+Kubernetes Network Polices in RHACS make it easy for security focused users to:
+
+- Examine namespace and deployment details
+- Switch from the active view to the allowed connections view
+- Use the network policy simulator
+- Fix PCI compliance in the microservices demo application
+
+=== Explore Network Graphs
+
+The network graph combines a flow diagram, a firewall diagram, and a firewall rule builder in one view.
+
+. From the left, navigate to the Network Graph tab:
++
+image::233-network-graph-menu.png[link=self, window=blank, width=100%, Network Graph Menu]
++
+. In the upper left, there is a cluster menu. Select the production cluster, the backend namespace, and all the deployments associated with the namespace.
++
+image::234-network-namespace.png[link=self, window=blank, width=100%, Network Namespace/Deployments]
++
+. You can easily navigate between any of the clusters connected to RHACS.
+. The default view, *Active*, shows actual traffic for the past hour between the deployments in the namespaces.
+. You can change the time frame (in the upper left corner of the menu) and review the legend (in the bottom left corner).
+. Click on the *backend-atlas* deployment to get a sidebar to appear.
++
+image::235-backend-atlas.png[link=self, window=blank, width=100%, Backend-Atlas Analysis]
+
+=== Analyze the Network Traffic
+
+The *Details* section outlines the Network Security, Deployment configuration, and Exposed ports giving you useful information about the deployment’s security.
+
+The *Flows* section highlights the current network flows associated with the deployment.
+
+The *Baselines* section highlights the baseline network flows that ACS has recorded.
+
+The *Network Policies* section highlights if there are any network policies associated with the deployment.
+
+. In the *Flows* box at the upper right, add the *API-server* flow to the network baseline.
+
+image::236-add-to-baseline.png[link=self, window=blank, width=100%, Add to Baseline]
+
+Adding network activity accomplishes a similar goal as adding runtime activity that we like. By doing this, we can tell ACS what policy should be crafted around. You can create policies that inform you on anomalous traffic in the future.
+
+[[net-pol-gen]]
+
+== Use the Network Policy Generator
+
+OpenShift defaults to no egress or ingress restrictions on namespaces. This may be useful for proof of concepts, but it conflicts with best practices required under several compliance standards. The network policy simulator is designed to help solve this problem quickly and accurately by using the history of observed traffic to build firewall rules.
+
+- At the top right, click Network Policy Generator.
++
+image::238-network-policy-generator.png[link=self, window=blank, width=100%, Network Policy Generator]
++
+. Click the *Generate and simulate network policies* button.
++
+image::239-gen-sim-pol.png[link=self, window=blank, width=100%, Generate and Simulate Network Policies]
++
+. It will generate YAML for applying a new firewall policy based on the current environment.
++
+image::240-net-pol-yaml.png[link=self, window=blank, width=100%, Network Policy YAML]
+
+The firewall rules you are generating are not proprietary, but OpenShift-native NetworkPolicy objects. This feature, more than any other, illustrates the philosophy that RHACS represents: security through platform-native features with fixes supplied as configuration for OpenShift.
+
+Implementing stronger security through declarative statements avoids the **anti-pattern** of having configuration rules in a separate system. This code becomes part of your application, ensuring the consistency of a **single source of truth** for your codebase. This approach also reduces operational risk because there is no proprietary firewall in your cluster or in your pods that could fail, causing an application outage.
+
+RHACS leverages the firewall that is already in your OpenShift cluster. Throughout the product, you see this approach: **fix it in the code; leverage the platform**. 
+
+In our next next section we will see how applying a policy affects the compliance score of an application.
+
+[[update-comp]]
+
+== Update Compliance for Applications
+
+[quote,PCI-DSS website,https://www.pcisecuritystandards.org]
+____
+The best way to maximize cardholder data security is to continuously monitor and enforce the use of controls specified in the PCI Data Security Standard.
+____
+
+RHACS continuously monitors and enforces policies and is aware of PCI-DSS and other compliance standards.
+
+In this section, you bring the *visa-processor* application closer to compliance with RHACS.
+
+. Select the *Namespaces* drop-down menu, and click on the *payments* namespace. 
+. Using the *Deployments* drop-down, select the *visa-processor* deployment. 
+. Highlight the *visa-processor* pod, and and examine the deployment details on the right side:
++
+image::241-visa-processor-details.png[link=self, window=blank, width=100%, Visa Processor Details]
++
+. From the left, navigate to the *Compliance* page.
+. In the upper right, click *Scan Environment*:
++
+image::242-compliance-dashboard.png[link=self, window=blank, width=100%, Compliance Dashboard]
++
+NOTE: You can use this opportunity to take a break and explore the various interactive graphs on the Compliance Dashboard.
++
+. On the top of the Compliance page, click *namespaces (scanned)* to see a report of compliance scores by namespace.
+. At the top, use the filter bar to restrict the view to the Namespace: *payments*.
+. Examine the results to see that the payments namespace has approximately 45% compliance for PCI.
++
+image::243-filter-pci-45.png[link=self, window=blank, width=100%, Filter Payments Namespace Demo 45%]
++
+. Click on the summary line to get a breakout of the current compliance statistics for this namespace. 
+. Scroll down and view the various compliance standards. 
+. There are some significant gaps on PCI-DSS compliance. Click on *View Standard* to see that there are practically no policies applied in *Control Section 1*, which addresses network isolation.
++
+image::243a-control-section-one.png[link=self, window=blank, width=100%, Control Section One]
++
+. After you note the current compliance level, return to the Network Graph page by clicking on *Network -> Network Graph* in the left side menu.
+. At the top, use the filter bar to narrow the view to Namespace: *payments*. The network graph changes focus to only the *payments* namespace.
+. Click *Network policy generator* in the upper-right corner, followed by and then *Generate and simulate network policies*
+. This generates a sample yaml to create a default network policy for this namespace. 
++
+NOTE: Take notice of the *red shield and X* icon on each pod within the payments namespace, noting there is no network policy currently in place.
++
+. Click the clipboard button to copy the yaml.
++
+image::244-network-pol-gen-yaml.png[link=self, window=blank, width=100%, Network Policy Generator Yaml]]
++
+. On your lab terminal use the text editor *vi* to create a new file named network-policy-generator.yaml
+. Hit *i* for insert mode, and paste the contents of your network policy yaml into the file.
+. Hit the *esc* key to leave edit mode, and type *:wq* to write and quit, and press enter.
+. Apply the network policy.
 +
 [source,sh,role=execute]
 ----
-oc get route -n openshift-operators 
+oc apply -f network-policy-generator.yaml
 ----
 +
-NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, to make the syntax below easier to copy/paste, or substitute it manually to the commands that follow.
+image::244a-terminal-net-pol.png[link=self, window=blank, width=100%, Terminal Network Policy]
 +
-[source,sh,role=execute]
-----
-export QUAY_URL=<quay_url> 
-----
+. Refresh the browser window where you have RHACS open, and you will see that the pods in the payments namespace now have a *gold shield icon* indicating that they have ingress network policies applied. 
 +
-. After opening the Quay UI, click on *Create Account* and fill in your account details.
+image::244b-ingress-policy.png[link=self, window=blank, width=100%, Golden Ingress Policy]
 +
-NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later. As a sample, we created a user called *admin* and a dummy email account. You may also want to export them as an environment variable to make the syntax later easier to copy/paste.
+. Navigate back to *Compliance* and click *Scan Environment*.
+. Click on *namespaces (scanned)* and search for the Namespace: *payments* in the filter bar.
+. Examine the results to see that the *payments* namespace has increased to approximately 60% compliance for PCI.
 +
-[source,sh,role=execute]
-----
-export QUAY_USER=<quay_user> 
-----
+image::245-filter-pci-60.png[link=self, window=blank, width=100%, Filter Payments Namespace 60%]
 +
-image::307-quay-create-account.png[link=self, window=blank, width=100%, Create Quay Account]
+. Like before we can click on this to get a more detailed view, and if we scroll down to the PCI-DSS graph and click on *View Standard* we can see the new rules applied to *Control Section 1*.
 +
-. Once we have created our quay login we can create our first repository by clicking the *Create New Repository* button.
-+
-image::308-create-repo.png[link=self, window=blank, width=100%, Create Quay Repo]
-+
-. We can name this repository *rh1-lab* and make it public or private so we can choose who has access to it.
-+
-image::309-name-repo.png[link=self, window=blank, width=100%, Name Quay Repo]
+image::245a-Control-Section-One-Update.png[link=self, window=blank, width=100%, Control Section One Update]
 
-NOTE: In addition to creating a repository in the Quay console, we can create one by pushing an image and defining the repository name on the command line. We will do this in our next lab step.
 
-[[working-images]]
+RHACS makes it easy to analyze the network security of your OpenShift clusters and helps you take advantage of OpenShift’s built-in firewall protections.
 
-== Working With Images
+To support network policy enforcement, you used Red Hat Advanced Cluster Security for Kubernetes to do the following:
 
-For a simple task to demonstrate the functionality of Quay, we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ubi image.
+- Examine the network and individual deployments in the network graph
+- Create network policies in the network policy generator that can be easily applied
+- Bring deployments closer to PCI DSS compliance by implementing appropriate network policies
 
-. Using the terminal on the bastion host, login to quay using the podman cli as shown below:
+[[deploy-enforce]]
+
+== Introduction to Deploy-Time Policy Enforcement
+
+In this lab, you explore how Red Hat Advanced Cluster Security for Kubernetes (RHACS) can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+There are two approaches to enforcing deploy-time policies in RHACS:
+
+- In clusters with **listen** and **enforce** AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
+- In clusters where the enforcement option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
+
+In this lab, the enforcement action output that is documented assumes that the AdmissionController deployment is created with the listen and enforce options enabled.
+
+- Prevent unscanned images from deployment
+- Prevent misuse of environment variables at deploy time
+
+== Prevent Unscanned Images from Deployment
+
+RHACS can block the deployment of container images that were not scanned for vulnerabilities either by the RHACS Scanner or other, third-party vulnerability scanners. Enforcing the use of vulnerability scanning is an important part of general security practices and in industry and regulatory standards like NIST 800-190, PCI-DSS, and HIPAA.
+
+=== Configure Admission Controller
+
+Using admission controller enforcement for image-based scanning requires enabling the AdmissionController deployment and configuring it to contact image scanners.
+
+. Verify that admission controller and image scanning are set up properly by navigating to Platform Configuration → Clusters → Production and verifying that the following settings are enabled:
++
+image::246-settings-enabled.png[link=self, window=blank, width=100%, Verify Settings Enabled]
++
+image::247-dynamic-config.png[link=self, window=blank, width=100%, Dynamic Configuration]
++
+NOTE: Before configuring this lab, be aware that enforcing this policy blocks all deployments that use images for which RHACS Central cannot retrieve results. For more information, review the RHACS help for Scanner and Image Registries.
++
+. Navigate to Platform Configuration → Policy Management, find the Images with no scans policy through the filter, and select it to open the side panel.
++
+image::248-image-noscan.png[link=self, window=blank, width=100%, Images with No Scans]
++
+. On the first page, click Edit and enable the policy. This policy rejects attempts to deploy an image that has no scanning status.
+. On your student VM, use Kubernetes to deploy a deliberately nonsensical image with no scans:
+
+[source,sh,role=execute]
+----
+oc new-project test
+oc run nonsense --image=test-nonsense:latest
+----
+
+RHACS evaluates the policy and performs the default behavior by informing on the violation by the Kubernetes admission controller, creating a logged event.
+
+We can check this by clicking on the *Violations* menu on the left hand side.
+
+image::248a-violation-log.png[link=self, window=blank, width=100%, Violation Log]
+
+In our next section we will discuss how to configure RHACS to block container actions at either deploy-time or runtime.
+
+=== Enforce Deploy-Time Policy on Misuse of Environment Variables
+
+In this section, you explore using RHACS to prevent the deployment of applications that mishandle sensitive data (such as account keys, certificates, or passwords).
+
+Container-based microservices applications face challenges when providing sensitive information like passwords to running containers. For example, an e-commerce application may have an order status microservice that needs to read records from a database that requires a username and password to execute queries. It is a critical security practice to keep passwords private.
+
+Unfortunately, several methods for distributing secrets that have come into common use fail to protect sensitive content or restrict access to secrets. One of these insecure methods is to store sensitive data in the clear in Kubernetes deployment YAML files. This section demonstrates how RHACS can bring this misuse to light and encourage a developer to use a proper secrets management method.
+
+RHACS also has a separate feature for visibility into the Kubernetes Secrets feature, a method for distributing secrets to deployments natively in Kubernetes. For more information, see the RHACS documentation.
+
+This section demonstrates two separate enforcement points for policies: at build time (perhaps as part of a CI/CD job) and at deployment time in a Kubernetes cluster.
+
+. Create the following Deployment manifest on your student VM:
 +
 [source,sh,role=execute]
 ----
-podman login $QUAY_URL 
+cat << EOF >$HOME/secrets.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu:18.04
+        env:
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "abcdefg"
+EOF
 ----
 +
-NOTE: Use the credentials you just created to complete the login process.
+. In the Platform Configuration → Policy Management page of the RHACS web console, locate the *Environment Variable Contains Secret* policy.
+. Click the *Actions* drop down and verify the policy is enabled, or enable it if not. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
+. Supply the file containing this YAML to roxctl on your student VM to run the Deployment check:
++
+[source,sh,role=execute]
+----
+roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file ./secrets.yaml --insecure-skip-tls-verify
+----
++
+. Among the policy violations, review the output and expect to see the following:
++
+[source,texinfo,subs="attributes"]
+----
+Policy check results for deployments: [ubuntu]
+(TOTAL: 6, LOW: 3, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
 
-. Pull the ubi image with the following cli command:
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| Environment Variable Contains  |   HIGH   |       -       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
+|             Secret             |          |               |            |   environment variables that   |   'AWS_SECRET_ACCESS_KEY' is   |    environment variables to    |
+|                                |          |               |            |        contain 'SECRET'        | present in container 'ubuntu'  |    orchestrator secrets or     |
+|                                |          |               |            |                                |                                |  your security team's secret   |
+|                                |          |               |            |                                |                                |      management solution.      |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+| No resource requests or limits |  MEDIUM  |       -       |   ubuntu   | Alert on deployments that have | - CPU limit set to 0 cores for |    Specify the requests and    |
+|           specified            |          |               |            |  containers without resource   |       container 'ubuntu'       |  limits of CPU and Memory for  |
+|                                |          |               |            |      requests and limits       |                                |        your deployment.        |
+|                                |          |               |            |                                |  - CPU request set to 0 cores  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                | - Memory limit set to 0 MB for |                                |
+|                                |          |               |            |                                |       container 'ubuntu'       |                                |
+|                                |          |               |            |                                |                                |                                |
+|                                |          |               |            |                                |  - Memory request set to 0 MB  |                                |
+|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Pod Service Account Token    |  MEDIUM  |       -       |   ubuntu   |  Protect pod default service   |    - Deployment mounts the     |              Add               |
+|     Automatically Mounted      |          |               |            | account tokens from compromise |    service account tokens.     | `automountServiceAccountToken: |
+|                                |          |               |            |   by minimizing the mounting   |                                |   false` or a value distinct   |
+|                                |          |               |            |     of the default service     | - Namespace has name 'default' |     from 'default' for the     |
+|                                |          |               |            |  account token to only those   |                                |    `serviceAccountName` key    |
+|                                |          |               |            |     pods whose application     |  - Service Account is set to   |    to the deployment's Pod     |
+|                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
+|                                |          |               |            |        Kubernetes API.         |                                |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|        90-Day Image Age        |   LOW    |       -       |   ubuntu   |   Alert on deployments with    | - Container 'ubuntu' has image |   Rebuild your image, push a   |
+|                                |          |               |            |    images that haven't been    | created at 2023-05-30 09:32:09 | new minor version (with a new  |
+|                                |          |               |            |       updated in 90 days       |             (UTC)              |   immutable tag), and update   |
+|                                |          |               |            |                                |                                |    your service to use it.     |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
+|  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
+|          Been Created          |          |               |            |                                |                                |         the root user          |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
+|             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
+|                                |          |               |            |     Debian/Ubuntu package      |            1.6.17)             |  --force-all debconf dpkg` in  |
+|                                |          |               |            |    management system in the    |                                | the image build for production |
+|                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
+|                                |          |               |            |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |            |                                |       1.19.0.5ubuntu2.4)       |                                |
++--------------------------------+----------+---------------+------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:   A total of 6 policies have been violated
+----
++
+In a CI/CD pipeline service, this output is available to the developer via the job’s console output, and the job fails because of this failed roxctl check.
++
+If a developer were to bypass the CI/CD checks, or deploy manually without any build-time controls, RHACS can still enforce policies at deployment time. RHACS does this by using policy evaluation and admission controller enforcement.
++
+. To see this in action, deploy the secrets file:
 +
 [source,sh,role=execute]
 ----
-podman pull registry.access.redhat.com/ubi8/ubi:8.9-1028
-----
-+
-. After we have a copy of the ubi image downloaded locally we can tag it and push it to our private registry using the following commands:
-+
-[source,sh,role=execute]
-----
-podman tag registry.access.redhat.com/ubi8/ubi:8.9-1028 $QUAY_URL/$QUAY_USER/ubi/ubi:8.9
-----
-+
-[source,sh,role=execute]
-----
-podman push $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 --remove-signatures
-----
-+
-. Once the image is successfully pushed, we can browse the Quay UI to validate it.
-+
-. Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created ubi one.
-+
-image::310-quay-repos.png[link=self, window=blank, width=100%, Quay Repositories]
-+
-. We can do a simple test with our newly pushed image by pulling it and running an *Echo* command.
-+
-[source,sh,role=execute]
-----
-podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
+oc create -f secrets.yaml
 ----
 +
 [source,texinfo,subs="attributes"]
 ----
-[demo-user@bastion ~]$ podman run $QUAY_URL/$QUAY_USER/ubi/ubi:8.9 echo Hello
-Trying to pull quay-registry-quay-openshift-operators.apps.cluster-tww6x.tww6x.sandbox916.opentlc.com/admin/ubi/u
-bi:8.9...
-Getting image source signatures
-Copying blob b4e744f5f131 done
-Copying config 86b358a425 done
-Writing manifest to image destination
-Storing signatures
-Hello
+Error from server (Failed currently enforced policies from StackRox): error when creating "secrets.yaml": admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+
+Policy: Environment Variable Contains Secret
+- Description:
+    - Alert on deployments with environment variables that contain 'SECRET'
+- Rationale:
+    - Using secrets in environment variables may allow inspection into your secrets
+      from the host or even through the orchestrator UI.
+- Remediation:
+    - Migrate your secrets from environment variables to orchestrator secrets or your
+      security team's secret management solution.
+- Violations:
+    - Environment variable 'AWS_SECRET_ACCESS_KEY' is present in container 'ubuntu'
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
 ----
+
+In this lab, you explored how RHACS can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
+
+You saw how to use the AdmissionController with the listen and enforce options enabled to reject deployments that violate policy.
+
+In clusters where the enforcement option is disabled, you saw how RHACS scales pod replicas to zero for deployments that violate policy.
+
+IMPORTANT: Once this section is complete, go back and disable enforcement of this policy (set back to inform), else it may affect other actions in the lab.
+
+
+[[runtime-enforce]]
+
+== Introduction to Runtime Policy Enforcement
+
+RHACS observes container processes and collects this information to enable you to craft policies to prevent behavior that you don’t like. This information can also create baseline policy configurations that the user can update.
+
+The example below demonstrates how security may want to block a package manager from downloading any packages to the container. This runtime enforcement option is the first in the process of shifting left. After runtime enforcement, you will want to stop the package manager from being used in the container altogether.
+
+=== Prevent Execution of Package Manager Binary
+
+Package managers like apt (Ubuntu), apk (Alpine), or yum/dnf (RedHat) are binary software components used to manage and update installed software on a Linux® host system. They are used extensively to manage running virtual machines. But using a package manager to install or remove software on a running container violates the immutable principle of container operation.
+
+This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift® to terminate the pod for enforcement. Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state where the container is operating. Furthermore, because a runtime policy may detect only part of an attacker’s activity inside a container, removing the container avoids the attack.
+
+=== Enable Enforcement of Policy
+
+. Navigate to *Platform Configuration → Policy Management* and find the *Ubuntu Package Manager Execution* policy.
+. On the *Policy Management* page, type *Policy + Ubuntu* into the filter bar at the top.
+. Select the policy *Ubuntu Package Manager Execution*.
+. Click the *Actions* button then click *Edit policy*.
+. Select the *Policy Behavior* tab.
+. Enable runtime enforcement by clicking the *inform and enforce* button.
+. Configure enforcement behavior by selecting *Enforce at Runtime*.
 +
-. After the container runs, we can view the process with the following command:
+image::249-enforce-runtime.png[link=self, window=blank, width=100%, Enforce Runtime Policy]
++
+. Click save.
+
+IMPORTANT: Make sure to save the policy changes! If you do not save the policy the process will not be blocked!
+
+=== Testing the Configured Policy
+
+Next, we will use tmux to watch OpenShift events while running the test, so you can see how RHACS enforces the policy at runtime.
+
+. On your student VM, ssh over to the *Bastion* host, and start tmux with two panes:
 +
 [source,sh,role=execute]
 ----
-podman ps -a 
+tmux new-session \; split-window -v \; attach
+----
++
+. Next, run a watch on OpenShift events in the first shell pane:
++
+[source,sh,role=execute]
+----
+oc get events -w
+----
++
+. Press *Ctrl+b, o* to switch to the next pane. (Ctrl+b THEN o)
+. Run a temporary Ubuntu OS image using the tmp-shell application:
++
+[source,sh,role=execute]
+----
+oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
+----
++
+NOTE: After the cluster pulls the image and starts the pod, expect to see a Linux command shell as shown.
++
+[source,texinfo,subs="attributes"]
+----
+If you don't see a command prompt, try pressing enter.
+root@tmp-shell:/#
+----
++
+. Run the package manager in this shell:
++
+[source,sh,role=execute]
+----
+apt update
+----
++
+. Examine the output and expect to see that the package manager attempts to perform an update operation:
++
+[source,texinfo,subs="attributes"]
+----
+Get:1 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
+0% [1 InRelease 14.2 kB/242 kB 6%] [Connecting to security.ubuntu.com (2620:2d:4000:1::16)]Sess
+ion ended, resume using 'oc attach tmp-shell -c tmp-shell -i -t' command when the pod is running
+No resources found
+----
++
+. Examine the oc get events tmux pane (The pane on the bottom), and note that it shows that RHACS detected the package manager invocation and deleted the pod:
++
+[source,texinfo,subs="attributes"]
+----
+0s          Normal    Scheduled              pod/tmp-shell   Successfully assigned tok-00-project/tmp-shell to ip-10-0-239-17.us-east-2.compute.internal
+0s          Normal    AddedInterface         pod/tmp-shell   Add eth0 [10.128.1.130/23] from openshift-sdn
+0s          Normal    Pulled                 pod/tmp-shell   Container image "ubuntu:18.04" already present on machine
+0s          Normal    Created                pod/tmp-shell   Created container tmp-shell
+0s          Normal    Started                pod/tmp-shell   Started container tmp-shell
+0s          Warning   StackRox enforcement   pod/tmp-shell   A pod (tmp-shell) violated StackRox policy "Ubuntu Package Manager Execution" and was killed
+0s          Normal    Killing                pod/tmp-shell   Stopping container tmp-shell
+----
++
+NOTE: After about 30 seconds you can see the pod is deleted.
++
+. In your tmux shell pane, note that your shell session has terminated and that you are returned to the student VM command line.
++
+NOTE: You can always type exit into the terminal or reload the terminal using the button on the top right of the workshop environment.
++
+[source,texinfo,subs="attributes"]
+----
+[~] $ oc run tmp-shell --labels="app=tmp-shell" --rm -i --tty --image ubuntu:18.04 -- /bin/bash
+If you don't see a command prompt, try pressing enter.
+root@tmp-shell:/# apt update
+Get:1 http://archive.ubuntu.com/ubuntu bionic InRelease [242 kB]
+0% [1 InRelease 14.2 kB/242 kB 6%] [Connecting to security.ubuntu.com (2620:2d:4002:1::102)]Session ended, resume using 'oc attach tmp-shell -
+c tmp-shell -i -t' command when the pod is running
+No resources found
+[~] $
 ----
 
-[[security-scan]]
+Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged!
 
-== Security Scanning
+[[report-resolve]]
 
-Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
+== Report and Resolve Violations
 
-We can use the following procedure to check the security scan results for our UBI image we just uploaded.
+At this point, any attacker using a shell to install software is now disconnected from the environment. A complete record of the event is available on the *Violations* page.
 
-. Click on the ubi repository and once inside click on the tags button on the left.
+. Navigate to the *Violations* page.
+. Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
+. Click the most recent violation and explore the list of the violation events:
 +
-image::311-image-tags.png[link=self, window=blank, width=100%, Image Tag Menu]
+image::250-violations.png[link=self, window=blank, width=100%, Violations Menu]
 +
-NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
+If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration, and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
 +
-. By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
+After this issue is addressed, in this case by the RHACS product using the runtime enforcement action, you can remove it from the list by marking it as *Resolved*.
 +
-image::312-quay-sec-scan.png[link=self, window=blank, width=100%, Quay Security Scan]
-+
-NOTE: The ubi image we are using in this lab shows 36 medium vulnerabilities, and 187 total when you hover over it at the time of this lab's creation.
-+
-. Click on the list of vulnerabilities to see a more detailed view.
-+
-image::313-security-details.png[link=self, window=blank, width=100%, Image Security Details] 
-+
-. Click the packages button on the left menu to see which specific packages in the image are affected by what vulnerabilities.
-+
-image::314-image-packages.png[link=self, window=blank, width=100%, Image Packages]
-+
-Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
+. Lastly, hover over the violation in the list to see the resolution options and resolve this issue as operator error.
 
+image::251-resolve-violation.png[link=self, window=blank, width=100%, Resolve Violations]
 
-IMPORTANT: As of the creation date of this lab the list of vulnerabilties and the scores assigned to the images may differ from those provided by the image scanning tools available in Red Hat Advanced Cluster Security for Kuberenetes. Beginning with updated versions to be released in Spring of 2024 these values will begin to coalesce. It's entirely possible this will be the case by the time you participate in this lab, if you attempt to replicate outside of this lab environment. 
+For more information about integration with SIEM tools, see the RHACS help documentation on external tools.
+
+Congratulations! You successfully stopped packages from being downloaded to the host by setting a runtime enforcement policy.
 
 == Conclusion
 
-We hope you have enjoyed this lab using Red Hat Quay to create and host your own repository, upload and use an image, and examine the image for security vulnerabilites. 
-Overall this lab has been dedicated to exploring many of the features added when upgrading an OpenShift Container Platform subscription to OpenShift Platform Plus. 
-At this time you have completed all of the tasks assigned in this lab, and you may freely explore the lab environment with the time you have remaining.
-
+In summary, we made use of the features provided by Red Hat Advanced Cluster Security for Kubernetes to display potential security violations in your cluster in a central dashboard. We also used the default tools to examine known image vulnerabilities and network communication and segmentation in our cluster. Lastly we crafted both deploy-time and runtime policies to help prevent malicious events from occurring in our cluster. Hopefully this lab has helped demonstrate to you the immense value provided by RHACS and OpenShift Platform Plus. Please feel free to continue and explore the RHACS lab environment, or continue on to the next portion of the lab at your leisure.
