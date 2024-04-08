@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"name": "demo-apps",
+			"path": "../../../../../demo-apps"
+		},
+		{
+			"path": "../../../../../openshift-security-roadshow"
+		},
+		{
+			"path": "../../../.."
+		}
+	],
+	"settings": {
+		"ansible.lightspeed.enabled": true,
+		"ansible.lightspeed.suggestions.enabled": true,
+		"yaml.schemas": {
+			"https://json.schemastore.org/yamllint.json": [
+				"file:///Users/michaelfoster/Desktop/github/red_hat_github/demo-apps/openshift-pipelines/tasks/rox-deployment-check-task.yml",
+				"file:///Users/michaelfoster/Desktop/github/red_hat_github/demo-apps/openshift-pipelines/tasks/rox-image-scan-task.yml",
+				"file:///Users/michaelfoster/Desktop/github/red_hat_github/demo-apps/openshift-pipelines/tasks/rox-image-check-task.yml"
+			],
+			"https://json.schemastore.org/sourcehut-build-0.65.0.json": "file:///Users/michaelfoster/Desktop/github/red_hat_github/demo-apps/openshift-pipelines/tasks/build%20and%20push-task.yml"
+		}
+	}
+}

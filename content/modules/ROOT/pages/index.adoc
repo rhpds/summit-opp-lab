@@ -36,19 +36,19 @@ In this workshop we will demonstrate the value of Quay with the following activi
 . Configure a private registry for use with our clusters.
 . Upload and explore an image with our newly created registry.
 
-=== Red Hat OpenShift Data Foundation
+=== Red Hat OpenShift Data Foundation (RHODF)
 
 Red Hat OpenShift Data Foundation—previously Red Hat OpenShift Container Storage—is software-defined storage for containers. Red Hat OpenShift Data Foundation helps teams develop and deploy applications quickly and efficiently across clouds.
 
 NOTE: In this workshop we will not use ODF explicitly, but it will be used as the primary backing storage for our Quay registry, and any other applications we deploy in the cluster that need persistent storage.
 
-== Environment Overview
+== Environment Access and Overview
 
 You will be interacting with an OpenShift 4 cluster that is running on Amazon Web Services. This cluster will act as a central hub for the actions you are performing in your environment.
 The basics of the OpenShift 4 installation have been completed in advance. The OpenShift cluster is essentially set to all defaults and looks like the following:
 
-. Three master nodes
-. Three or Four worker nodes
+. Three control-plane nodes
+. Three or four worker nodes
 . One bastion host
 
 In addition you will have an additional working cluster provisioned with Hosted Control Planes in AWS, and be able to deploy your own cluster as a part of the lab tasks. 
@@ -56,6 +56,8 @@ In addition you will have an additional working cluster provisioned with Hosted 
 Homeroom is a solution that provides this integrated lab guide, terminal, and web console pane. 
 
 It is actually running inside the cluster that you will be interacting with.
+
+[IMPORTANT]
 
 === OpenShift Console Access
 

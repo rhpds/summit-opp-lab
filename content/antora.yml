@@ -1,5 +1,5 @@
 name: modules
-title: 'Red Hat OpenShift Platform Plus'
+title: 'Hands-on lab with Red Hat OpenShift Platform Plus'
 version: master
 nav:
   - modules/ROOT/nav.adoc
@@ -16,5 +16,9 @@ asciidoc:
     ssh_command: ssh devops@bastion.{guid}.example.opentlc.com
 
   extensions:
+    - id: dev-mode
+      require: ./content/lib/dev-mode.js
+      enabled: false
     - ./content/lib/tab-block.js
     - ./content/lib/remote-include-processor.js
+
