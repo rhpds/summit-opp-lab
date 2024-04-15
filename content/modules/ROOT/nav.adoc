@@ -27,5 +27,6 @@
 ** xref:module-03.adoc#runtime-enforce[Introduction to Runtime Policy Enforcement]
 ** xref:module-03.adoc#report-resolve[Report and Resolve Violations]
 
+* xref:module-04.adoc[4. Red Hat OpenShift Data Foundation]
 
-
+// * xref:module-05.adoc[4. Red Hat OpenShift Data Foundation]

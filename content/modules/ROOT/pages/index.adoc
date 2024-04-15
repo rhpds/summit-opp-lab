@@ -2,7 +2,16 @@
 
 == Introduction
 
-In this lab, we aim to demonstrate the value-add available to customers from purchasing OpenShift Platform Plus subscriptions, which can be quite beneficial to enterprises that need to manage multiple cluster deployments in an organized and security-focused manner. OpenShift Platform Plus contains all of the features that you may be familiar with in a standard OpenShift Container Platform subscription, but with the added bonus of including four additional components for advanced management and functionality:  Red Hat Advanced Cluster Management for Kubernetes, Red Hat Advanced Cluster Security for Kubernetes, Quay, and OpenShift Data Foundation. In this lab participants can expect to gain a comprehensive understanding of the advanced capabilities provided by making use of these products to perform such tasks as the deployment of clusters and the setting of global policies to make cluster management easier; optimizing the security profile of their clusters by creating application enforcement policies and viewing image and network graph information to understand possible vulnerabilities in their deployments; and lastly participants will be tasked with setting up a private registry for hosting images.  Overall, this workshop promises to be a valuable learning experience for anyone looking to expand their knowledge of the wonderful value provided by purchasing a subscription for OpenShift Platform Plus.
+In this lab, we aim to demonstrate the value-added service available to customers who purchase OpenShift Platform Plus subscriptions, which can benefit enterprises that need to manage multiple cluster deployments in an organized and security-focused manner. OpenShift Platform Plus contains all of the features that you may be familiar with in a standard OpenShift Container Platform subscription, but with the bonus of including four additional components for advanced management and functionality:  
+
+* Red Hat Advanced Cluster Management for Kubernetes (RHACM)
+* Red Hat Advanced Cluster Security for Kubernetes (RHACS)
+* Red Hat Quay (Quay)
+* Red Hat OpenShift Data Foundation (RHODF)
+
+In this lab, participants can expect to gain a comprehensive understanding of the advanced capabilities provided by making use of these products to perform such as setting up a private registry for hosting images, deploying clusters and setting up global policies to make cluster management more straightforward, and analyzing the security profile of their clusters and applications by creating application enforcement policies and viewing image and network graph information to understand possible vulnerabilities in their deployments. 
+
+Overall, this workshop promises to be a valuable learning experience for anyone looking to expand their knowledge of the value provided by purchasing a subscription for OpenShift Platform Plus.
 
 == OpenShift Platform Plus Components
 
@@ -26,7 +35,7 @@ In this workshop we will demonstrate the value of RHACS with the following activ
 . Explore network graphs and metrics created by observing applications running in the cluster.
 . Demonstrate deployment and runtime enforcement options to prevent security issues.
 
-=== Red Hat Quay
+=== Red Hat Quay (Quay)
 
 Red Hat Quay is a security-focused and scalable private registry platform for managing content across globally distributed datacenter and cloud environments. It provides a single and resilient content repository for delivering containerized software to development and production across Red Hat OpenShift and Kubernetes clusters. Red Hat Quay is a distributed and highly available container image registry for your enterprise.
 
@@ -42,44 +51,39 @@ Red Hat OpenShift Data Foundation—previously Red Hat OpenShift Container Stora
 
 NOTE: In this workshop we will not use ODF explicitly, but it will be used as the primary backing storage for our Quay registry, and any other applications we deploy in the cluster that need persistent storage.
 
-== Environment Access and Overview
+== Environment Overview and Access
 
 You will be interacting with an OpenShift 4 cluster that is running on Amazon Web Services. This cluster will act as a central hub for the actions you are performing in your environment.
 The basics of the OpenShift 4 installation have been completed in advance. The OpenShift cluster is essentially set to all defaults and looks like the following:
 
 . Three control-plane nodes
-. Three or four worker nodes
+. Three worker nodes
 . One bastion host
 
 In addition you will have an additional working cluster provisioned with Hosted Control Planes in AWS, and be able to deploy your own cluster as a part of the lab tasks. 
 
-Homeroom is a solution that provides this integrated lab guide, terminal, and web console pane. 
+=== Working Environment
 
-It is actually running inside the cluster that you will be interacting with.
+All of the commands, walkthroughs, images, and warnings for the lab can be found in the this lab guide, called the "Showroom lab guide" 
 
 [IMPORTANT]
 
-=== OpenShift Console Access
+=== OpenShift Console Access (RHACM console)
 
-Your OpenShift cluster console is available at: {openshift_console_url}[window=_blank]
+Your OpenShift cluster console is available at: {openshift_console_url}
 
-You can access the workshop at: https://dashboard-lab-ocp-cns.{openshift_cluster_ingress_domain}[window=blank]
+[cols="1,1"]
+|===
+OpenShift console URL | {openshift_console_url}
+|===
 
 Administrator login is available with:
 
-* *User:* kubeadmin +
-* *Password:* {openshift_kubeadmin_password}
-
-The OpenShift API is available at: {openshift_api_url}
-
-The `oc` command line utility is available for download at: {openshift_client_download_url}
-
-You can authenticate to the cluster in the terminal using the *oc login* command, like so:
-
-[source,sh,role=execute,subs="attributes"]
-----
-oc login -u kubeadmin -p {openshift_kubeadmin_password} {openshift_api_url}
-----
+[cols="1,1"]
+|===
+*User:*| kubeadmin |
+*Password:*| {openshift_kubeadmin_password} |
+|===
 
 === RHACS Console Access
 
@@ -87,17 +91,25 @@ Your RHACS Console is available at: {acs_route}[window=blank]
 
 Administrator login is available with:
 
-* *RHACS Console Username:* {acs_portal_username}
-* *RHACS Console Password:* {acs_portal_password}
+[cols="1,1"]
+|===
+*RHACS Console Username:* | {acs_portal_username} |
+*RHACS Console Password:* | {acs_portal_password} |
+|===
+
 
 === Bastion Access
 
 A RHEL bastion host is available with common utilities pre-installed and OpenShift command line access pre-configured.
+
 For SSH access to the bastion:
 
-* *Bastion Hostname:* {bastion_public_hostname}
-* *Bastion Username:* {bastion_ssh_user_name}
-* *Bastion Password:* {bastion_ssh_password}
+[cols="1,1"]
+|===
+*Bastion Hostname:* | {bastion_public_hostname} |
+*Bastion Username:* | {bastion_ssh_user_name} |
+*Bastion Password:* | {bastion_ssh_password} |
+|===
 
 .Example bastion SSH command
 [subs=attributes+]
@@ -106,9 +118,3 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 
 Make sure you use the username '{bastion_ssh_user_name}' and the password '{bastion_ssh_password}' when prompted.
-
-=== AWS Sandbox Credentials:
-
-* *AWS Access Key ID:*  | {rhacm_aws_access_key_id}
-* *AWS Secret Access Key:* | {rhacm_aws_secret_key}
-* *Top level domain:* | {rhacm_aws_subdomain}

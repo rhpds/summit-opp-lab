@@ -6,82 +6,9 @@ The goal of this portion of the lab is to show the value that Quay provides for 
 
 IMPORTANT: Several of the following tasks require use of the CLI, and should be run from the *Bastion* host in your lab environment. 
 
-[[quay-install]]
-
-== Install Red Hat Quay
-
-The Quay operator can be installed from the OperatorHub available in OpenShift Platform Plus. 
-
-{quay_console_url}
-
-. On our *local-cluster*, open the *Operators* menu on the left and click on *OperatorHub*.
-+
-image::301-operatorhub-quay.png[link=self, window=blank, width=100%, OperatorHub Quay]
-+
-. Type *Quay* in the search bar, and select the option for *Red Hat Quay*.
-+
-image::302-install-quay.png[link=self, window=blank, width=100%, Install Quay]
-+
-. Click the *Install* button and follow the default prompts.
-+
-image::303-default-options.png[link=self, window=blank, width=100%, Quay Default Options]
-+
-. Once the operator is installed, click on the *Create Instance* button under Quay Registry.
-+
-image::304-create-quay-instance.png[link=self, window=blank, width=100%, Create Instance]
-+
-NOTE: For the purposes of our lab we can accept the default options and do a basic installation of Red Hat Quay, but in a real world example you may want to customize your install.
-+
-image::305-default-install.png[link=self, window=blank, width=100%, Default Quay Install]
-+
-. Once it is installed successfully, we can check the *Resources* under the instance.
-+
-image::306-quay-resources.png[link=self, window=blank, width=100%, Quay Resources]
-
-[[configure-registry]]
-
-== Configuring Your Registry
-
-Now that Quay is installed, we need to configure it to be able to host our images.
-
-. We can find the Quay url from the output of the following CLI command:
-+
-[source,sh,role=execute]
-----
-oc get route -n openshift-operators 
-----
-+
-NOTE: Look for the route with Quay in it's name that's exposing an http port, you can set it as an environment variable, to make the syntax below easier to copy/paste, or substitute it manually to the commands that follow.
-+
-[source,sh,role=execute]
-----
-export QUAY_URL=<quay_url> 
-----
-+
-. After opening the Quay UI, click on *Create Account* and fill in your account details.
-+
-NOTE: The account details can be whatever you want them to be for the purpose of this workshop, as long as you can remember them to login later. As a sample, we created a user called *admin* and a dummy email account. You may also want to export them as an environment variable to make the syntax later easier to copy/paste.
-+
-[source,sh,role=execute]
-----
-export QUAY_USER=<quay_user> 
-----
-+
-image::307-quay-create-account.png[link=self, window=blank, width=100%, Create Quay Account]
-+
-. Once we have created our quay login we can create our first repository by clicking the *Create New Repository* button.
-+
-image::308-create-repo.png[link=self, window=blank, width=100%, Create Quay Repo]
-+
-. We can name this repository *rh1-lab* and make it public or private so we can choose who has access to it.
-+
-image::309-name-repo.png[link=self, window=blank, width=100%, Name Quay Repo]
-
-NOTE: In addition to creating a repository in the Quay console, we can create one by pushing an image and defining the repository name on the command line. We will do this in our next lab step.
-
 == Quay setup
 
-=== Download the "Juice Shop" application and push the container image to Quay via the Student VM
+=== Download the "Wordpress" application and push the container image to Quay via the Student VM
 
 IMPORTANT: You will need to complete the following commands in the *Student VM*
 
@@ -127,7 +54,7 @@ Login Succeeded!
 ----
 
 [start=2]
-. Pull the Juice Shop container image with the following cli command:
+. Pull the Wordpress container image with the following cli command:
 
 [source,sh,role=execute]
 ----
@@ -164,7 +91,7 @@ WARNING: image platform (linux/arm64/v8) does not match the expected platform (l
 f5857a06852012a8f7eb9b464eac419ec03d31e810b4d48ae1ea86131cd81475
 ----
 
-. Now that you have a copy of the Juice Shop container image locally. Let's tag the image and push it to our private registry using the following commands:
+. Now that you have a copy of the Wordpress container image locally. Let's tag the image and push it to our private registry using the following commands:
 
 [source,sh,role=execute]
 ----
@@ -178,7 +105,7 @@ podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
 
 . Once the image is successfully pushed, we can browse the Quay UI to validate it.
 
-. Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created Juice Shop one.
+. Click on the *Repositories* button, and you will be taken to a screen that shows our original empty repository, and the newly created Wordpress one.
 
 
 == Demo application setup
