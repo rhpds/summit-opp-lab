@@ -68,7 +68,9 @@ All of the commands, walkthroughs, images, and warnings for the lab can be found
 
 [IMPORTANT]
 
-=== OpenShift Console Access (RHACM console)
+=== OpenShift Console Access & RHACM console Access
+
+The Red Hat Advanced Cluster Management for Kubernetes (RHACM) Console is now integrated with OpenShift Console, to access it please select *All Clusters* from the dropdown menu once you log in. 
 
 Your OpenShift cluster console is available at: {openshift_console_url}
 
@@ -97,6 +99,15 @@ Administrator login is available with:
 *RHACS Console Password:* | {acs_portal_password} |
 |===
 
+=== Red Hat Quay
+
+Your Red Hat Quay Console is available at: {quay_console_url}[window=blank]
+
+[cols="1,1"]
+|===
+*Quay Console Username:* | {quay_admin_username} |
+*Quay Console Password:* | {quay_admin_password} |
+|===
 
 === Bastion Access
 
@@ -118,3 +129,5 @@ ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 
 Make sure you use the username '{bastion_ssh_user_name}' and the password '{bastion_ssh_password}' when prompted.
+
+

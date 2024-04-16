@@ -18,7 +18,7 @@ For a simple task to demonstrate the functionality of Quay, we can pull an image
 
 [source,sh,role=execute]
 ----
-export QUAY_USER={quay_admin_password}
+export QUAY_USER= {quay_admin_password}
 ----
 
 [start=2]
@@ -26,7 +26,7 @@ export QUAY_USER={quay_admin_password}
 
 [source,sh,role=execute]
 ----
-export QUAY_URL={quay_console_url} #remove https://
+export QUAY_URL= {quay_console_url} #remove https://
 ----
 
 [start=3]
@@ -34,7 +34,7 @@ export QUAY_URL={quay_console_url} #remove https://
 
 [source,sh,role=execute]
 ----
-podman login QUAY_URL
+podman login {quay_console_url}
 ----
 
 NOTE: Make sure to use the quay admin credentials (Username: *{quay_admin_username}* & password: *{quay_admin_password}*). You can create unique user and group credentials in Quay for proper segmentation. 
@@ -212,8 +212,9 @@ image::314-image-packages.png[link=self, window=blank, width=100%, Image Package
 +
 Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
-
 IMPORTANT: As of the creation date of this lab the list of vulnerabilties and the scores assigned to the images may differ from those provided by the image scanning tools available in Red Hat Advanced Cluster Security for Kuberenetes. Beginning with updated versions to be released in Spring of 2024 these values will begin to coalesce. It's entirely possible this will be the case by the time you participate in this lab, if you attempt to replicate outside of this lab environment. 
+
+[subs=attributes+]
 
 == Conclusion
 
