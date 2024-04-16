@@ -27,6 +27,11 @@ For a simple task to demonstrate the functionality of Quay, we can pull an image
 *Qauy Console Password:* | {quay_admin_password} |
 |===
 
+[cols="1,1"]
+|===
+*Quay Console Username:* | {quay_admin_username} |
+|===
+
 [source,sh,role=execute]
 
 ----
@@ -40,7 +45,7 @@ export QUAY_USER={quay_admin_username}
 
 [cols="1,1"]
 |===
-*Quay Console URL"* | {quay_console_url} |
+*Quay Console URL"*      | {quay_console_url}    |
 |===
 
 ----

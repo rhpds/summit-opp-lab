@@ -107,6 +107,7 @@ Your Red Hat Quay Console is available at: {quay_console_url}[window=blank]
 |===
 *Quay Console Username:* | {quay_admin_username} |
 *Quay Console Password:* | {quay_admin_password} |
+*Quay Console URL"*      | {quay_console_url}    |
 |===
 
 === Bastion Access
