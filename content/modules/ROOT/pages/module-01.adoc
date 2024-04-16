@@ -8,25 +8,43 @@ IMPORTANT: Several of the following tasks require use of the CLI, and should be 
 
 == Quay setup
 
-=== Download the "Wordpress" application and push the container image to Quay via the Student VM
+=== Download the "Wordpress" application and push the container image to Quay via the Bastion VM
 
-IMPORTANT: You will need to complete the following commands in the *Student VM*
+IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it by using the following command:
+
+----
+ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+----
+Make sure you use the username '{bastion_ssh_user_name}' and the password '{bastion_ssh_password}' when prompted.
 
 For a simple task to demonstrate the functionality of Quay, we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ctf-web-to-system container image.
 
-. First, let's export a few variable to make our life easier.
+. First, let's export a few variable to make our life easier
+
+[cols="1,1"]
+|===
+*Quay Console Username:* | {quay_admin_username} |
+*Qauy Console Password:* | {quay_admin_password} |
+|===
 
 [source,sh,role=execute]
+
 ----
-export QUAY_USER= {quay_admin_password}
+export QUAY_USER={quay_admin_username}
 ----
 
 [start=2]
 . Set the Quay URL variable but make to REMOVE the *https://*
 
 [source,sh,role=execute]
+
+[cols="1,1"]
+|===
+*Quay Console URL"* | {quay_console_url} |
+|===
+
 ----
-export QUAY_URL= {quay_console_url} #remove https://
+export QUAY_URL={quay_console_url} #remove https://
 ----
 
 [start=3]
@@ -34,7 +52,7 @@ export QUAY_URL= {quay_console_url} #remove https://
 
 [source,sh,role=execute]
 ----
-podman login {quay_console_url}
+podman login $QUAY_URL
 ----
 
 NOTE: Make sure to use the quay admin credentials (Username: *{quay_admin_username}* & password: *{quay_admin_password}*). You can create unique user and group credentials in Quay for proper segmentation. 
@@ -93,12 +111,12 @@ f5857a06852012a8f7eb9b464eac419ec03d31e810b4d48ae1ea86131cd81475
 
 . Now that you have a copy of the Wordpress container image locally. Let's tag the image and push it to our private registry using the following commands:
 
-[source,sh,role=execute]
+[source,sh,subs="attributes",role=execute]
 ----
 podman tag quay.io/jechoisec/ctf-web-to-system-01 $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0
 ----
 
-[source,sh,role=execute]
+[source,sh,subs="attributes",role=execute]
 ----
 podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
 ----
