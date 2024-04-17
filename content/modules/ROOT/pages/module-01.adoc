@@ -6,6 +6,19 @@ This module will give a brief overview of Quay and show the value of local image
 
 Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
 
+To get started, let's log in to Red Hat Quay
+
+Your Red Hat Quay console is available at: {quay_console_url}[window=blank]
+
+[cols="1,1"]
+|===
+*Quay Console Username:* | {quay_admin_username} |
+*Quay Console Password:* | {quay_admin_password} |
+*Quay Console URL"*      | {quay_console_url}    |
+|===
+
+[source,sh,subs="attributes",role=execute]
+
 We can use the following procedure to check the security scan results for our UBI image we just uploaded.
 
 . Click on the ubi repository and once inside click on the tags button on the left.
