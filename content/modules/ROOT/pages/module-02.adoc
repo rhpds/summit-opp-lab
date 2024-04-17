@@ -98,7 +98,7 @@ The *development* cluster that we have provisioned is an example of a Hosted Con
 
 For our lab, We will be using the Standalone cluster option. Click on that option, and you will be presented with a menu that allows you to customize the cluster. 
 
-Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.14.7*. 
+Name your cluster *demo-cluster*, and select *default* for the cluster set. Lastly select the most recent release image *OpenShift 4.15.9*. 
 
 Click on *Next* to continue.
 

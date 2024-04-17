@@ -139,15 +139,15 @@ For a simple task to demonstrate the functionality of Quay, we can pull an image
 
 IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
 
+[source,sh,subs="attributes",role=execute]
+
 ----
 ssh {bastion_ssh_user_name}@{bastion_public_hostname}
 ----
 
 Make sure you use the password '{bastion_ssh_password}' when prompted.
 
-. First, let's export a few variable to make our life easier
-
-[source,sh,subs="attributes",role=execute]
+. Let's export a few variable to make our life easier
 
 ----
 export QUAY_USER={quay_admin_username}
