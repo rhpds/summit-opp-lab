@@ -101,11 +101,12 @@ Administrator login is available with:
 
 Your Red Hat Quay console is available at: {quay_console_url}[window=blank]
 
+Administrator login is available with:
+
 [cols="1,1"]
 |===
 *Quay Console Username:* | {quay_admin_username} |
 *Quay Console Password:* | {quay_admin_password} |
-*Quay Console URL"*      | {quay_console_url}    |
 |===
 
 ==== Bastion Access
@@ -133,9 +134,11 @@ Make sure you use the password '{bastion_ssh_password}' when prompted.
 
 == Demo applications setup
 
-=== Download the "Java" application and push the container image to Quay via the Bastion VM
+Important: Make sure to finish all of the following steps and ensure the vulnerable applications deploy properly. We will use these applications in later modules. 
 
-For a simple task to demonstrate the functionality of Quay, we can pull an image from a public respository and then upload it to our newly created private registry. For this purpose we are going to use the ctf-web-to-system container image.
+=== Download, build and push the Java demo container image to Quay via the Bastion VM
+
+To demonstrate Quay's functionality, we can pull an image from a public repository and upload it to our newly created registry. We can push container images to Quay as long as we have the correct credentials to set up new registries. To demonstrate this functionality, we are going to use the ctf-web-to-system container image.
 
 IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
 
@@ -149,18 +152,16 @@ Make sure you use the password '{bastion_ssh_password}' when prompted.
 
 . Let's export a few variable to make our life easier
 
+[source,sh,subs="attributes",role=execute]
 ----
 export QUAY_USER={quay_admin_username}
 ----
 
 [start=2]
 
-. Set the Quay URL variable but make to REMOVE the *https://*
+. Set the Quay URL variable 
 
-[cols="1,1"]
-|===
-*Quay Console URL"*      | {quay_console_url}    |
-|===
+IMPORTANT: Make sure to REMOVE the *https://* from the URL command below.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -240,63 +241,3 @@ podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
 
 In the next module, we will browse through Quay to see the Java container app that you have tagged and pushed. The apple will be deployed into the cluster in the next step.
 
-=== Deploy the demo applications
-
-Our insecure demo applications come from a variety of public GitHub repositories and sources. Including the Java app that you just pushed to Quay. Let's deploy them into our cluster.
-
-. Run the following command in the Bastion VM
-
-[source,sh,subs="attributes",role=execute]
-----
-git clone https://github.com/mfosterrox/demo-apps.git roadshow-apps
-export TUTORIAL_HOME="$(pwd)/roadshow-apps"
-sed -i "s|quay.io/jechoisec/ctf-web-to-system-01|$QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0|g" $TUTORIAL_HOME/kubernetes-manifests/ctf-web-to-system/ctf-w2s.yml
-oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive
-oc apply -f $TUTORIAL_HOME/openshift-pipelines/ --recursive
-----
-
-[IMPORTANT]
-You should see warnings such as: Warning: would violate PodSecurity "restricted:latest": unrestricted capabilities (container "ubi" must set securityContext.capabilities.drop=["ALL"] this is because we are deploying flawed container configurations and vulnerabile container applications into the OpenShift cluster.
-
-[NOTE] This command applies a plethora of manifests to your environment. The important part is that the deployments are up and running. 
-
-[start=2]
-. Run the following command and ensure that the applications are up and running
-
-[source,bash,role="execute"]
-----
-kubectl get deployments -l demo=roadshow -A
-----
-
-*Output*
-```bash
-NAMESPACE    NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
-backend      api-server              1/1     1            1           72m
-default      adservice               1/1     1            1           67m
-default      api-server              1/1     1            1           71m
-default      cartservice             1/1     1            1           67m
-default      checkoutservice         1/1     1            1           67m
-default      ctf-web-to-system       1/1     1            1           72m
-default      currencyservice         1/1     1            1           67m
-default      emailservice            1/1     1            1           67m
-default      frontend                1/1     1            1           71m
-default      juice-shop              1/1     1            1           57m
-default      loadgenerator           1/1     1            1           66m
-default      paymentservice          1/1     1            1           66m
-default      productcatalogservice   1/1     1            1           66m
-default      rce                     1/1     1            1           71m
-default      recommendationservice   1/1     1            1           66m
-default      redis-cart              1/1     1            1           66m
-default      reporting               1/1     1            1           71m
-default      shippingservice         1/1     1            1           67m
-frontend     asset-cache             1/1     1            1           71m
-medical      reporting               1/1     1            1           71m
-operations   jump-host               1/1     1            1           71m
-payments     visa-processor          1/1     1            1           71m
-```
-
-[NOTE]
-the main focus needs to be that the *ctf-web-to-system* application deployed properly. 
-
-
-Nice Job! Please move onto the next module.

@@ -2,9 +2,9 @@
 
 In this session, participants will learn how to work with Red Hat Advanced Cluster Security for Kubernetes (RHACS).
 
-The goal of the tasks in this part of the OpenShift Platform Plus lab  is to take you through the RHACS console/user interface and to observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to affect pods at both deployment and runtime. 
+The tasks in this part of the OpenShift Platform Plus lab aim to take you through the RHACS console/user interface and observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to enforce policies at both deployment and runtime. 
 
-IMPORTANT: Several of the following tasks require use of the CLI. Many like those involving *roxctl* can be run from the user terminal built into the lab. For other tasks, you may need to SSH over to the *Bastion* host provided in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
+IMPORTANT: Several of the following tasks require the use of the CLI. Many commands, like those involving *roxctl*, can be run from the user terminal built into the lab. For other tasks, you may need to SSH over to the *Bastion* host provided in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
 
 If you have questions at any time, please don’t hesitate to ask!
 
@@ -12,7 +12,7 @@ If you have questions at any time, please don’t hesitate to ask!
 
 RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
 
-The RHACS solution offers visibility into the security of your cluster, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants an ability to pull the actions from that tooling deep into the application code development process through APIs.
+The RHACS solution offers visibility into your cluster's security, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants the ability to pull the actions from that tooling deep into the application code development process through APIs.
 
 These security features represent any developer or administrator’s primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
 
@@ -40,107 +40,17 @@ The following information will be available in the the main lab screen:
 
 === Logging into the RHACS Console
 
-- From the main lab page, click the URL for the RHACS web console to head to the console's login page.
+==== RHACS console access
 
-image::201-lab-environment.png[link=self, window=blank, width=100%, Lab Environment]
+Your RHACS Console is available at: {acs_route}[window=blank]
 
-NOTE: You may get a warning page that the webpage is not private. During setup, RHACS can utilize your certification server to avoid these errors. It is also considered best practice to integrate the application with your authentication server.
+Administrator login is available with:
 
-- Click through the warning page to get to the RHACS console login page.
-
-image::202-cert-warning.png[link=self, window=blank, width=100%, Certificate Warning]
-
-image::203-login-page.png[link=self, window=blank, width=100%, Login Page]
-
-- Log in with the ADMINISTRATOR credentials from the main demo page. These credentials are located with all of the demo credentials and will be underneath the RHACS console URL *(HINT: The Username is always admin)*.
-
-image::204-admin-login.png[link=self, window=blank, width=100%, Admin Login]
-
-- Ensure you maintain access to the console and keep your tab open for the future lab sections.
-
-image::205-rhacs-dashboard.png[link=self, window=blank, width=100%, RHACS Dashboard]
-
-[[lab-setup]]
-
-== Lab Setup
-
-To have the applications and vulnerabilities necessary for the demo, we need to introduce a few vulnerable applications into the cluster.
-
-NOTE: This step is mandatory, you must deploy these applications into your cluster in order to work through the lab exercises.
-
-The command below will clone the tutorial sources and set the *TUTORIAL_HOME* environment variable to point to the root directory of the tutorial and deploy the applications.
-
-Please complete the following steps to configure your lab environment
-
-- Click the button to run the command in the terminal.
-
-[source,sh,subs="attributes",role=execute]
-----
-git clone https://github.com/openshiftdemos/openshift-ops-workshops acs-workshop
-export TUTORIAL_HOME="$(pwd)/acs-workshop"
-kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/configuration --recursive
-kubectl apply -f $TUTORIAL_HOME/workshop/demo-apps/ --recursive
-export ROX_CENTRAL_ADDRESS={acs_route}
-----
-
-CAUTION: These commands download and apply a significant number of manifests to your environment. All of these applications are insecure, and pose a significant threat if used elsewhere. Please use these commands with caution.
-
-- You will also need to create a token for login with the *roxctl* cli for later lab steps, this will be uniquely generated in your RHACS web console.
-
-- Follow these instructions:
-* Navigate to browser window with the RHACS portal open.
-* Go to *Platform Configuration* --> *Integrations*.
-* Scroll down to the *Authentication Tokens* category, and click *API Token*.
-+
-image::205a-generate-api-token.png[link=self, window=blank, width=100%, Generate API Token]
-+
-* Click *Generate Token*.
-* Enter a name for the token, and select *Admin* as the role
-+
-image::205b-name-api-token.png[link=self, window=blank, width=100%, Name API Token]
-+
-* Click the *Generate* button.
-* On the next screen click the copy button, and paste the value into a variable in your student VM.
-+
-image::205c-copy-api-token.png[link=self, window=blank, width=100%, Copy API Token]
-
-IMPORTANT: Once you leave this screen, you will not be able to recover the token value.
-
-[source,sh,role=execute]
-----
-export $ROX_API_TOKEN=<api_token>
-----
-
--  To ensure the deployment was successful, and the lab environment is set up correctly, run the following command and ensure that the variable is set, and the applications are up and running.
-
-[source,sh,subs="attributes",role=execute]
-----
-echo "The address for ROX Central is: $ROX_CENTRAL_ADDRESS"
-echo "The token for roxctl authentication is: $ROX_API_TOKEN"
-echo "The deployments for the lab are listed below:"
-kubectl get deployments -l demo=acs -A
-----
-
-The output should look similar to this:
-
-[source,texinfo,subs="attributes"]
-----
-The address for ROX Central is: {acs_route}
-The token for roxctl authentication is: 
-The deployments for the lab are listed below:
-NAMESPACE      NAME               READY   UP-TO-DATE   AVAILABLE   AGE
-backend        api-server         1/1     1            1           0d
-frontend       asset-cache        1/1     1            1           0d
-log4shell      log4shell-app      3/3     3            3           0d
-medical        reporting          1/1     1            1           0d
-operations     jump-host          1/1     1            1           0d
-payments       visa-processor     1/1     1            1           0d
-spring4shell   spring4shell-app   3/3     3            3           0d
-----
-
-If all of the applications are up and running, feel free to proceed to the next stage. If they are not running, rerun the command set, or ask a proctor for assistance.
-
-[[nav-con]]
+[cols="1,1"]
+|===
+*RHACS Console Username:* | {acs_portal_username} |
+*RHACS Console Password:* | {acs_portal_password} |
+|===
 
 == Introducing the RHACS console and Vulnerability Management
 
