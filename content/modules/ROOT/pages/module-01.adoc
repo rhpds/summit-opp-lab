@@ -12,6 +12,8 @@ Your Red Hat Quay console is available at: {quay_console_url}[window=blank]
 
 Administrator login is available with:
 
+[source,sh,subs="attributes",role=execute]
+
 [cols="1,1"]
 |===
 *Quay Console Username:* | {quay_admin_username} |
@@ -26,12 +28,9 @@ Let's take a look at our application in the registry.
 
 . 
 
-
 == Vulnerability Scanning with Quay
 
 Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
-
-[source,sh,subs="attributes",role=execute]
 
 We can use the following procedure to check the security scan results for our UBI image we just uploaded.
 
