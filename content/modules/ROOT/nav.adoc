@@ -1,9 +1,9 @@
 
 * xref:module-01.adoc[1. Red Hat Quay]
-** xref:module-01.adoc#Access-Quay[Accessing Red Hat Quay]
-** xref:module-01.adoc#Navigating-the-registry[Navigating the registry]
-** xref:module-01.adoc#Vulnerability-Scanning-with-Quay[Vulnerability Scanning with Quay]
-** xref:module-01.adoc#Deploy-the-Java-application[Deploy the Java application]
+** xref:module-01.adoc#access-quay[Accessing Red Hat Quay]
+** xref:module-01.adoc#navigating-the-registry[Navigating the registry]
+** xref:module-01.adoc#vulnerability-scanning-with-quay[Vulnerability Scanning with Quay]
+** xref:module-01.adoc#deploy-the-java-application[Deploy the Java application]
 
 * xref:module-02.adoc[2. Red Hat Advanced Cluster Management for Kubernetes]
 ** xref:module-02.adoc#cluster-lifecycle[Working with Kubernetes Clusters and Cluster Lifecycle]
@@ -20,9 +20,6 @@
 ** xref:module-03.adoc#nav-con[Navigate the Console]
 ** xref:module-03.adoc#vuln-mgmt[Vulnerability Management]
 ** xref:module-03.adoc#policy-mgmt[Policy Management]
-** xref:module-03.adoc#network-seg[Introduction to Network Segmentation]
-** xref:module-03.adoc#net-pol-gen[Use the Network Policy Generator]
-** xref:module-03.adoc#update-comp[Update Compliance for Applications]
 ** xref:module-03.adoc#deploy-enforce[Introduction to Deploy-Time Policy Enforcement]
 ** xref:module-03.adoc#runtime-enforce[Introduction to Runtime Policy Enforcement]
 ** xref:module-03.adoc#report-resolve[Report and Resolve Violations]

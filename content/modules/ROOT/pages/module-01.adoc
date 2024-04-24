@@ -4,6 +4,8 @@ Red Hat Quay is an enterprise-quality registry for building, securing and servin
 
 To get started, make sure that you are logged in to Red Hat Quay and have access to the newly created *quayadmin/ctf-web-to-system* repository
 
+[[access-quay]]
+
 == Access Quay 
 
 Your Red Hat Quay console is available at: {quay_console_url}[window=blank]
@@ -17,6 +19,8 @@ Administrator login is available with:
 *Quay Console Username:* | {quay_admin_username} |
 *Quay Console Password:* | {quay_admin_password} |
 |===
+
+[[navigating-the-registry]]
 
 == Browse the registry
 
@@ -94,6 +98,7 @@ image::quay-make-public.png[link=self, window=blank, width=100%]
 
 image::quay-make-public.png[link=self, window=blank, width=100%]
 
+[[vulnerability-scanning-with-quay]]
 
 == Vulnerability Scanning with Quay
 
@@ -129,6 +134,8 @@ Congratulations, you now know how to examine images in your registry for potenti
 [subs=attributes]
 
 IMPORTANT: Please ensure the deploy application are deployed to your cluster before moving onto the next module. 
+
+[[deploy-the-java-application]]
 
 == Deploy the Java application
 
