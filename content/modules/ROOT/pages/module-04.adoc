@@ -1,2 +1,4 @@
-== Module 04: OpenShift Data Foundation (RHODF)
+= {lab_name}
+
+== OpenShift Data Foundation (RHODF)
 

@@ -2,9 +2,7 @@
 
 Red Hat Quay is an enterprise-quality registry for building, securing and serving container images. It provides secure storage, distribution, governance of containers and cloud-native artifacts on any infrastructure.
 
-Manual deployments of Red Hat Quay involves multiple sub-components and the overhead of managing those components. Red Hat Quay is best deployed on Red Hat OpenShift using the Operators which simplifies the deployment and manages all the components. It also gives you the option of keeping any of the components self-managed.
-
-To get started, let's log in to Red Hat Quay.
+To get started, make sure that you are logged in to Red Hat Quay and have access to the newly created *quayadmin/ctf-web-to-system* repository
 
 == Access Quay 
 
@@ -26,43 +24,129 @@ In the setup module we downloaded built and pushed a insecure java application c
 
 Let's take a look at our application in the registry.
 
-. 
+image::quay-login.png[link=self, window=blank, width=100%]
+
+. Next, click on the *ctf-web-to-system* repository. 
+
+image::quay-repo.png[link=self, window=blank, width=100%]
+
+On the left hand side of the window you should see the following icons labelled in order from top to bottom,
+
+image::quay-sidebar.png[link=self, window=blank, width=100%]
+
+- Information
+- Tags
+- Tag History
+- Usage Logs
+- Settings
+
+The information tab shows you information such as;
+
+- Podman and Docker commands
+- Repository activity
+- The repository description. 
+
+image::quay-information.png[link=self, window=blank, width=100%]
+
+[start=2]
+. Click on the *Tags* icon. 
+
+image::quay-tags.png[link=self, window=blank, width=100%]
+
+This tab displays all of the images and tags that have been upladed, providing information such as fixable vulnerabilities, the image size and allows for bulk changes to images based on the security posture. 
+
+image::quay-tags-security.png[link=self, window=blank, width=100%]
+
+[start=3]
+. Click on the *Tags History* icon. 
+
+image::quay-tags-history.png[link=self, window=blank, width=100%]
+
+This tab simply displays the container images history over time. 
+
+[start=4]
+. Click on the *Usage Logs* icon. 
+
+This tab displays the usage over time along with details about who/how the images were pushed to the cluster. 
+
+image::quay-usage-logs.png[link=self, window=blank, width=100%]
+
+You can see that you (The "quayadmin") pushed an image tagged 1.0 to the repository today. 
+
+[start=5]
+. Lastly click on the *Settings* icon. 
+
+image::quay-settings.png[link=self, window=blank, width=100%]
+
+In this tab you can add/remove users and update permissions, alter the privacy of the repository, and even schedule alerts based on found vulnerabilities.
+
+image::quay-tags-security.png[link=self, window=blank, width=100%]
+
+IMPORTANT: Make sure to make the repository public. Otherwise we will not be able to deploy the application in the next step.
+
+[start=6]
+. Make your repository public before deploying our application in the next step by clicking the *Make Public* button under `Repository Visability`
+
+image::quay-make-public.png[link=self, window=blank, width=100%]
+
+[start=7]
+. Click OK
+
+image::quay-make-public.png[link=self, window=blank, width=100%]
+
 
 == Vulnerability Scanning with Quay
 
 Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
 
-We can use the following procedure to check the security scan results for our UBI image we just uploaded.
+Use the following procedure to check the security scan results for our Java container image you have uploaded.
 
-. Click on the ubi repository and once inside click on the tags button on the left.
-+
-image::311-image-tags.png[link=self, window=blank, width=100%, Image Tag Menu]
-+
+. Click on the *Tags* icon on the left side of the screen like before.
+
+image::quay-tags.png[link=self, window=blank, width=100%]
+
 NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
-+
+
+[start=2]
 . By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
-+
-image::312-quay-sec-scan.png[link=self, window=blank, width=100%, Quay Security Scan]
-+
-NOTE: The ubi image we are using in this lab shows 36 medium vulnerabilities, and 187 total when you hover over it at the time of this lab's creation.
-+
+
+image::quay-scan-hover.png[link=self, window=blank, width=100%]
+
+NOTE: The Java container image we are using in this lab shows 12 vulnerabilities, with 1 high vulnerabilities. This number will change with time and will be different between container scanners for a variety of reasons such as reporting mechanisms, vulnerability feeds and operating system support. 
+
 . Click on the list of vulnerabilities to see a more detailed view.
-+
-image::313-security-details.png[link=self, window=blank, width=100%, Image Security Details] 
-+
-. Click the packages button on the left menu to see which specific packages in the image are affected by what vulnerabilities.
-+
-image::314-image-packages.png[link=self, window=blank, width=100%, Image Packages]
-+
+
+image::quay-security-detailed.png[link=self, window=blank, width=100%, Image Security Details] 
+
+. Click on a vulnerabile package on the left menu to get more information about the vulnerability and see what you have to do to fix the issue.
+
+image::quay-vuln-detailed.png[link=self, window=blank, width=100%]
+
+NOTE: Toggling for fixable/unfixable vulnerabilities is an excellent way for developers to understand what is within their responsibility for fixing. For example, since we are using an older version of Java, many fixes are available for these common issues. 
+
 Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
-IMPORTANT: As of the creation date of this lab the list of vulnerabilties and the scores assigned to the images may differ from those provided by the image scanning tools available in Red Hat Advanced Cluster Security for Kuberenetes. Beginning with updated versions to be released in Spring of 2024 these values will begin to coalesce. It's entirely possible this will be the case by the time you participate in this lab, if you attempt to replicate outside of this lab environment. 
+[subs=attributes]
 
-[subs=attributes+]
+IMPORTANT: Please ensure the deploy application are deployed to your cluster before moving onto the next module. 
 
-=== Deploy the demo applications
+== Deploy the Java application
 
-Our insecure demo applications come from a variety of public GitHub repositories and sources. Including the Java app that you just pushed to Quay. Let's deploy them into our cluster.
+IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
+
+[source,sh,subs="attributes",role=execute]
+
+----
+ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+export QUAY_USER={quay_admin_username}
+export QUAY_URL={quay_console_url} #remove https://
+----
+
+Our insecure demo applications come from a variety of public GitHub repositories and sources. Including the Java application that you just pushed to Quay. Let's deploy them into our cluster.
 
 . Run the following command in the Bastion VM. 
 
@@ -71,15 +155,15 @@ This command downloads a bunch of Kubernetes manifests to deploy to OpenShift. W
 
 [source,sh,subs="attributes",role=execute]
 ----
-git clone https://github.com/mfosterrox/demo-apps.git roadshow-apps
-export TUTORIAL_HOME="$(pwd)/roadshow-apps"
-sed -i "s|quay.io/jechoisec/ctf-web-to-system-01|$QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0|g" $TUTORIAL_HOME/kubernetes-manifests/ctf-web-to-system/ctf-w2s.yml
+git clone https://github.com/mfosterrox/demo-apps.git demo-apps
+export TUTORIAL_HOME="$(pwd)/demo-apps"
+sed -i "s|CHANGEME|$QUAY_URL/$QUAY_USER/ctf-web-to-system:0.1|g" $TUTORIAL_HOME/kubernetes-manifests/ctf-web-to-system/ctf-web-to-system.yml
 oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive
 oc apply -f $TUTORIAL_HOME/openshift-pipelines/ --recursive
 ----
 
 [IMPORTANT]
-You should see warnings such as: Warning: would violate PodSecurity "restricted:latest": unrestricted capabilities (container "ubi" must set securityContext.capabilities.drop=["ALL"]) this is because we are deploying flawed container configurations and vulnerabile container applications into the OpenShift cluster.
+You should see warnings such as: Warning: would violate PodSecurity "restricted:latest": unrestricted capabilities (container "Java" must set securityContext.capabilities.drop=["ALL"]) this is because we are deploying flawed container configurations and vulnerabile container applications into the OpenShift cluster.
 
 
 [start=2]
@@ -92,37 +176,25 @@ kubectl get deployments -l demo=roadshow -A
 
 *Output*
 ```bash
-NAMESPACE    NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
-backend      api-server              1/1     1            1           72m
-default      adservice               1/1     1            1           67m
-default      api-server              1/1     1            1           71m
-default      cartservice             1/1     1            1           67m
-default      checkoutservice         1/1     1            1           67m
-default      ctf-web-to-system       1/1     1            1           72m
-default      currencyservice         1/1     1            1           67m
-default      emailservice            1/1     1            1           67m
-default      frontend                1/1     1            1           71m
-default      juice-shop              1/1     1            1           57m
-default      loadgenerator           1/1     1            1           66m
-default      paymentservice          1/1     1            1           66m
-default      productcatalogservice   1/1     1            1           66m
-default      rce                     1/1     1            1           71m
-default      recommendationservice   1/1     1            1           66m
-default      redis-cart              1/1     1            1           66m
-default      reporting               1/1     1            1           71m
-default      shippingservice         1/1     1            1           67m
-frontend     asset-cache             1/1     1            1           71m
-medical      reporting               1/1     1            1           71m
-operations   jump-host               1/1     1            1           71m
-payments     visa-processor          1/1     1            1           71m
+NAMESPACE    NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+backend      api-server                         1/1     1            1           30m
+default      api-server                         1/1     1            1           29m
+default      ctf-web-to-system                  1/1     1            1           25m
+default      frontend                           1/1     1            1           29m
+default      juice-shop                         1/1     1            1           30m
+default      rce                                1/1     1            1           29m
+default      reporting                          1/1     1            1           29m
+default      ctf-web-to-system-deployment       1/1     1            1           29m
+frontend     asset-cache                        1/1     1            1           29m
+medical      reporting                          1/1     1            1           29m
+operations   jump-host                          1/1     1            1           29m
+payments     visa-processor                     1/1     1            1           29m
 ```
 
 [NOTE]
 The main focus needs to be that the *ctf-web-to-system* application deployed properly. 
 
-
-Nice Job! Please move onto the next module.
-
+Nice job!
 
 == Conclusion
 

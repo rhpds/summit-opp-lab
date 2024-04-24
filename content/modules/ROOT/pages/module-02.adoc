@@ -1,4 +1,6 @@
-== Module 02: Red Hat Advanced Cluster Management for Kubernetes
+= {lab_name}
+
+== Red Hat Advanced Cluster Management for Kubernetes
 
 In this session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM).
 

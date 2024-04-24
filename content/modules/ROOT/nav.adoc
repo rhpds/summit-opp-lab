@@ -1,9 +1,9 @@
 
 * xref:module-01.adoc[1. Red Hat Quay]
-** xref:module-01.adoc#quay-install[Installing Red Hat Quay]
-** xref:module-01.adoc#configure-registry[Configuring Your Registry]
-** xref:module-01.adoc#working-images[Working With Images]
-** xref:module-01.adoc#security-scan[Security-Scanning]
+** xref:module-01.adoc#Access-Quay[Accessing Red Hat Quay]
+** xref:module-01.adoc#Navigating-the-registry[Navigating the registry]
+** xref:module-01.adoc#Vulnerability-Scanning-with-Quay[Vulnerability Scanning with Quay]
+** xref:module-01.adoc#Deploy-the-Java-application[Deploy the Java application]
 
 * xref:module-02.adoc[2. Red Hat Advanced Cluster Management for Kubernetes]
 ** xref:module-02.adoc#cluster-lifecycle[Working with Kubernetes Clusters and Cluster Lifecycle]

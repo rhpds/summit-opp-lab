@@ -1,20 +1,14 @@
-== Module 03: Red Hat Advanced Cluster Security for Kubernetes
+= {lab_name}
+
+== Red Hat Advanced Cluster Security for Kubernetes
 
 In this session, participants will learn how to work with Red Hat Advanced Cluster Security for Kubernetes (RHACS).
 
-The tasks in this part of the OpenShift Platform Plus lab aim to take you through the RHACS console/user interface and observe network traffic maps to get you used to finding vulnerabilities in your clusters. After you are comfortable with the general look and feel of RHACS, we will create and apply some custom policies to enforce policies at both deployment and runtime. 
-
-IMPORTANT: Several of the following tasks require the use of the CLI. Many commands, like those involving *roxctl*, can be run from the user terminal built into the lab. For other tasks, you may need to SSH over to the *Bastion* host provided in your lab environment. You can ssh to that host from your lab terminal using the demo-user account and password supplied.
-
-If you have questions at any time, please don’t hesitate to ask!
+This lab's goal is to shocase the features of RHACS while observing the Ubuntu container image that you deployed in the Quay module. 
 
 === RHACS Basics
 
-RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes.
-
-The RHACS solution offers visibility into your cluster's security, vulnerability management, and security compliance through auditing, network segmentation awareness and configuration, security risk profiling, security-related configuration management, threat detection, and incident response. In addition, RHACS grants the ability to pull the actions from that tooling deep into the application code development process through APIs.
-
-These security features represent any developer or administrator’s primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
+RHACS provides the tools and capabilities to address the security needs of a cloud-native development approach on Kubernetes. These security features represent any developer or administrator’s primary work across various environments, including multiple datacenters, private clouds, or public clouds that run Kubernetes clusters.
 
 === RHACS Features
 
@@ -62,14 +56,13 @@ In this section, you familiarize yourself with the RHACS portal, including its t
 
 The RHACS dashboard has four main sections:
 
-. Top Bar
-. Global Search
-. Navigation Menu
+. Navigation Bar
+. Navigation Drawer
 . Dashboard
 
-image::206-numbered-dashboard.png[link=self, window=blank, width=100%, Numbered Dashboard]
+image::acs-numbered-dashboard.png[link=self, window=blank, width=100%, Numbered Dashboard]
 
-=== Top Bar
+=== Navigation Bar
 
 The top bar contains the following functionality: 
 
@@ -81,7 +74,7 @@ The top bar contains the following functionality:
 - Enable Dark/Light Mode 
 - Logged-in user account
 
-image::207-top-bar.png[link=self, window=blank, width=100%, Top Bar]
+image::acs-top-bar.png[link=self, window=blank, width=100%, Navigation Bar]
 
 === Global Search
 
@@ -94,9 +87,9 @@ A search query consists of two parts:
 - An attribute that identifies the resource type you want to search for.
 - A search term that finds the matching resource.
 
-For example, to find all violations in the *visa-processor* deployment, the search query is *Deployment:visa-processor*.
+For example, to find all violations in the *ubuntu-deployment* deployment, the search query is *Deployment:ubuntu-deployment*.
 
-In this search query, Deployment is the attribute, and visa-processor is the search term.
+In this search query, Deployment is the attribute, and ubuntu-deployment is the search term.
 
 NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the next attribute you would like to enter. Results will appear once there are matches to the entered query.
 
@@ -237,11 +230,11 @@ Notice which images are more exposed. Not only can we see the number of CVEs aff
 - How many deployments are using the vulnerable image
 - The total components in the image
 +
-. Next, find and click on the image *visa-processor:latest-v2*. You will review the images' components and violations.
+. Next, find and click on the image *ubuntu-deployment:latest-v2*. You will review the images' components and violations.
 +
 image::219-visa-proc.png[link=self, window=blank, width=100%, Visa Processor Image]
 +
-NOTE: If you cannot find the visa-processor:latest-v2 image, use the search bar to filter for the specific image you want.
+NOTE: If you cannot find the ubuntu-deployment:latest-v2 image, use the search bar to filter for the specific image you want.
 +
 If you click the search bar, you will be shown the different labels you can search by. Click Image and type visa until the correct image comes up.
 +
@@ -317,9 +310,9 @@ image::227-log4shell-risk.png[link=self, window=blank, width=100%, Log4Shell Ris
 +
 image::228-log4shell-info.png[link=self, window=blank, width=100%, Log4Shell Info]
 +
-. Next, click on the visa-processor deployment and review its risk indicators. What do you think made the visa-processor deployment #1 in this example?
+. Next, click on the ubuntu-deployment deployment and review its risk indicators. What do you think made the ubuntu-deployment deployment #1 in this example?
 +
-image::229-visa-processor.png[link=self, window=blank, width=100%, Visa Processor Info]
+image::229-ubuntu-deployment.png[link=self, window=blank, width=100%, Visa Processor Info]
 +
 Factors that play into the overall score are in the risk indicators section. These include, but are not limited to:
 +
@@ -332,7 +325,7 @@ Factors that play into the overall score are in the risk indicators section. The
 - Image Freshness
 - RBAC Configuration
 
-A primary reason for the visa-processor deployment to be ranked so high is that it is an ancient image (older than the log4shell app). A good indicator of risk is that the older an image is, the more likely it will have a significant exploitable vulnerability.
+A primary reason for the ubuntu-deployment deployment to be ranked so high is that it is an ancient image (older than the log4shell app). A good indicator of risk is that the older an image is, the more likely it will have a significant exploitable vulnerability.
 
 We will leave it to you to make your own risk assessments in the future. 
 
@@ -455,13 +448,13 @@ ____
 
 RHACS continuously monitors and enforces policies and is aware of PCI-DSS and other compliance standards.
 
-In this section, you bring the *visa-processor* application closer to compliance with RHACS.
+In this section, you bring the *ubuntu-deployment* application closer to compliance with RHACS.
 
 . Select the *Namespaces* drop-down menu, and click on the *payments* namespace. 
-. Using the *Deployments* drop-down, select the *visa-processor* deployment. 
-. Highlight the *visa-processor* pod, and and examine the deployment details on the right side:
+. Using the *Deployments* drop-down, select the *ubuntu-deployment* deployment. 
+. Highlight the *ubuntu-deployment* pod, and and examine the deployment details on the right side:
 +
-image::241-visa-processor-details.png[link=self, window=blank, width=100%, Visa Processor Details]
+image::241-ubuntu-deployment-details.png[link=self, window=blank, width=100%, Visa Processor Details]
 +
 . From the left, navigate to the *Compliance* page.
 . In the upper right, click *Scan Environment*:
