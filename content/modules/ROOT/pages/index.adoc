@@ -230,7 +230,7 @@ NOTE: Quay will automatically create a private registry to store our Java apppli
 
 [source,sh,subs="attributes",role=execute]
 ----
-podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:0.1 --remove-signatures
+podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
 ----
 
 *Sample output*
