@@ -1,12 +1,14 @@
 {
     "folders": [
         {
-            "name": "demo-apps",
-            "path": "../../../../../demo-apps"
-        },
-        {
             "name": "summit-opp-lab",
             "path": "../../../.."
+        },
+        {
+            "path": "../../../../../openshift-ops-workshops"
+        },
+        {
+            "path": "../../../../../demo-apps"
         }
     ]
 }
