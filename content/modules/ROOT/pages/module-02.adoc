@@ -96,7 +96,7 @@ image::quay-make-public.png[link=self, window=blank, width=100%]
 [start=7]
 . Click OK
 
-image::quay-make-public.png[link=self, window=blank, width=100%]
+image::quay-make-public-ok.png[link=self, window=blank, width=100%]
 
 [[vulnerability-scanning-with-quay]]
 
@@ -187,19 +187,18 @@ kubectl get deployments -l demo=roadshow -A
 
 *Output*
 ```bash
-NAMESPACE    NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
-backend      api-server                         1/1     1            1           30m
-default      api-server                         1/1     1            1           29m
-default      ctf-web-to-system                  1/1     1            1           25m
-default      frontend                           1/1     1            1           29m
-default      juice-shop                         1/1     1            1           30m
-default      rce                                1/1     1            1           29m
-default      reporting                          1/1     1            1           29m
-default      ctf-web-to-system-deployment       1/1     1            1           29m
-frontend     asset-cache                        1/1     1            1           29m
-medical      reporting                          1/1     1            1           29m
-operations   jump-host                          1/1     1            1           29m
-payments     visa-processor                     1/1     1            1           29m
+NAMESPACE    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+backend      api-server          1/1     1            1           4h39m
+default      api-server          1/1     1            1           4h38m
+default      ctf-web-to-system   1/1     1            1           46m
+default      frontend            1/1     1            1           4h38m
+default      juice-shop          1/1     1            1           4h39m
+default      rce                 1/1     1            1           4h38m
+default      reporting           1/1     1            1           4h38m
+frontend     asset-cache         1/1     1            1           4h38m
+medical      reporting           1/1     1            1           4h38m
+operations   jump-host           1/1     1            1           4h38m
+payments     visa-processor      1/1     1            1           4h38m
 ```
 
 [NOTE]

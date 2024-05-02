@@ -189,7 +189,7 @@ These counters are clickable, providing fast access to the desired list view pag
 |Secrets|Configuration Management -> Applications & Infrastructure -> Secrets
 |============
 
-=== 2. The Dashboard Filter 
+=== 2. The dashboard filter 
 
 The dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope.
 
@@ -199,7 +199,7 @@ image::acs-dashboard-03.png[link=self, window=blank, width=100%, Dashboard Filte
 
 image::acs-dashboard-04.png[link=self, window=blank, width=100%, Dashboard Drop-down]
 
-=== 3. Actionable Widgets
+=== 3. Actionable widgets
 
 If you have time, adjust the dashboard filtering options and widgets to hone the filtering capabilities.
 

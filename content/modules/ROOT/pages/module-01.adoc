@@ -1,4 +1,4 @@
-= {lab_name}
+= Setup
 
 [[access]]
 
