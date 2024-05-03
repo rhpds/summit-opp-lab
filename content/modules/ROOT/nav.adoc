@@ -26,7 +26,11 @@
 ** xref:module-04.adoc#outline[RHACS basics]
 ** xref:module-04.adoc#console-access[Accessing the RHACS console]
 ** xref:module-04.adoc#acs-nav[Navigating the RHACS console]
-** xref:module-04.adoc#
+** xref:module-04.adoc#vuln-mgmt[The Vulnerability Management dashboard]
+** xref:module-04.adoc#vuln-scanner[RHACS Vulnerability Scanner]
+** xref:module-04.adoc#log4shell[log4shell CVE vulnerability analysis]
+** xref:module-04.adoc#runtime-enforce[Introduction to Runtime policy enforcement]
+** xref:module-04.adoc#deploy-enforce[Introduction to Deploy-Time policy enforcement]
 ** xref:module-04.adoc#
 ** xref:module-04.adoc#
 

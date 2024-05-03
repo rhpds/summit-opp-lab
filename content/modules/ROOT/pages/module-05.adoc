@@ -1,2 +1,56 @@
 = OpenShift Data Foundation (RHODF)
 
+
+=== Relating Image CVEs with Kubernetes Configuration Properties
+
+All of these CVE details are well and good, but they are a bit noisy. How do we judge the genuine risk - which vulnerabilities are likely to be exploited? Which vulnerabilities do we have to fix first? RHACS can use other sources of information in OpenShift to judge the risk that a given vulnerability would be exploited and set priorities for fixes.
+
+The first *risk factor* - is the vulnerable component in a running deployment.
+
+. Click on the *Risk* panel to continue.
+
+image::226-risk-panel.png[link=self, window=blank, width=100%, Risk Panel]
+
+Take a look at the total amount of deployments in the cluster. If you remember, the log4shell image was rated a 5 on risk priority based on CVSS score and other CVEs. But at the time this lab is written it now shows as a 12. Why, we must ask ourselves, is it scored differently in this dashboard?
+
+image::227-log4shell-risk.png[link=self, window=blank, width=100%, Log4Shell Risk]
+
+. Click on the log4shell deployment and review the risk indicators.
+
+image::228-log4shell-info.png[link=self, window=blank, width=100%, Log4Shell Info]
+
+. Next, click on the ctf-web-to-system deployment and review its risk indicators. What do you think made the ctf-web-to-system deployment #1 in this example?
+
+image::229-ctf-web-to-system.png[link=self, window=blank, width=100%, Visa Processor Info]
+
+Factors that play into the overall score are in the risk indicators section. These include, but are not limited to:
+
+- Policy Violations
+- Image Vulnerabilities
+- Service Configuration
+- Service Reachability
+- Components Useful for Attackers
+- Number of Components in an Image
+- Image Freshness
+- RBAC Configuration
+
+A primary reason for the ctf-web-to-system deployment to be ranked so high is that it is an ancient image (older than the log4shell app). A good indicator of risk is that the older an image is, the more likely it will have a significant exploitable vulnerability.
+
+We will leave it to you to make your own risk assessments in the future. 
+
+Now, let us move along to enforcing a log4shell policy and stopping future deployments containing the vulnerability.
+
+[[policy-mgmt]]
+
+
+=== Configure Admission Controller
+
+Using admission controller enforcement for image-based scanning requires enabling the AdmissionController deployment and configuring it to contact image scanners.
+
+. Verify that admission controller and image scanning are set up properly by navigating to Platform Configuration → Clusters → Production and verifying that the following settings are enabled:
+
+image::246-settings-enabled.png[link=self, window=blank, width=100%, Verify Settings Enabled]
+
+image::247-dynamic-config.png[link=self, window=blank, width=100%, Dynamic Configuration]
+
+NOTE: Before configuring this lab, be aware that enforcing this policy blocks all deployments that use images for which RHACS Central cannot retrieve results. For more information, review the RHACS help for Scanner and Image Registries.
