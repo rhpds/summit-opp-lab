@@ -418,7 +418,7 @@ image::acs-runtime-03.png[link=self, window=blank, width=100%, Enforce Runtime P
 
 IMPORTANT: Make sure to save the policy changes! If you do not save the policy the process will not be blocked!
 
-=== Testing the Configured Policy
+=== Testing the configured Policy
 
 Next, we will use tmux to watch OpenShift events while running the test, so you can see how RHACS enforces the policy at runtime.
 
@@ -515,182 +515,52 @@ There are two approaches to enforcing deploy-time policies in RHACS:
 - In clusters with **listen** and **enforce** AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
 - In clusters where the admission controller option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
 
-== Prevent the Ubuntu Package Manage in IMage
+== Prevent the Ubuntu Package Manager in the ctf-web-to-system image from being deployed
 
-. Navigate to Platform Configuration → Policy Management, find the Images with no scans policy through the filter, and select it to open the side panel.
+. Navigate to Platform Configuration → Policy Management
+. On the *Policy Management* page, type *Policy* then *Ubuntu* into the filter bar at the top.
 
-image::248-image-noscan.png[link=self, window=blank, width=100%, Images with No Scans]
+NOTE: This time we are going to edit a different policy. Specifically related to the *Build & Deploy* phases.
 
-. On the first page, click Edit and enable the policy. This policy rejects attempts to deploy an image that has no scanning status.
-. On your Bastion VM, use Kubernetes to deploy a deliberately nonsensical image with no scans:
+[start=3]
 
-[source,sh,role=execute]
-----
-oc new-project test
-oc run nonsense --image=test-nonsense:latest
-----
+. Click on the *Ubuntu Package Manager in Image* options (The three dots on the right side of the screen) and select *Clone policy*
 
-RHACS evaluates the policy and performs the default behavior by informing on the violation by the Kubernetes admission controller, creating a logged event.
+image::acs-deploy-00.png[link=self, window=blank, width=100%]
 
-We can check this by clicking on the *Violations* menu on the left hand side.
+[start=4]
 
-image::248a-violation-log.png[link=self, window=blank, width=100%, Violation Log]
+. Give the policy a new name. Something you will remember. For example;
 
-In our next section we will discuss how to configure RHACS to block container actions at either deploy-time or runtime.
+image::acs-deploy-01.png[link=self, window=blank, width=100%]
 
-=== Enforce Deploy-Time Policy on Misuse of Environment Variables
+[start=5]
 
-In this section, you explore using RHACS to prevent the deployment of applications that mishandle sensitive data (such as account keys, certificates, or passwords).
+. Next, update the policy to inform and enforce while clicking on the deploy stage only.
 
-Container-based microservices applications face challenges when providing sensitive information like passwords to running containers. For example, an e-commerce application may have an order status microservice that needs to read records from a database that requires a username and password to execute queries. It is a critical security practice to keep passwords private.
+image::acs-deploy-02.png[link=self, window=blank, width=100%]
 
-Unfortunately, several methods for distributing secrets that have come into common use fail to protect sensitive content or restrict access to secrets. One of these insecure methods is to store sensitive data in the clear in Kubernetes deployment YAML files. This section demonstrates how RHACS can bring this misuse to light and encourage a developer to use a proper secrets management method.
+[start=6]
 
-RHACS also has a separate feature for visibility into the Kubernetes Secrets feature, a method for distributing secrets to deployments natively in Kubernetes. For more information, see the RHACS documentation.
+Now we want to target our specific deployment with an image label.
 
-This section demonstrates two separate enforcement points for policies: at build time (perhaps as part of a CI/CD job) and at deployment time in a Kubernetes cluster.
+. Click on the *Policy criteria* tab.
+. Click on the *Image contents* dropdown on the right side of the browser.
+. Find the *Namespace* label and drag it to the default policy criteria.
+. Default only
 
-. Create the following Deployment manifest on your Bastion VM:
+You're policy should look like this,
 
-[source,sh,role=execute]
-----
-cat << EOF >$HOME/secrets.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ubuntu
-  labels:
-    app: ubuntu
-spec:
-  selector:
-    matchLabels:
-      app: ubuntu
-  template:
-    metadata:
-      labels:
-        app: ubuntu
-    spec:
-      containers:
-      - name: ubuntu
-        image: ubuntu:18.04
-        env:
-            - name: AWS_SECRET_ACCESS_KEY
-              value: "abcdefg"
-EOF
-----
+image::acs-deploy-04.png[link=self, window=blank, width=100%]
 
-. In the Platform Configuration → Policy Management page of the RHACS web console, locate the *Environment Variable Contains Secret* policy.
-. Click the *Actions* drop down and verify the policy is enabled, or enable it if not. At build time, the roxctl binary can be used to **preview** the Deployment before actually attempting to create it in a Kubernetes cluster.
-. Supply the file containing this YAML to roxctl on your Bastion VM to run the Deployment check:
+. Lastly, go to the *Review Policy* tab
+. Review the changes
+. Click save
 
-[source,sh,role=execute]
-----
-roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file ./secrets.yaml --insecure-skip-tls-verify
-----
-
-. Among the policy violations, review the output and expect to see the following:
-
-[source,texinfo,subs="attributes"]
-----
-Policy check results for deployments: [ubuntu]
-(TOTAL: 6, LOW: 3, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
-
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|             POLICY             | SEVERITY | BREAKS DEPLOY | DEPLOYMENT |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| Environment Variable Contains  |   HIGH   |       -       |   ubuntu   |   Alert on deployments with    |     - Environment variable     |   Migrate your secrets from    |
-|             Secret             |          |               |            |   environment variables that   |   'AWS_SECRET_ACCESS_KEY' is   |    environment variables to    |
-|                                |          |               |            |        contain 'SECRET'        | present in container 'ubuntu'  |    orchestrator secrets or     |
-|                                |          |               |            |                                |                                |  your security team's secret   |
-|                                |          |               |            |                                |                                |      management solution.      |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| No resource requests or limits |  MEDIUM  |       -       |   ubuntu   | Alert on deployments that have | - CPU limit set to 0 cores for |    Specify the requests and    |
-|           specified            |          |               |            |  containers without resource   |       container 'ubuntu'       |  limits of CPU and Memory for  |
-|                                |          |               |            |      requests and limits       |                                |        your deployment.        |
-|                                |          |               |            |                                |  - CPU request set to 0 cores  |                                |
-|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
-|                                |          |               |            |                                |                                |                                |
-|                                |          |               |            |                                | - Memory limit set to 0 MB for |                                |
-|                                |          |               |            |                                |       container 'ubuntu'       |                                |
-|                                |          |               |            |                                |                                |                                |
-|                                |          |               |            |                                |  - Memory request set to 0 MB  |                                |
-|                                |          |               |            |                                |     for container 'ubuntu'     |                                |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|   Pod Service Account Token    |  MEDIUM  |       -       |   ubuntu   |  Protect pod default service   |    - Deployment mounts the     |              Add               |
-|     Automatically Mounted      |          |               |            | account tokens from compromise |    service account tokens.     | `automountServiceAccountToken: |
-|                                |          |               |            |   by minimizing the mounting   |                                |   false` or a value distinct   |
-|                                |          |               |            |     of the default service     | - Namespace has name 'default' |     from 'default' for the     |
-|                                |          |               |            |  account token to only those   |                                |    `serviceAccountName` key    |
-|                                |          |               |            |     pods whose application     |  - Service Account is set to   |    to the deployment's Pod     |
-|                                |          |               |            | requires interaction with the  |           'default'            |         configuration.         |
-|                                |          |               |            |        Kubernetes API.         |                                |                                |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|        90-Day Image Age        |   LOW    |       -       |   ubuntu   |   Alert on deployments with    | - Container 'ubuntu' has image |   Rebuild your image, push a   |
-|                                |          |               |            |    images that haven't been    | created at 2023-05-30 09:32:09 | new minor version (with a new  |
-|                                |          |               |            |       updated in 90 days       |             (UTC)              |   immutable tag), and update   |
-|                                |          |               |            |                                |                                |    your service to use it.     |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|  Docker CIS 4.1: Ensure That   |   LOW    |       -       |   ubuntu   |   Containers should run as a   | - Container 'ubuntu' has image | Ensure that the Dockerfile for |
-|  a User for the Container Has  |          |               |            |         non-root user          |        with user 'root'        |  each container switches from  |
-|          Been Created          |          |               |            |                                |                                |         the root user          |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|   Ubuntu Package Manager in    |   LOW    |       -       |   ubuntu   |      Alert on deployments      | - Container 'ubuntu' includes  |    Run `dpkg -r --force-all    |
-|             Image              |          |               |            |     with components of the     |    component 'apt' (version    |     apt apt-get && dpkg -r     |
-|                                |          |               |            |     Debian/Ubuntu package      |            1.6.17)             |  --force-all debconf dpkg` in  |
-|                                |          |               |            |    management system in the    |                                | the image build for production |
-|                                |          |               |            |             image.             | - Container 'ubuntu' includes  |          containers.           |
-|                                |          |               |            |                                |   component 'dpkg' (version    |                                |
-|                                |          |               |            |                                |       1.19.0.5ubuntu2.4)       |                                |
----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-WARN:   A total of 6 policies have been violated
-----
-
-In a CI/CD pipeline service, this output is available to the developer via the job’s console output, and the job fails because of this failed roxctl check.
-
-If a developer were to bypass the CI/CD checks, or deploy manually without any build-time controls, RHACS can still enforce policies at deployment time. RHACS does this by using policy evaluation and admission controller enforcement.
-
-. To see this in action, deploy the secrets file:
-
-[source,sh,role=execute]
-----
-oc create -f secrets.yaml
-----
-
-[source,texinfo,subs="attributes"]
-----
-Error from server (Failed currently enforced policies from StackRox): error when creating "secrets.yaml": admission webhook "policyeval.stackrox.io" denied the request:
-The attempted operation violated 1 enforced policy, described below:
-
-Policy: Environment Variable Contains Secret
-- Description:
-    - Alert on deployments with environment variables that contain 'SECRET'
-- Rationale:
-    - Using secrets in environment variables may allow inspection into your secrets
-      from the host or even through the orchestrator UI.
-- Remediation:
-    - Migrate your secrets from environment variables to orchestrator secrets or your
-      security team's secret management solution.
-- Violations:
-    - Environment variable 'AWS_SECRET_ACCESS_KEY' is present in container 'ubuntu'
-
-In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
-----
-
-In this lab, you explored how RHACS can prevent the deployment of applications that violate workflow, configuration, or security best practices before they become actively running containers.
-
-You saw how to use the AdmissionController with the listen and enforce options enabled to reject deployments that violate policy.
-
-In clusters where the enforcement option is disabled, you saw how RHACS scales pod replicas to zero for deployments that violate policy.
-
-IMPORTANT: Once this section is complete, go back and disable enforcement of this policy (set back to inform), else it may affect other actions in the lab.
-
-
-
-[[report-resolve]]
+image::acs-deploy-04.png[link=self, window=blank, width=100%]
 
 == Report and Resolve Violations
 
-At this point, any attacker using a shell to install software is now disconnected from the environment. A complete record of the event is available on the *Violations* page.
 
 . Navigate to the *Violations* page.
 . Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
