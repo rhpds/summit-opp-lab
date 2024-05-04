@@ -31,8 +31,8 @@
 ** xref:module-04.adoc#log4shell[log4shell CVE vulnerability analysis]
 ** xref:module-04.adoc#runtime-enforce[Introduction to Runtime policy enforcement]
 ** xref:module-04.adoc#deploy-enforce[Introduction to Deploy-Time policy enforcement]
-** xref:module-04.adoc#
-** xref:module-04.adoc#
+** xref:module-04.adoc#conclusion[Conclusion]
+
 
 // * xref:module-04.adoc[Red Hat OpenShift Data Foundation]
 

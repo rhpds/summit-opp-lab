@@ -4,7 +4,7 @@
 
 == Module outline
 
-This lab's goal is to showcase the features of Red Hat Advanced Cluster Security for Kubernetes (RHACS) while observing the Java application that you deployed earlier in the Quay module. 
+This lab aims to showcase the features of Red Hat Advanced Cluster Security for Kubernetes (RHACS) while observing the Java application you deployed earlier in the Quay module. 
 
 We will start with the basics of navigation and progress into vulnerability management, policy management and enforcement and finish with CI/CD integration. 
 
@@ -22,7 +22,7 @@ Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensi
 - *Network Segmentation:* Visualize existing connections and enforce tighter segmentation using Kubernetes-native controls to reduce your blast radius.
 - *Risk Profiling:* See all your deployments ranked by risk level, using context from Kubernetes' declarative data, to prioritize remediation.
 - *Configuration Management:* Apply best practices for Docker and Kubernetes to harden your environment for a more secure and stable application.
-- *Threat Detection:* Use rules, automated allow lists, and baselining to accurately identify suspicious activity in your running applications.
+- *Threat Detection:* Use rules, automated allow lists, and baselining to identify suspicious activity in your running applications accurately.
 - *Incident Response:* Take action, from failing builds and blocking deployments to killing pods and thwarting attacks, using Kubernetes for enforcement.
 
 [[console-access]]
@@ -31,9 +31,9 @@ Using Red Hat Advanced Cluster Security for Kubernetes, you can gain comprehensi
 
 In this section, you will confirm that you can connect to the RHACS portal.
 
-The following information will be available in the the main lab screen:
+The following information will be available on the main lab screen:
 
-- The RHACS admin Credentials
+- The RHACS Admin Credentials
 - The URL for the RHACS portal
 
 === Logging into the RHACS console
@@ -62,6 +62,8 @@ image::acs-warning-00.png[]
 . Click "Proceed to central-stackrox...."
 
 image::acs-warning-01.png[]
+
+IMPORTANT: Make sure to refresh the dashboard before moving on to the module
 
 [[acs-nav]]
 
@@ -110,11 +112,11 @@ For example, to find all violations in the *ctf-web-to-system* deployment, the s
 
 In this search query, Deployment is the attribute, and ctf-web-to-system is the search term.
 
-NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the next attribute you would like to enter. Results will appear once there are matches to the entered query.
+NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the following attribute you would like to enter. Results will appear once they match the entered query.
 
 image::acs-search-ctf-00.png[link=self, window=blank, width=100%, Search Syntax]
 
-NOTE: RHACS maintains a library of searchable assets to help you search faster, they will appear in a drop-down list, and you can click on them to enter them as well. If a specific CVE or deployment cannot be found, please confirm the spelling of the asset name, or that it is correctly deployed in the cluster. 
+NOTE: RHACS maintains a library of searchable assets to help you search faster, they will appear in a drop-down list, and you can click on them to enter them as well. If a specific CVE or deployment cannot be found, please confirm the spelling of the asset name or that it is correctly deployed in the cluster. 
 
 ==== Common search queries
 
@@ -144,16 +146,20 @@ The left-hand navigation menu provides access to each of the security use cases,
 - Dashboard: Summary view of your environment
 - Network Graph: Configured and actual network flows and the creation of Network Policies to implement network segmentation
 - Violations: Events that do not match the defined security policies
-- Compliance: Several industry and regulatory security standards, such as PCI DSS
-- Vulnerability Management: Information about known vulnerabilities affecting your environment, including deployed workloads and infrastructure, risk acceptance and reporting.
+- Compliance (2.0): Our new compliance dashboard update is in progress. With plans to make compliance reporting even easier with tailored compliance profiles and reporting by application, namespace and cluster. 
+- Compliance (1.0): Several industry and regulatory security standards, such as PCI DSS, our default dashboard.
+- Vulnerability Management (2.0): We are in the process of migrating our vulnerability management dashboard to focus on triaging by vulnerability. This is to help identify what layer contains vulnerability. Whether it be the node, cluster or application.
+- Vulnerability Management (1.0): Information about known vulnerabilities affecting your environment, including deployed workloads and infrastructure, risk acceptance and reporting.
 - Configuration Management: Identification of potential misconfigurations that can lead to security issues
 - Risk: Risks affecting your environment, such as suspicious executions
 - Platform Configuration: RHACS configuration, policy management and integration details, including;
 * Clusters
 * Policy Management
+* Collections
 * Integrations
 * Access Control
 * System Configuration
+* Administration Events
 * System Health
 
 === 3. Dashboard 
@@ -193,7 +199,7 @@ These counters are clickable, providing fast access to the desired list view pag
 
 The dashboard includes a top-level filter that applies simultaneously to all widgets. You can select clusters and one or more namespaces within selected clusters. Any change to the filter is immediately reflected by all widgets, limiting the data they present to the selected scope.
 
-NOTE: The dashboard filter does not affect the status bar and when no clusters or namespaces are selected, the view automatically switches to All.
+NOTE: The dashboard filter does not affect the status bar, and when no clusters or namespaces are selected, the view automatically switches to All.
 
 image::acs-dashboard-03.png[link=self, window=blank, width=100%, Dashboard Filter]
 
@@ -209,7 +215,7 @@ With these widgets, you can customize the information displayed on the dashboard
 
 == The Vulnerability Management dashboard
 
-Let us continue by looking at our primary use case for RHACS and that is the Vulnerability Management features and dashboard, a familiar topic for most security teams.
+Let us continue by looking at our primary use case for RHACS that is the Vulnerability Management features and dashboard, a familiar topic for most security teams.
 
 IMPORTANT: The locations and size of your panels may vary depending on your screen size and zoom.
 
@@ -219,7 +225,7 @@ NOTE: For the following section, please note that the order in which the images 
 
 image::acs-vuln-dashboard-00.png[link=self, window=blank, width=100%, Vulnerability Management Dashboard]
 
-The dashboard provides several important vulnerability breakdowns such as:
+The dashboard provides several critical vulnerability breakdowns, such as:
 
 - Top risky deployments/images
 - Recently detected image vulnerabilities
@@ -239,7 +245,7 @@ image::acs-vuln-dashboard-02.png[link=self, window=blank, width=100%, Top Policy
 
 . Locate the *Top riskiest images* panel. 
 
-Here you can see the CVEs associated with containers currently running in the cluster. The goal is to find the *log4shell* exploit in your cluster and block that container from being pushed in the future.
+Here, you can see the CVEs associated with containers currently running in the cluster. The goal is to find the *log4shell* exploit in your cluster and block that container from being pushed in the future.
 
 image::acs-risk-02.png[link=self, window=blank, width=100%, Riskiest Images]
 
@@ -251,7 +257,7 @@ image::acs-risk-03.png[link=self, window=blank, width=100%, Riskiest Images]
 
 The images in this dashboard are listed here in order of *risk*, 
 
-Risk is based on a multitude of security issues such as
+Risk is based on a multitude of security issues, such as
 
 - the severity of the vulnerabilities present
 - in the components in the images
@@ -287,7 +293,7 @@ image::acs-risk-07.png[link=self, window=blank, width=100%, Image Info]
 
 === RHACS Vulnerability Scanner
 
-RHACS' Scanner v4 is a built-in vulnerability scanner breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, Go, Java and more. The *Image Summary tab* provides the essential security details of the image overall, with links to the components. Below you can see why the image is ranked as a critically vulnerable application:
+RHACS' Scanner v4 is a built-in vulnerability scanner that breaks down images into layers and components - where components can be operating-system installed packages or dependencies installed by programming languages like Python, Javascript, Go, Java and more. The *Image Summary tab* provides the essential security details of the image overall, with links to the components. Below, you can see why the image is ranked as a critically vulnerable application:
 
 - In the *Details and metadata* → Image Summary panel, the information you see there tells you that this image has a severe security problem - the base image was imported several years ago (Debian 8 - 2015).
 - At the top of the page is the warning that CVE data is stale - that this image has a base OS version whose distribution has stopped providing security information and likely stopped publishing security fixes. ACS will still scan for language issues even if the Operating System does not have CVE dat available.
@@ -309,7 +315,7 @@ The Dockerfile tab view shows the layer-by-layer view, and, as you can see, the 
 image::acs-vulns-02.png[link=self, window=blank, width=100%]
 
 
-*Now let's put this UI to the test with a real use case!*
+*Now let's put this UI to the test with an actual use case!*
 
 [[log4shell]]
 
@@ -350,13 +356,15 @@ As we move into this next section, let's focus on identifying and enforcing a ru
 
 Our example container *ctf-web-to-system* has this package manager in the container. Let's ensure that it never calls for updates while present in our clusters.
 
+*Procedure*
+
 . On the left-hand side of the application, click the *Platform Configuration* tab and select *Policy Management*.
 
 image::acs-policy-00.png[link=self, window=blank, width=100%, Policy Management Dashboard]
 
 [start=2]
 
-. Filter through the policies to find *Ubuntu Package Manager Execution* or use the search bar to select by *category*.
+. Filter through the policies to find *Ubuntu Package Manager Execution* or use the search bar to select *Policy*.
 
 image::acs-policy-01.png[link=self, window=blank, width=100%, Policy Management Search]
 
@@ -378,7 +386,7 @@ The example below demonstrates how security may want to block a package manager 
 
 === Prevent execution of package manager binary
 
-Package managers like apt (Ubuntu), apk (Alpine), or yum/dnf (RedHat) are binary software components used to manage and update installed software on a Linux® host system. They are used extensively to manage running virtual machines. But using a package manager to install or remove software on a running container violates the immutable principle of container operation.
+Package managers like apt (Ubuntu), apk (Alpine), or yum/dnf (RedHat) are binary software components used to manage and update installed software on a Linux® host system. They are used extensively to manage running virtual machines. However, using a package manager to install or remove software on a running container violates the immutable principle of container operation.
 
 This policy demonstrates how RHACS detects and avoids a runtime violation, using Linux kernel instrumentation to detect the running process and OpenShift® to terminate the pod for enforcement. Using OpenShift to enforce runtime policy is preferable to enforcing rules directly within containers or in the container engine, as it avoids a disconnect between the state that OpenShift is maintaining and the state where the container is operating. Furthermore, because a runtime policy may detect only part of an attacker’s activity inside a container, removing the container avoids the attack.
 
@@ -393,7 +401,7 @@ image::acs-runtime-00.png[link=self, window=blank, width=100%]
 
 . Select the policy *Ubuntu Package Manager Execution*.
 
-. Click the *Actions* button then click *Edit policy*.
+. Click the *Actions* button, then click *Edit policy*.
 
 image::acs-runtime-01.png[link=self, window=blank, width=100%]
 
@@ -416,11 +424,11 @@ image::acs-runtime-03.png[link=self, window=blank, width=100%, Enforce Runtime P
 . Review the changes
 . Click save
 
-IMPORTANT: Make sure to save the policy changes! If you do not save the policy the process will not be blocked!
+IMPORTANT: Make sure to save the policy changes! If you do not save the policy, the process will not be blocked!
 
-=== Testing the configured Policy
+=== Testing the configured policy
 
-Next, we will use tmux to watch OpenShift events while running the test, so you can see how RHACS enforces the policy at runtime.
+Next, we will use tmux to watch OpenShift events while running the test so you can see how RHACS enforces the policy at runtime.
 
 IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
 
@@ -500,20 +508,24 @@ node@ctf-web-to-system-6db858448f-stwhq:/$ command terminated with exit code 137
 0s          Normal    Started                  pod/ctf-web-to-system-6db858448f-qp85v    Started container ctf-web-container
 ----
 
-NOTE: After a few seconds you can see the pod is deleted a recreated. In your tmux shell pane, note that your shell session has terminated and that you are returned to the Bastion VM command line.
+NOTE: After a few seconds, you can see the pod is deleted and recreated. In your tmux shell pane, note that your shell session has terminated and that you are returned to the Bastion VM command line.
 
 Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged! We will triage our violations after we look at deploy time policies.
 
-NOTE: type exit in the terminal twice to get back to the default terminal.
+NOTE: type exit in the terminal, use ctrl+c to stop the 'watch' command, and type exit one more time to get back to the default terminal.
 
 [[deploy-enforce]]
 
 == Introduction to *Deploy-Time* policy enforcement
 
+Deploy-Time policy referes to enforcing configuration controls in the cluster and before deployment in the CI/CD process. In this example we want to stop the Ubuntu Package Manager from ever making it into the default namespace in the first place. 
+
 There are two approaches to enforcing deploy-time policies in RHACS:
 
 - In clusters with **listen** and **enforce** AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
 - In clusters where the admission controller option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
+
+In the next example, we are going to configure a *Deploy-Time* policy to block applications from deploying into the default namespace with the *apt|dpkg* application in the image.
 
 == Prevent the Ubuntu Package Manager in the ctf-web-to-system image from being deployed
 
@@ -526,11 +538,13 @@ NOTE: This time we are going to edit a different policy. Specifically related to
 
 . Click on the *Ubuntu Package Manager in Image* options (The three dots on the right side of the screen) and select *Clone policy*
 
+IMPORTANT: Make sure to *CLONE* the policy
+
 image::acs-deploy-00.png[link=self, window=blank, width=100%]
 
 [start=4]
 
-. Give the policy a new name. Something you will remember. For example;
+. Give the policy a new name. Something you will remember. The best practice would be to add a description for future policy enforcers as well. For example;
 
 image::acs-deploy-01.png[link=self, window=blank, width=100%]
 
@@ -542,44 +556,138 @@ image::acs-deploy-02.png[link=self, window=blank, width=100%]
 
 [start=6]
 
-Now we want to target our specific deployment with an image label.
+Now, we want to target our specific deployment with an image label.
 
 . Click on the *Policy criteria* tab.
-. Click on the *Image contents* dropdown on the right side of the browser.
+. Click on the *Deployment metadata* dropdown on the right side of the browser.
 . Find the *Namespace* label and drag it to the default policy criteria.
-. Default only
+. Type *default* under the namespace criteria
 
-You're policy should look like this,
+Your policy should look like this,
 
 image::acs-deploy-04.png[link=self, window=blank, width=100%]
+
+[start=10]
 
 . Lastly, go to the *Review Policy* tab
 . Review the changes
-. Click save
 
-image::acs-deploy-04.png[link=self, window=blank, width=100%]
+NOTE: There is a preview tab on the right side of the page that will show you all of the affected applications with the introduction of this policy.
+
+image::acs-deploy-05.png[link=self, window=blank, width=100%]
+
+[start=12]
+
+. Click Save
+
+Congrats! You're now enforcing at runtime and deploy time. In the last step in this module. We will review
 
 == Report and Resolve Violations
 
+In this last section. We will resolve a few of the issues that we have created.
+
+*Procedure*
 
 . Navigate to the *Violations* page.
 . Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
 . Click the most recent violation and explore the list of the violation events:
 
-image::250-violations.png[link=self, window=blank, width=100%, Violations Menu]
+image::acs-violations-00.png[link=self, window=blank, width=100%, Violations Menu]
 
-If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration, and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
+If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
 
 After this issue is addressed, in this case by the RHACS product using the runtime enforcement action, you can remove it from the list by marking it as *Resolved*.
 
-. Lastly, hover over the violation in the list to see the resolution options and resolve this issue as operator error.
+[start=4]
 
-image::251-resolve-violation.png[link=self, window=blank, width=100%, Resolve Violations]
+. Lastly, hover over the violation in the list to see the resolution options and resolve this issue.
+
+image::acs-violations-01.png[link=self, window=blank, width=100%, Resolve Violations]
 
 For more information about integration with SIEM tools, see the RHACS help documentation on external tools.
 
-Congratulations! You successfully stopped packages from being downloaded to the host by setting a runtime enforcement policy.
+IMPORTANT: If you want to enforce on deploy-time you will need to use the roxctl CLI at deploy time. There are a few commands after the conclusion if you have time.
+
+=== Deploy-Time enforcement
+
+IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
+
+[source,sh,subs="attributes",role=execute]
+
+----
+ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+----
+
+Make sure you use the password '{bastion_ssh_password}' when prompted.
+
+*Procedure*
+
+. Set variables to connect to RHACS Central.
+
+[source,sh,subs="attributes",role=execute]
+----
+export ROX_CENTRAL_ADDRESS={acs_route}
+cd ~/
+export TUTORIAL_HOME="$(pwd)/demo-apps"
+----
+
+[start=2]
+
+. Verify the ctf-web-to-system application against the policies you've created.
+
+[source,sh,subs="attributes",role=execute]
+----
+roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file $TUTORIAL_HOME/kubernetes-manifests/ctf-web-to-system/ctf-w2s.yml --insecure-skip-tls-verify
+----
+
+*Sample output*
+[source,bash]
+----
+[demo-user@bastion ~]$ roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file $TUTORIAL_HOME/kubernetes-manifests/ctf-web-to-system/ctf-w2s.yml --insecure-skip-tls-verify
+Policy check results for deployments: [ctf-web-to-system]
+(TOTAL: 7, LOW: 4, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+
++--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
+|             POLICY             | SEVERITY | BREAKS DEPLOY |    DEPLOYMENT     |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
++--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
++--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       -       | ctf-web-to-system |      Alert on deployments      |          - Container           |    Run `dpkg -r --force-all    |
+|             Image              |          |               |                   |     with components of the     |  'ctf-web-container' includes  |     apt apt-get && dpkg -r     |
+|                                |          |               |                   |     Debian/Ubuntu package      |    component 'apt' (version    |  --force-all debconf dpkg` in  |
+|                                |          |               |                   |    management system in the    |             1.4.9)             | the image build for production |
+|                                |          |               |                   |             image.             |                                |          containers.           |
+|                                |          |               |                   |                                |          - Container           |                                |
+|                                |          |               |                   |                                |  'ctf-web-container' includes  |                                |
+|                                |          |               |                   |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |                   |                                |            1.18.25)            |                                |
++--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
+|   Ubuntu Package Manager in    |   LOW    |       X       | ctf-web-to-system |      Alert on deployments      |          - Container           |    Run `dpkg -r --force-all    |
+|   Image - Default namespace    |          |               |                   |     with components of the     |  'ctf-web-container' includes  |     apt apt-get && dpkg -r     |
+|                                |          |               |                   |     Debian/Ubuntu package      |    component 'apt' (version    |  --force-all debconf dpkg` in  |
+|                                |          |               |                   |    management system in the    |             1.4.9)             | the image build for production |
+|                                |          |               |                   |             image.             |                                |          containers.           |
+|                                |          |               |                   |                                |          - Container           |                                |
+|                                |          |               |                   |                                |  'ctf-web-container' includes  |                                |
+|                                |          |               |                   |                                |   component 'dpkg' (version    |                                |
+|                                |          |               |                   |                                |            1.18.25)            |                                |
+|                                |          |               |                   |                                |                                |                                |
+|                                |          |               |                   |                                | - Namespace has name 'default' |                                |
++--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:   A total of 7 policies have been violated
+ERROR:  failed policies found: 1 policies violated that are failing the check
+ERROR:  Policy "Ubuntu Package Manager in Image - Default namespace" within Deployment "ctf-web-to-system" - Possible remediation: "Run `dpkg -r --force-all apt apt-get && dpkg -r --force-all debconf dpkg` in the image build for production containers."
+ERROR:  checking deployment failed after 3 retries: breaking policies found: failed policies found: 1 policies violated that are failing the check
+----
+
+You should see one of the policies you've create breaking the deploy process while the others are in inform only mode. 
+
+[[conclusion]]
 
 == Conclusion
 
-In summary, we made use of the features provided by Red Hat Advanced Cluster Security for Kubernetes to display potential security violations in your cluster in a central dashboard. We also used the default tools to examine known image vulnerabilities and network communication and segmentation in our cluster. Lastly we crafted both deploy-time and runtime policies to help prevent malicious events from occurring in our cluster. Hopefully this lab has helped demonstrate to you the immense value provided by RHACS and OpenShift Platform Plus. Please feel free to continue and explore the RHACS lab environment, or continue on to the next portion of the lab at your leisure.
+In summary, we made use of the features provided by Red Hat Advanced Cluster Security for Kubernetes to display potential security violations in your cluster in a central dashboard. You crafted both deploy-time and runtime policies to help prevent malicious events from occurring in our cluster. Hopefully this lab has helped demonstrate to you the immense value provided by RHACS and OpenShift Platform Plus. Please feel free to continue and explore the RHACS lab environment.
+
+Thank you for joining and have fun in Denver!
+
+
+
