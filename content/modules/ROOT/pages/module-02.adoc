@@ -154,7 +154,7 @@ IMPORTANT: Make sure to REMOVE the *https://* from the URL command below.
 [source,sh,subs="attributes",role=execute]
 ----
 export QUAY_USER={quay_admin_username}
-export QUAY_URL={quay_console_url} #remove https://
+export QUAY_URL=$(oc -n quay get route quay-quay -o jsonpath='{.spec.host}')
 ----
 
 Our insecure demo applications come from a variety of public GitHub repositories and sources. Including the Java application that you just pushed to Quay. Let's deploy them into our cluster.
