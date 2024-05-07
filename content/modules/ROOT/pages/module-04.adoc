@@ -550,7 +550,9 @@ image::acs-deploy-01.png[link=self, window=blank, width=100%]
 
 [start=5]
 
-. Next, update the policy to inform and enforce while clicking on the deploy stage only.
+. Next, update the policy to *inform and enforce* while clicking on the deploy stage only.
+
+IMPORTANT: Make sure to unselect the *Build* lifecycle before moving forward.
 
 image::acs-deploy-02.png[link=self, window=blank, width=100%]
 

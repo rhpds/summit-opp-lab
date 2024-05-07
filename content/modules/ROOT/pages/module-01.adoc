@@ -116,11 +116,17 @@ export QUAY_USER={quay_admin_username}
 
 . Set the Quay URL variable 
 
-IMPORTANT: Make sure to REMOVE the *https://* from the URL command below.
+[source,sh,subs="attributes",role=execute]
+----
+export QUAY_URL=$(oc -n quay get route quay-quay -o jsonpath='{.spec.host}')
+----
+
+IMPORTANT: Verify that the variables are correct
 
 [source,sh,subs="attributes",role=execute]
 ----
-export QUAY_URL={quay_console_url} #remove https://
+$QUAY_URL
+$QUAY_USER
 ----
 
 [start=3]
