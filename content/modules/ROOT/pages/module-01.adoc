@@ -10,15 +10,7 @@
 
 NOTE: The Red Hat Advanced Cluster Management for Kubernetes (RHACM) Console is now integrated with OpenShift Console, to access it please select *All Clusters* from the dropdown menu once you log in. 
 
-Your OpenShift cluster console is available at: {openshift_console_url}
 
-Administrator login is available with:
-
-[cols="1,1"]
-|===
-*User:*| kubeadmin |
-*Password:*| {openshift_kubeadmin_password} |
-|===
 
 [[acs]]
 === RHACS console access
@@ -200,5 +192,5 @@ Writing manifest to image destination
 
 Perfect!
 
-In the next module, we will browse through Quay to see the Java container app that you have tagged and pushed. The apple will be deployed into the cluster in the next step.
+In the next module, we will browse through Quay to see the Java container app that you have tagged and pushed. The application will be deployed into the cluster in the next step.
 
