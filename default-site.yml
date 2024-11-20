@@ -1,7 +1,7 @@
 ---
 site:
   title: OpenShift Platform Plus
-  url: https://redhat-scholars.github.io/course-template
+  # url: https://redhat-scholars.github.io/course-template
   start_page: modules::index.adoc
 
 content:
@@ -19,7 +19,8 @@ content:
 
 ui:
   bundle:
-    url: https://github.com/rhpds/showroom_theme_summit/releases/download/v0.0.1/ui-bundle.zip
+    # url: https://github.com/rhpds/showroom_theme_summit/releases/download/v0.0.1/ui-bundle.zip # summit
+    url: https://github.com/rhpds/showroom_theme_rh1/releases/download/v0.0.4/ui-bundle.zip # rh1
     snapshot: true
   supplemental_files:
     - path: ./content/supplemental-ui
@@ -32,3 +33,8 @@ runtime:
 
 output:
   dir: ./www
+
+antora:
+  extensions:
+    - require: ./content/lib/dev-mode.js
+      enabled: true
