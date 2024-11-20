@@ -1,0 +1,56 @@
+////
+This file translates attributes depending upon the source of the infrasturcture.
+
+For example, the original lab on AWS there are:
+* openshift_kubeadmin_password
+
+But on Infra CNV, there are:
+* openshift_cluster_admin_password
+* openshift_cluster_admin_username
+
+So, we translate
+ :openshift_kubeadmin_password: {openshift_cluster_admin_password}
+
+Note that kubeadmin is removed from the Infra CNV.
+So we need to write more complex logic to translate the attribute.
+
+////
+
+ifdef::openshift_cluster_admin_username[]
+:openshift_kubeadmin_username: {openshift_cluster_admin_username}
+:openshift_kubeadmin_password: {openshift_cluster_admin_password}
+endif::openshift_cluster_admin_username[]
+ifndef::openshift_cluster_admin_username[]
+:openshift_kubeadmin_username: kubeadmin
+:openshift_kubeadmin_password: {openshift_kubeadmin_password}
+endif::openshift_cluster_admin_username[]
+
+// Default attributes on GCP
+
+:acs_portal_password: sample_acs_portal_password
+:acs_portal_username: sample_acs_portal_username
+:acs_route: sample_acs_route
+:api_url: sample_api_url
+:bastion_public_hostname: sample_bastion_public_hostname
+:bastion_ssh_password: sample_bastion_ssh_password
+:bastion_ssh_user_name: sample_bastion_ssh_user_name
+:guid: sample_guid
+:openshift_api_server_url: sample_openshift_api_server_url
+:openshift_api_url: sample_openshift_api_url
+:openshift_client_download_url: sample_openshift_client_download_url
+:openshift_cluster_admin_password: sample_openshift_cluster_admin_password
+:openshift_cluster_admin_username: sample_openshift_cluster_admin_username
+:openshift_cluster_console_url: sample_openshift_cluster_console_url
+:openshift_cluster_ingress_domain: sample_openshift_cluster_ingress_domain
+:openshift_cluster_num_users: sample_openshift_cluster_num_users
+:openshift_cluster_user_base: sample_openshift_cluster_user_base
+:openshift_cluster_user_count: sample_openshift_cluster_user_count
+:openshift_cluster_user_name: sample_openshift_cluster_user_name
+:openshift_console_url: sample_openshift_console_url
+:openshift_gitops_server: sample_openshift_gitops_server
+:quay_admin_password: sample_quay_admin_password
+:quay_admin_token: sample_quay_admin_token
+:quay_admin_username: sample_quay_admin_username
+:quay_console_url: sample_quay_console_url
+:showroom_primary_view_url: sample_showroom_primary_view_url
+:web_console_url: sample_web_console_url
