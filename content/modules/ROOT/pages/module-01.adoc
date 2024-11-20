@@ -8,7 +8,7 @@
 
 ===  OpenShift console access & RHACM console access
 
-NOTE: The Red Hat Advanced Cluster Management for Kubernetes (RHACM) Console is now integrated with OpenShift Console, to access it please select *All Clusters* from the dropdown menu once you log in. 
+NOTE: The Red Hat Advanced Cluster Management for Kubernetes (RHACM) Console is now integrated with OpenShift Console, to access it please select *All Clusters* from the dropdown menu once you log in.
 
 Your OpenShift cluster console is available at: {openshift_console_url}
 
@@ -16,8 +16,8 @@ Administrator login is available with:
 
 [cols="1,1"]
 |===
-*User:*| kubeadmin |
-*Password:*| {openshift_kubeadmin_password} |
+*User:*| {openshift_cluster_admin_password} |
+*Password:*| {openshift_cluster_admin_password} |
 |===
 
 [[acs]]
@@ -89,7 +89,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 
 == Demo applications setup
 
-IMPORTANT: Make sure to finish all of the following steps and ensure the vulnerable applications deploy properly. We will use these applications in later modules. 
+IMPORTANT: Make sure to finish all of the following steps and ensure the vulnerable applications deploy properly. We will use these applications in later modules.
 
 === Download, build and push the Java demo container image to Quay via the Bastion VM
 
@@ -114,7 +114,7 @@ export QUAY_USER={quay_admin_username}
 
 [start=2]
 
-. Set the Quay URL variable 
+. Set the Quay URL variable
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -125,8 +125,8 @@ IMPORTANT: Verify that the variables are correct
 
 [source,sh,subs="attributes",role=execute]
 ----
-$QUAY_URL
-$QUAY_USER
+echo $QUAY_URL
+echo $QUAY_USER
 ----
 
 [start=3]
@@ -137,7 +137,7 @@ $QUAY_USER
 podman login $QUAY_URL
 ----
 
-NOTE: Use the quay admin credentials, Username: *{quay_admin_username}* & password: *{quay_admin_password}*. You can create unique user and group credentials in Quay for proper segmentation. 
+NOTE: Use the quay admin credentials, Username: *{quay_admin_username}* & password: *{quay_admin_password}*. You can create unique user and group credentials in Quay for proper segmentation.
 
 *Sample output*
 [source,bash]
@@ -160,16 +160,16 @@ podman pull quay.io/jechoisec/ctf-web-to-system-01
 ----
 Trying to pull quay.io/jechoisec/ctf-web-to-system-01:latest...
 Getting image source signatures
-Copying blob 37aaf24cf781 done 
+Copying blob 37aaf24cf781 done
 ...
 ...
-Copying config 1cbb2b7908 done  
+Copying config 1cbb2b7908 done
 Writing manifest to image destination
 1cbb2b79086961e34d06f301b2fa15d2a7e359e49cfe67c06b6227f6f0005149
 ----
 
 [start=5]
-. Now that you have a copy of the Java container image locally. You must tag the image before pushing it to Quay. 
+. Now that you have a copy of the Java container image locally. You must tag the image before pushing it to Quay.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -189,10 +189,10 @@ podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
 *Sample output*
 [source,bash]
 ----
-Copying blob 3113fb957b33 done 
+Copying blob 3113fb957b33 done
 ...
 ...
-Copying config 1cbb2b7908 done  
+Copying config 1cbb2b7908 done
 Writing manifest to image destination
 ----
 
@@ -201,4 +201,3 @@ Writing manifest to image destination
 Perfect!
 
 In the next module, we will browse through Quay to see the Java container app that you have tagged and pushed. The apple will be deployed into the cluster in the next step.
-
