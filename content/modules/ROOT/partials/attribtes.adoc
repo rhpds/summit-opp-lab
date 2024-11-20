@@ -16,17 +16,14 @@ So we need to write more complex logic to translate the attribute.
 
 ////
 
-ifdef::openshift_cluster_admin_username[]
-:openshift_kubeadmin_username: {openshift_cluster_admin_username}
-:openshift_kubeadmin_password: {openshift_cluster_admin_password}
-endif::openshift_cluster_admin_username[]
+// NOT GCP
 ifndef::openshift_cluster_admin_username[]
-:openshift_kubeadmin_username: kubeadmin
-:openshift_kubeadmin_password: {openshift_kubeadmin_password}
+:openshift_cluster_admin_username: kubeadmin
+:openshift_cluster_admin_password: {openshift_kubeadmin_password}
 endif::openshift_cluster_admin_username[]
 
-// Default attributes on GCP
-
+// GCP attributes from AgD
+ifdef::openshift_cluster_admin_username[]
 :acs_portal_password: sample_acs_portal_password
 :acs_portal_username: sample_acs_portal_username
 :acs_route: sample_acs_route
@@ -54,3 +51,4 @@ endif::openshift_cluster_admin_username[]
 :quay_console_url: sample_quay_console_url
 :showroom_primary_view_url: sample_showroom_primary_view_url
 :web_console_url: sample_web_console_url
+endif::openshift_cluster_admin_username[]
