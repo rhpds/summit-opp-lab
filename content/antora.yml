@@ -18,7 +18,6 @@ asciidoc:
   extensions:
     - id: dev-mode
       require: ./content/lib/dev-mode.js
-      enabled: false
+      enabled: true
     - ./content/lib/tab-block.js
     - ./content/lib/remote-include-processor.js
-
