@@ -10,7 +10,15 @@
 
 NOTE: The Red Hat Advanced Cluster Management for Kubernetes (RHACM) Console is now integrated with OpenShift Console, to access it please select *All Clusters* from the dropdown menu once you log in. 
 
+Your OpenShift cluster console is available at: {openshift_console_url}
 
+Administrator login is available with:
+
+[cols="1,1"]
+|===
+*Username:* | kubeadmin |
+*Password:* | {openshift_kubeadmin_password} |
+|===
 
 [[acs]]
 === RHACS console access
@@ -26,7 +34,6 @@ Administrator login is available with:
 |===
 
 [[quay]]
-
 === Quay console access
 
 Your Red Hat Quay console is available at: {quay_console_url}[window=blank]
@@ -39,158 +46,193 @@ Administrator login is available with:
 *Quay Console Password:* | {quay_admin_password} |
 |===
 
-[[bastion-host]]
 
-=== Bastion Access
+=== roxctl CLI verification 
 
-A RHEL bastion host is available with common utilities pre-installed and OpenShift command line access pre-configured.
+Next, verify that we have access to the RHACS Central Service.
 
-For SSH access to the bastion:
+*Procedure*
 
-[cols="1,1"]
-|===
-*Bastion Hostname:* | {bastion_public_hostname} |
-*Bastion Username:* | {bastion_ssh_user_name} |
-*Bastion Password:* | {bastion_ssh_password} |
-|===
+[start=1]
+. Run the following command.
 
-. Enter the ssh command in the Showroom lab terminal
+====
+This command uses variables saved in the ~/.bashrc file to authenticate with the RHACS Central Service.
+====
 
 [source,sh,subs="attributes",role=execute]
+----
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" central whoami
+----
 
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
 ----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+UserID:
+	auth-token:718744a9-9548-488b-a8b9-07b2c59ea5e6
+User name:
+	anonymous bearer token "pipelines-ci-token" with roles [Admin] (jti: 718744a9-9548-488b-a8b9-07b2c59ea5e6, expires: 2025-04-03T15:15:06Z)
+Roles:
+	- Admin
+Access:
+	rw Access
+	rw Administration
+	rw Alert
+	rw CVE
+	rw Cluster
+	rw Compliance
+	rw Deployment
+	rw DeploymentExtension
+	rw Detection
+	rw Image
+	rw Integration
+	rw K8sRole
+	rw K8sRoleBinding
+	rw K8sSubject
+	rw Namespace
+	rw NetworkGraph
+	rw NetworkPolicy
+	rw Node
+	rw Secret
+	rw ServiceAccount
+	rw VulnerabilityManagementApprovals
+	rw VulnerabilityManagementRequests
+	rw WatchedImage
+	rw WorkflowAdministration
 ----
 
-*Sample output*
-[source,bash]
+NOTE: This output is showing that you have unrestricted access to the RHACS product. These permissions can be seen in the **RHACS Access Control** tab that we will review later.
+
+image::01-rhacs-access-control.png[RHACS access control]
+
+If you have full access you are ready to go!
+
+== Deploy the workshop applications
+
+You now have access to the core OPP applications. Next, you'll deploy a bunch of insecure apps into the OpenShift cluster. Our insecure demo applications come from a variety of public GitHub repositories and sources. These apps will be the main use cases we look at during the workshop and range from some well know Capture the Flag (CTF) applications to log4shell and Apache struts vulnerabilities. 
+
+After you deploy the applications you'll scan a few of these containers using the *roxctl* CLI to get a feeling about what you will be dealing with when you get to the security section with Red Hat Advanced Cluster Security.
+
+=== Time to deploy
+
+*Procedure*
+
+[start=1]
+. Run the following commands in the terminal, one after the other.
+
+====
+This command downloads a repository container dockerfiles, attack scripts, and Kubernetes manifests that you will use to deploy the containerized applications to OpenShift.  
+====
+
+[source,sh,subs="attributes",role=execute]
 ----
-The authenticity of host 'ec2-18-218-57-221.us-east-2.compute.amazonaws.com ($IP_ADDRESS)' can't be established.
-ED25519 key fingerprint is SHA256:X2AGqDUv+yVqYGGh0Ul8b8awRM0kWXgAAzePskZ6ixo.
-This key is not known by any other names
-Are you sure you want to continue connecting (yes/no/[fingerprint])?
+git clone https://github.com/mfosterrox/demo-apps.git demo-apps
+export TUTORIAL_HOME="$(pwd)/demo-apps"
 ----
+
+====
+This command applies the manifests into the OpenShift environment.
+====
+
+[source,sh,subs="attributes",role=execute]
+----
+oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive
+namespace/operations created
+namespace/backend created
+....
+route.route.openshift.io/webgoat created
+configmap/webgoat-config created
+----
+
+NOTE: You should see warnings such as: *Warning: would violate PodSecurity "baseline:latest": privileged (container "proxy" must not set securityContext.privileged=true)*. This is because we are deploying flawed container configurations and vulnerable container applications into the OpenShift cluster.
 
 [start=2]
-. Type "Yes"
+. For the last step. Run the following command to varify that the applications are up and running. 
 
+====
+The following command will wathc all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.
+====
 
-. Enter the SSH password (*{bastion_ssh_password}*) when prompted.
-
-[[demo-applications]]
-
-== Demo applications setup
-
-IMPORTANT: Make sure to finish all of the following steps and ensure the vulnerable applications deploy properly. We will use these applications in later modules. 
-
-=== Download, build and push the Java demo container image to Quay via the Bastion VM
-
-To demonstrate Quay's functionality, we can pull an image from a public repository and upload it to our newly created registry. We can push container images to Quay as long as we have the correct credentials to set up new registries. To demonstrate this functionality, we are going to use the ctf-web-to-system container image.
-
-IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
-
-[source,sh,subs="attributes",role=execute]
-
+[source,bash,role="execute"]
 ----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
+oc get deployments -l demo=roadshow -A -w
 ----
 
-Make sure you use the password '{bastion_ssh_password}' when prompted.
-
-. Let's export a few variable to make our life easier
-
-[source,sh,subs="attributes",role=execute]
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
 ----
-export QUAY_USER={quay_admin_username}
+[demo-user@bastion ~]$ oc get deployments -l demo=roadshow -A -w
+NAMESPACE    NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+backend      api-server        1/1     1            1           7m15s
+default      juice-shop        1/1     1            1           7m3s
+default      log4shell         1/1     1            1           6m59s
+default      open-api-server   1/1     1            1           6m47s
+default      reporting         1/1     1            1           6m50s
+default      webgoat           1/1     1            1           6m42s
+frontend     asset-cache       1/1     1            1           7m12s
+medical      reporting         1/1     1            1           6m57s
+operations   jump-host         1/1     1            1           6m55s
+payments     visa-processor    1/1     1            1           6m54s
 ----
 
-[start=2]
-
-. Set the Quay URL variable 
-
-[source,sh,subs="attributes",role=execute]
-----
-export QUAY_URL=$(oc -n quay get route quay-quay -o jsonpath='{.spec.host}')
-----
-
-IMPORTANT: Verify that the variables are correct
-
-[source,sh,subs="attributes",role=execute]
-----
-$QUAY_URL
-$QUAY_USER
-----
+IMPORTANT: Please ensure the deploy application are deployed and available before moving onto the next module. 
 
 [start=3]
-. Using the terminal on the bastion host, login to quay using the Podman CLI as shown below:
+. Let's take a quick look at some of the applications that you deployed. 
+
+====
+The following command triggers a vulnerability scan by RHACS, roxctl filters the results into a table. The severity flag means only the critical vulnerabilities will be shown.
+====
 
 [source,sh,subs="attributes",role=execute]
 ----
-podman login $QUAY_URL
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
 ----
 
-NOTE: Use the quay admin credentials, Username: *{quay_admin_username}* & password: *{quay_admin_password}*. You can create unique user and group credentials in Quay for proper segmentation. 
+TIP: The following output can be configured using flags. You can configure different outputs (table, CSV, JSON, and sarif.) and filter for specific severities.
 
-*Sample output*
-[source,bash]
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
 ----
-Username: quayadmin
-Password:
-Login Succeeded!
-----
+[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
+Scan results for image: bkimminich/juice-shop
+(TOTAL-COMPONENTS: 34, TOTAL-VULNERABILITIES: 63, LOW: 13, MODERATE: 25, IMPORTANT: 18, CRITICAL: 7)
 
-[start=4]
-. Pull the Java container image with the following CLI command:
 
-[source,sh,subs="attributes",role=execute]
-----
-podman pull quay.io/jechoisec/ctf-web-to-system-01
-----
-
-*Sample output*
-[source,bash]
-----
-Trying to pull quay.io/jechoisec/ctf-web-to-system-01:latest...
-Getting image source signatures
-Copying blob 37aaf24cf781 done 
++-------------+---------+------------------+----------+--------------------------------------------------------------------------------+---------------+
+|  COMPONENT  | VERSION |       CVE        | SEVERITY |                                      LINK                                      | FIXED VERSION |
++-------------+---------+------------------+----------+--------------------------------------------------------------------------------+---------------+
+|     ejs     |  2.7.4  |  CVE-2022-29078  | CRITICAL |                https://nvd.nist.gov/vuln/detail/CVE-2022-29078                 |     3.1.7     |
 ...
-...
-Copying config 1cbb2b7908 done  
-Writing manifest to image destination
-1cbb2b79086961e34d06f301b2fa15d2a7e359e49cfe67c06b6227f6f0005149
+WARN:   A total of 63 unique vulnerabilities were found in 34 components
 ----
 
-[start=5]
-. Now that you have a copy of the Java container image locally. You must tag the image before pushing it to Quay. 
+== Summary
 
-[source,sh,subs="attributes",role=execute]
-----
-podman tag quay.io/jechoisec/ctf-web-to-system-01 $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0
-----
+image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnY0NDA0ZnJqNXh6cGNqeHNxZGd5Zm5qMnlpOHhrbm1hY2pwcG5ydSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p18ohAgD3H60LSoI1C/giphy.gif[link=self, window=blank, width=100%, class="center"]
 
-NOTE: Quay will automatically create a private registry to store our Java appplication. We will need to make it a public repository to be able to pull the miage without credentials. We will do this in the following module
+*Beautiful!*
 
-[start=6]
-. The last step is to push the image to Quay.
+In this module, you got access to all of the lab UI's and interfaces including the Showroom lab enviroment (Where you are reading this sentence). You downloaded and deployed some very insecure applications and setup the lab full of examples to dive into. 
 
-[source,sh,subs="attributes",role=execute]
-----
-podman push $QUAY_URL/$QUAY_USER/ctf-web-to-system:1.0 --remove-signatures
-----
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
 
-*Sample output*
-[source,bash]
-----
-Copying blob 3113fb957b33 done 
-...
-...
-Copying config 1cbb2b7908 done  
-Writing manifest to image destination
-----
 
-[start=6]
-
-Perfect!
-
-In the next module, we will browse through Quay to see the Java container app that you have tagged and pushed. The application will be deployed into the cluster in the next step.
-
+quay.io/rhacs-demo/netflow:latest
+bkimminich/juice-shop
+ghcr.io/christophetd/log4shell-vulnerable-app:latest
+-api-server redhat/ubi8
+ quay.io/rhacs-misc/log4shell-minimal:1.2
+ webgoat/webgoat
+frontend asset-cache quay.io/rhacs-demo/asset-cache:latest
+quay.io/rhacs-demo/asset-cache:sidecar-latest
+medical reporting quay.io/rhacs-demo/reporting:latest
+operations jump-host quay.io/rhacs-demo/jump-host:latest
+payments visa-processor quay.io/rhacs-demo/visa-processor:latest-v2
+quay.io/rhacs-demo/visa-processor:sidecar-latest-v2

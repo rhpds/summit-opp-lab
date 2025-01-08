@@ -1,0 +1,47 @@
+= Red Hat Advanced Cluster Security for Kubernetes
+
+[[outline]]
+
+== Module outline
+
+
+
+== A task to complete on your own.
+
+*Here is your mission*
+
+image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNnJoNHE2MXhocm52ZzFmeHVyY3JiN3F5cGFjYW00dGsycXF2bnNtbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ohs4lNKssQD2wewyQ/giphy.gif[link=self, window=blank, width=100%, class="center"]
+
+*Should you choose to accept it*
+
+Run roxctl against a few of your favorite container images. Try pulling from link:https://hub.docker.com/[docker hub] or link:https://quay.io/[quay.io]. Try modifying the command below to include your image of choice.
+
+For example:
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[lab-user@bastion ~]$ MYIMAGE=docker.io/ubuntu             
+[lab-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=$MYIMAGE --force -o table --severity=CRITICAL
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Scan results for image: docker.io/ubuntu
+(TOTAL-COMPONENTS: 0, TOTAL-VULNERABILITIES: 0, LOW: 0, MODERATE: 0, IMPORTANT: 0, CRITICAL: 0)
+
++-----------+---------+-----+----------+------+---------------+
+| COMPONENT | VERSION | CVE | SEVERITY | LINK | FIXED VERSION |
++-----------+---------+-----+----------+------+---------------+
++-----------+---------+-----+----------+------+---------------+
+----
+Showing that the latest version of Ubuntu from Docker.io has 0 critical vulnerabilities.
+
+*Your turn*
+
+[source,sh,subs="attributes",role=execute]
+----
+MYIMAGE=<Add the registry URL here>
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image $MYIMAGE --force -o table --severity=CRITICAL
+----
