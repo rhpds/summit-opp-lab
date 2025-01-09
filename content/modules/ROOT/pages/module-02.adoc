@@ -23,8 +23,8 @@ QUAY_USER={quay_admin_username}
 
 [source,sh,subs="attributes",role=execute]
 ----
-echo export QUAY_URL=$(oc -n quay-enterprise get route quay-quay -o jsonpath='{.spec.host}') >> ~/.bashrc
-QUAY_URL=$(oc -n quay-enterprise get route quay-quay -o jsonpath='{.spec.host}')
+echo export QUAY_URL=$(oc -n quay get route quay-quay -o jsonpath='{.spec.host}') >> ~/.bashrc
+QUAY_URL=$(oc -n quay get route quay-quay -o jsonpath='{.spec.host}')
 ----
 
 IMPORTANT: Verify that the variables are correct
@@ -68,60 +68,47 @@ Password:
 Login Succeeded!
 ----
 
-=== Download a base container image
+=== Download a base container image and tag it
 
 *Procedure*
 
 . Run the following commands 
 
-podman pull python:3.9-slim node:16
-
+[source,sh,subs="attributes",role=execute]
 ----
-Resolved "python" as an alias (/etc/containers/registries.conf.d/000-shortnames.conf)
-Trying to pull docker.io/library/python:3.9-slim...
-Getting image source signatures
-Copying blob d381bf0bfd6e done   | 
-Copying blob 96df0e5e8179 done   | 
-Copying blob fd674058ff8f done   | 
-Copying blob 75a2bc32319e done   | 
-Copying config 47e5116b5e done   | 
-Writing manifest to image destination
-47e5116b5ec1de854ad39b1868d3ea37555ff2ed7edb8dccc618db2427d490ae
+podman pull python:3.12-slim
 ----
 
 [source,sh,subs="attributes",role=execute]
 ----
-podman tag docker.io/library/python:3.9-slim $QUAY_URL/$QUAY_USER/python-slim-golden:0.1
-podman tag docker.io/library/node:16 $QUAY_URL/$QUAY_USER/node-16-golden:0.1
+podman tag docker.io/library/python:3.12-slim $QUAY_URL/$QUAY_USER/python-slim-golden:0.1
 ----
 
+[source,sh,subs="attributes",role=execute]
+----
+podman images
+----
 
 Perfect! 
 
 === Add the application code & build the container image
 
-In this section, we will download the "*TBD*" give it a new tag, and push the image to Quay. Later, we'll deploy the image to the OpenShift Cluster and use it in future modules.
-
+In this section, we will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy and application to the OpenShift Cluster.
 
 TIP: With the variables saved in the ~/.bashrc file you will not have to declare them again in the future. 
 
-
-
-echo $QUAY_URL/$QUAY_USER/python-slim-golden:0.1
-echo $QUAY_URL/$QUAY_USER/node-16-golden:0.1
+ls $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/
+cat $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
 
 REGEX command to change the Dockerfiles
 
-echo export TUTORIAL_HOME="$(pwd)/demo-apps") >> ~/.bashrc
-export TUTORIAL_HOME="$(pwd)/demo-apps"
+sed -i "s|^FROM --platform=\$TARGETPLATFORM python:3\.12-slim AS \(\w\+\)|FROM $QUAY_URL/$QUAY_USER/python-slim-golden:0.1 AS \1|" $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
 
-cd $TUTORIAL_HOME/flask-app/app/backend
-podman build -t $QUAY_URL/$QUAY_USER/backend-python:0.1 .
-podman push $QUAY_URL/$QUAY_USER/backend-python:0.1 --remove-signatures
+cat $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
 
-cd $TUTORIAL_HOME/flask-app/app/frontend
-podman build -t $QUAY_URL/$QUAY_USER/frontend-node:0.1 .
-podman push $QUAY_URL/$QUAY_USER/frontend-node:0.1 --remove-signatures
+cd $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/
+podman build -t $QUAY_URL/$QUAY_USER/patient-frontend-app:0.1 .
+podman push $QUAY_URL/$QUAY_USER/patient-frontend-app:0.1 --remove-signatures
 
 NOTE: Quay will automatically create a private registry to store our TBD application since we have admin access. To deploy the app, you'll need to make the repository public so you can pull the image without credentials.
 
@@ -259,3 +246,9 @@ IMPORTANT: Please ensure the deploy application are deployed to your cluster bef
 ==== Deploy the Application with RHACM
 
 Perfect! 
+
+
+Test it out by running the following
+
+sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/patient-frontend-app:0.1|" $TUTORIAL_HOME/kubernetes-manifests/patient-portal-acm-skupper-demo/frontend.yml
+oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive

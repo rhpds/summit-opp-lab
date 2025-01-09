@@ -127,6 +127,7 @@ This command downloads a repository container dockerfiles, attack scripts, and K
 [source,sh,subs="attributes",role=execute]
 ----
 git clone https://github.com/mfosterrox/demo-apps.git demo-apps
+echo export TUTORIAL_HOME="$(pwd)/demo-apps") >> ~/.bashrc
 export TUTORIAL_HOME="$(pwd)/demo-apps"
 ----
 
@@ -156,7 +157,7 @@ NOTE: You should see warnings such as: *Warning: would violate PodSecurity "base
 . For the last step. Run the following command to varify that the applications are up and running. 
 
 ====
-The following command will wathc all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.
+The following command will watch all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.
 ====
 
 [source,bash,role="execute"]
@@ -168,17 +169,22 @@ oc get deployments -l demo=roadshow -A -w
 [source,bash,subs="+macros,+attributes"]
 ----
 [demo-user@bastion ~]$ oc get deployments -l demo=roadshow -A -w
-NAMESPACE    NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-backend      api-server        1/1     1            1           7m15s
-default      juice-shop        1/1     1            1           7m3s
-default      log4shell         1/1     1            1           6m59s
-default      open-api-server   1/1     1            1           6m47s
-default      reporting         1/1     1            1           6m50s
-default      webgoat           1/1     1            1           6m42s
-frontend     asset-cache       1/1     1            1           7m12s
-medical      reporting         1/1     1            1           6m57s
-operations   jump-host         1/1     1            1           6m55s
-payments     visa-processor    1/1     1            1           6m54s
+NAMESPACE    NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+backend      api-server            1/1     1            1           18s
+default      database              1/1     1            1           48s
+default      dvma                  1/1     1            1           76s
+default      juice-shop            1/1     1            1           73s
+default      log4shell             1/1     1            1           70s
+default      open-api-server       1/1     1            1           39s
+default      patient-frontend      3/3     3            3           46s
+default      payment-processor     3/3     3            3           43s
+default      reporting             1/1     1            1           42s
+default      vulnerable-node-app   1/1     1            1           36s
+default      webgoat               1/1     1            1           33s
+frontend     asset-cache           1/1     1            1           66s
+medical      reporting             1/1     1            1           58s
+operations   jump-host             1/1     1            1           54s
+payments     visa-processor        1/1     1            1           52s
 ----
 
 IMPORTANT: Please ensure the deploy application are deployed and available before moving onto the next module. 
@@ -192,7 +198,7 @@ The following command triggers a vulnerability scan by RHACS, roxctl filters the
 
 [source,sh,subs="attributes",role=execute]
 ----
-roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:0.1 --force -o table 
 ----
 
 TIP: The following output can be configured using flags. You can configure different outputs (table, CSV, JSON, and sarif.) and filter for specific severities.
@@ -200,17 +206,13 @@ TIP: The following output can be configured using flags. You can configure diffe
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
-Scan results for image: bkimminich/juice-shop
-(TOTAL-COMPONENTS: 34, TOTAL-VULNERABILITIES: 63, LOW: 13, MODERATE: 25, IMPORTANT: 18, CRITICAL: 7)
+[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:0.1 --force -o table 
+Scan results for image: quay.io/mfoster/juice-shop:0.1
 
-
-+-------------+---------+------------------+----------+--------------------------------------------------------------------------------+---------------+
-|  COMPONENT  | VERSION |       CVE        | SEVERITY |                                      LINK                                      | FIXED VERSION |
-+-------------+---------+------------------+----------+--------------------------------------------------------------------------------+---------------+
-|     ejs     |  2.7.4  |  CVE-2022-29078  | CRITICAL |                https://nvd.nist.gov/vuln/detail/CVE-2022-29078                 |     3.1.7     |
-...
-WARN:   A total of 63 unique vulnerabilities were found in 34 components
+---------------------------------+------------------+
+|          ws          |      7.4.6       | GHSA-3h5v-q93c-6h6q | IMPORTANT |            https://osv.dev/vulnerability/GHSA-3h5v-q93c-6h6q             |      7.5.10      |
++----------------------+------------------+---------------------+-----------+--------------------------------------------------------------------------+------------------+
+WARN:   A total of 65 unique vulnerabilities were found in 35 components
 ----
 
 == Summary
@@ -220,19 +222,3 @@ image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnY0NDA0ZnJqNXh6cGNqeHNx
 *Beautiful!*
 
 In this module, you got access to all of the lab UI's and interfaces including the Showroom lab enviroment (Where you are reading this sentence). You downloaded and deployed some very insecure applications and setup the lab full of examples to dive into. 
-
-roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=bkimminich/juice-shop --force -o table 
-
-
-quay.io/rhacs-demo/netflow:latest
-bkimminich/juice-shop
-ghcr.io/christophetd/log4shell-vulnerable-app:latest
--api-server redhat/ubi8
- quay.io/rhacs-misc/log4shell-minimal:1.2
- webgoat/webgoat
-frontend asset-cache quay.io/rhacs-demo/asset-cache:latest
-quay.io/rhacs-demo/asset-cache:sidecar-latest
-medical reporting quay.io/rhacs-demo/reporting:latest
-operations jump-host quay.io/rhacs-demo/jump-host:latest
-payments visa-processor quay.io/rhacs-demo/visa-processor:latest-v2
-quay.io/rhacs-demo/visa-processor:sidecar-latest-v2
