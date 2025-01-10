@@ -2,12 +2,17 @@
 
 In this session, participants will learn how to work with Red Hat Advanced Cluster Management for Kubernetes (RHACM).
 
-Participants will walk through these 3 major use cases:
+Participants will walk through these 4 major use cases:
 
 - Multi-Cluster Lifecycle
 * Centrally manage, create, update, and delete Kubernetes clusters.
 * Search, find and modify any kubernetes resource across the entire domain.
 * Quickly troubleshoot and resolve issues across your federated domain.
+
+- Virtual Machine Lifecycle
+* Centrally manage, create, update, and delete Virtual Machines.
+* Search, find and modify any VMs across the entire domain Managed by RHACM.
+* Quickly troubleshoot and resolve issues across your VMs with Observability.
 
 - Advanced Application Lifecycle
 * Easily deploy applications at scale leveraging GitOps.
@@ -499,4 +504,4 @@ Now you have successfully created a Policy leveraging the Policy Generator to sc
 
 == Conclusion
 
-In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy a Virtual Machine using infrastructure as code with RedHat GitOps, we also deployed a complex application and manage policies across clusters, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM lab environment, or continue on to the next portion of the lab.
+In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy a Virtual Machine using infrastructure as code with RedHat GitOps, we also deployed a complex application and manage policies across clusters, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM lab environment, or continue on to the next portion of the lab. 
