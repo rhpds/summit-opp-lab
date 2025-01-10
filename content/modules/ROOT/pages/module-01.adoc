@@ -103,8 +103,6 @@ Access:
 
 NOTE: This output is showing that you have unrestricted access to the RHACS product. These permissions can be seen in the **RHACS Access Control** tab that we will review later.
 
-image::01-rhacs-access-control.png[RHACS access control]
-
 If you have full access you are ready to go!
 
 == Deploy the workshop applications
@@ -127,7 +125,7 @@ This command downloads a repository container dockerfiles, attack scripts, and K
 [source,sh,subs="attributes",role=execute]
 ----
 git clone https://github.com/mfosterrox/demo-apps.git demo-apps
-echo export TUTORIAL_HOME="$(pwd)/demo-apps") >> ~/.bashrc
+echo export TUTORIAL_HOME="$(pwd)/demo-apps" >> ~/.bashrc
 export TUTORIAL_HOME="$(pwd)/demo-apps"
 ----
 
