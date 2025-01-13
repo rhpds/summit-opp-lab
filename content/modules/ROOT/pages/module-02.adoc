@@ -247,7 +247,6 @@ IMPORTANT: Please ensure the deploy application are deployed to your cluster bef
 
 Perfect! 
 
-
 Test it out by running the following
 
 sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/patient-frontend-app:0.1|" $TUTORIAL_HOME/kubernetes-manifests/patient-portal-acm-skupper-demo/frontend.yml

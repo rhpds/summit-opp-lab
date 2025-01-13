@@ -219,4 +219,6 @@ image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnY0NDA0ZnJqNXh6cGNqeHNx
 
 *Beautiful!*
 
-In this module, you got access to all of the lab UI's and interfaces including the Showroom lab enviroment (Where you are reading this sentence). You downloaded and deployed some very insecure applications and setup the lab full of examples to dive into. 
+In this module, you got access to all of the lab UI's and interfaces including the Showroom lab enviroment (Where you are reading this). You downloaded and deployed some very insecure applications and set up the lab full of examples to dive into. 
+
+*Time to test out your developer skills!*
