@@ -125,6 +125,14 @@ This command downloads a repository container dockerfiles, attack scripts, and K
 [source,sh,subs="attributes",role=execute]
 ----
 git clone https://github.com/mfosterrox/demo-apps.git demo-apps
+----
+
+====
+This command sets the variable TUTORIAL_HOME to equal the working directory, allowing you to make references to various files easily.
+====
+
+[source,sh,subs="attributes",role=execute]
+----
 echo export TUTORIAL_HOME="$(pwd)/demo-apps" >> ~/.bashrc
 export TUTORIAL_HOME="$(pwd)/demo-apps"
 ----
@@ -151,9 +159,6 @@ configmap/webgoat-config created
 
 NOTE: You should see warnings such as: *Warning: would violate PodSecurity "baseline:latest": privileged (container "proxy" must not set securityContext.privileged=true)*. This is because we are deploying flawed container configurations and vulnerable container applications into the OpenShift cluster.
 
-[start=2]
-. For the last step. Run the following command to varify that the applications are up and running. 
-
 ====
 The following command will watch all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.
 ====
@@ -169,13 +174,10 @@ oc get deployments -l demo=roadshow -A -w
 [demo-user@bastion ~]$ oc get deployments -l demo=roadshow -A -w
 NAMESPACE    NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
 backend      api-server            1/1     1            1           18s
-default      database              1/1     1            1           48s
 default      dvma                  1/1     1            1           76s
 default      juice-shop            1/1     1            1           73s
 default      log4shell             1/1     1            1           70s
 default      open-api-server       1/1     1            1           39s
-default      patient-frontend      3/3     3            3           46s
-default      payment-processor     3/3     3            3           43s
 default      reporting             1/1     1            1           42s
 default      vulnerable-node-app   1/1     1            1           36s
 default      webgoat               1/1     1            1           33s
@@ -187,16 +189,16 @@ payments     visa-processor        1/1     1            1           52s
 
 IMPORTANT: Please ensure the deploy application are deployed and available before moving onto the next module. 
 
-[start=3]
+[start=2]
 . Let's take a quick look at some of the applications that you deployed. 
 
 ====
-The following command triggers a vulnerability scan by RHACS, roxctl filters the results into a table. The severity flag means only the critical vulnerabilities will be shown.
+The following command triggers a vulnerability scan by RHACS, roxctl filters the results into a table. The severity flag means only the critical vulnerabilities will be shown. This image is known as the "Damn Vulnerable Wed Application" and it contains A LOT of vulnerabilities.
 ====
 
 [source,sh,subs="attributes",role=execute]
 ----
-roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:0.1 --force -o table 
+roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/dvwa --force -o table
 ----
 
 TIP: The following output can be configured using flags. You can configure different outputs (table, CSV, JSON, and sarif.) and filter for specific severities.
@@ -204,13 +206,15 @@ TIP: The following output can be configured using flags. You can configure diffe
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:0.1 --force -o table 
+[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:arm --force -o table 
 Scan results for image: quay.io/mfoster/juice-shop:0.1
 
 ---------------------------------+------------------+
-|          ws          |      7.4.6       | GHSA-3h5v-q93c-6h6q | IMPORTANT |            https://osv.dev/vulnerability/GHSA-3h5v-q93c-6h6q             |      7.5.10      |
-+----------------------+------------------+---------------------+-----------+--------------------------------------------------------------------------+------------------+
-WARN:   A total of 65 unique vulnerabilities were found in 35 components
+|          zlib1g           |     1:1.2.13.dfsg-1     |   CVE-2023-45853    | CRITICAL  |         https://nvd.nist.gov/vuln/detail/CVE-2023-45853         |       -       |
++---------------------------+                         +---------------------+-----------+-----------------------------------------------------------------+---------------+
+|        zlib1g-dev         |                         |   CVE-2023-45853    | CRITICAL  |         https://nvd.nist.gov/vuln/detail/CVE-2023-45853         |       -       |
++---------------------------+-------------------------+---------------------+-----------+-----------------------------------------------------------------+---------------+
+WARN:   A total of 800 unique vulnerabilities were found in 94 components
 ----
 
 == Summary

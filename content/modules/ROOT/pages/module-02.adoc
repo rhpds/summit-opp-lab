@@ -1,15 +1,17 @@
 = Store, Scan and Deploy Applications with Red Hat Quay
 
-In this module we will be acting as the devloper.
+In this module we will be acting as the devloper.(UPDATE STORY)
 
-==== Login to Quay
+==== Login to Quay from the CLI
 
 *Procedure*
 
 [start=1]
 . Run the following command.
 
+====
 Let's export a few variables to make things easier. These variables will stay in the .bashrc file so they're saved in case you need to refresh the terminal.
+====
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -19,7 +21,7 @@ QUAY_USER={quay_admin_username}
 
 [start=2]
 
-. Set the Quay URL variable 
+. Run the following command to set the Quay URL variable 
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -68,7 +70,11 @@ Password:
 Login Succeeded!
 ----
 
-=== Download a base container image and tag it
+Beautiful! We're logged in. Now you can download build and push images directly to your quay repository.
+
+=== Create our developer golden image
+
+Imagine a base image as a blank canvas, providing a reliable foundation like a minimal operating system or runtime environment. Developers add the essential configurations, libraries, and tools needed to fit their application's unique demands. By tagging this customized creation as a golden image, developers ensure every deployment uses the same standardized, consistent setup, simplifying workflows and avoiding unexpected surprises.
 
 *Procedure*
 
@@ -76,39 +82,174 @@ Login Succeeded!
 
 [source,sh,subs="attributes",role=execute]
 ----
-podman pull python:3.12-slim
+podman pull python:3.12-alpine
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ podman pull python:3.12-alpine
+Trying to pull docker.io/library/python:3.12-alpine...
+Getting image source signatures
+Copying blob e846654b130a skipped: already exists  
+Copying blob 00bb69fc5235 skipped: already exists  
+Copying blob 1f3e46996e29 skipped: already exists  
+Copying blob 7b104e645578 skipped: already exists  
+Copying config 451fdb03e1 done   | 
+Writing manifest to image destination
+451fdb03e17285d3263d88f0f3bed692c82556935490d233096974386cd0381b
 ----
 
 [source,sh,subs="attributes",role=execute]
 ----
-podman tag docker.io/library/python:3.12-slim $QUAY_URL/$QUAY_USER/python-slim-golden:0.1
+podman tag docker.io/library/python:3.12-alpine $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1
 ----
+
 
 [source,sh,subs="attributes",role=execute]
 ----
 podman images
 ----
 
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ podman images
+REPOSITORY                                                                                  TAG          IMAGE ID      CREATED      SIZE
+quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/python-alpine-golden  0.1          451fdb03e172  5 weeks ago  50.6 MB
+docker.io/library/python                                                                    3.12-alpine  451fdb03e172  5 weeks ago  50.6 MB
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+podman push $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ podman push $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1
+Getting image source signatures
+Copying blob c6121fb0c7de done   | 
+Copying blob a0904247e36a done   | 
+Copying blob 5b6d0b88dd08 done   | 
+Copying blob 375bee7d34e2 done   | 
+Copying config 451fdb03e1 done   | 
+Writing manifest to image destination
+----
+
 Perfect! 
 
-=== Add the application code & build the container image
+=== Create the applications frontend, and upload it to Quay
 
 In this section, we will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy and application to the OpenShift Cluster.
 
 TIP: With the variables saved in the ~/.bashrc file you will not have to declare them again in the future. 
 
-ls $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/
-cat $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
+[source,sh,subs="attributes",role=execute]
+----
+ls $TUTORIAL_HOME/app-images/frontend/
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ ls $TUTORIAL_HOME/app-images/frontend/
+Dockerfile  main.py  static
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+cat $TUTORIAL_HOME/app-images/frontend/Dockerfile
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ cat $TUTORIAL_HOME/app-images/frontend/Dockerfile
+FROM python:3.12-alpine AS build
+
+RUN pip install --no-cache-dir httpx psycopg psycopg_binary psycopg_pool starlette sse_starlette uvicorn
+
+FROM python:3.12-alpine AS run
+
+RUN adduser -S fritz -G root
+USER fritz
+
+COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --chown=fritz:root static /home/fritz/static
+COPY --chown=fritz:root main.py /home/fritz/main.py
+
+EXPOSE 8080
+WORKDIR /home/fritz
+ENTRYPOINT ["python", "main.py"]
+----
 
 REGEX command to change the Dockerfiles
 
-sed -i "s|^FROM --platform=\$TARGETPLATFORM python:3\.12-slim AS \(\w\+\)|FROM $QUAY_URL/$QUAY_USER/python-slim-golden:0.1 AS \1|" $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
+[source,sh,subs="attributes",role=execute]
+----
+sed -i "s|^FROM python:3\.12-alpine AS \(\w\+\)|FROM $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1 AS \1|" $TUTORIAL_HOME/app-images/frontend/Dockerfile
+----
 
-cat $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/Dockerfile
+[source,sh,subs="attributes",role=execute]
+----
+cat $TUTORIAL_HOME/app-images/frontend/Dockerfile
+----
 
-cd $TUTORIAL_HOME/app-images/patient-portal-acm-skupper-demo/
-podman build -t $QUAY_URL/$QUAY_USER/patient-frontend-app:0.1 .
-podman push $QUAY_URL/$QUAY_USER/patient-frontend-app:0.1 --remove-signatures
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ cat $TUTORIAL_HOME/app-images/frontend/Dockerfile
+FROM quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/python-alpine-golden:0.1 AS build
+
+RUN pip install --no-cache-dir 
+
+....
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+cd $TUTORIAL_HOME/app-images/frontend/
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+podman build -t $QUAY_URL/$QUAY_USER/frontend:0.1 .
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion frontend]$ podman build -t $QUAY_URL/$QUAY_USER/frontend:0.1 .
+[1/2] STEP 1/2: FROM quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/python-alpine-golden:0.1 AS build
+.
+.
+.
+Successfully tagged quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/frontend:0.1
+46ea42cba3f17c366b0c534164ae088719266df9ab4122532b0bffd1bbefaec9
+----
+
+[source,sh,subs="attributes",role=execute]
+----
+podman push $QUAY_URL/$QUAY_USER/frontend:0.1 --remove-signatures
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion frontend]$ podman push $QUAY_URL/$QUAY_USER/frontend:0.1 --remove-signatures
+Copying blob e2adcecab318 done   | 
+Copying blob 9944062081bf done   | 
+Copying blob 83e98ac5789e skipped: already exists  
+Copying blob 32fd82e104c5 skipped: already exists  
+Copying blob 453d5d1264c7 done   | 
+Copying blob 3c37dc31320d done   | 
+Copying blob 210a2ae1a75e skipped: already exists  
+Copying blob 57a6ec527341 skipped: already exists  
+Copying config 46ea42cba3 done   | 
+Writing manifest to image destination
+----
 
 NOTE: Quay will automatically create a private registry to store our TBD application since we have admin access. To deploy the app, you'll need to make the repository public so you can pull the image without credentials.
 
@@ -130,13 +271,13 @@ Administrator login is available with:
 
 == Browse the registry
 
-In the setup module we downloaded built and pushed a insecure java application called *ctf-web-to-system*. Now it's time to deploy it to the OpenShift Cluster. To do this we will need to make the registry that we created public. 
+In the setup module we downloaded built and pushed a insecure java application called *python-alpine-golden*. Now it's time to deploy it to the OpenShift Cluster. To do this we will need to make the registry that we created public. 
 
 Let's take a look at our application in the registry.
 
 image::quay-login.png[link=self, window=blank, width=100%]
 
-. Next, click on the *ctf-web-to-system* repository. 
+. Next, click on the *python-alpine-golden* repository. 
 
 image::quay-repo.png[link=self, window=blank, width=100%]
 
@@ -181,8 +322,11 @@ This tab displays the usage over time along with details about who/how the image
 
 image::quay-usage-logs.png[link=self, window=blank, width=100%]
 
-You can see that you (The "quayadmin") pushed an image tagged 1.0 to the repository today. 
+====
+You can see that you (The "quayadmin") pushed an image tagged 0.1 to the repository today. 
+====
 
+image::quay-usage-logs-admin.png[link=self, window=blank, width=100%]
 [start=5]
 . Lastly click on the *Settings* icon. 
 
@@ -190,12 +334,10 @@ image::quay-settings.png[link=self, window=blank, width=100%]
 
 In this tab you can add/remove users and update permissions, alter the privacy of the repository, and even schedule alerts based on found vulnerabilities.
 
-image::quay-tags-security.png[link=self, window=blank, width=100%]
-
-IMPORTANT: Make sure to make the repository public. Otherwise we will not be able to deploy the application in the next step.
-
 [start=6]
-. Make your repository public before deploying our application in the next step by clicking the *Make Public* button under `Repository Visability`
+. Make your repository public before deploying our application in the next step by clicking the *Make Public* button under `Repository Visibility`
+
+IMPORTANT: Make sure to make the repository public. Otherwise we will not be able to deploy the application in the ACM section.
 
 image::quay-make-public.png[link=self, window=blank, width=100%]
 
@@ -206,9 +348,9 @@ image::quay-make-public-ok.png[link=self, window=blank, width=100%]
 
 [[vulnerability-scanning-with-quay]]
 
-== Vulnerability Scanning with Quay
+== Vulnerability Scanning with Quay (NEED TO UPDATE)
 
-Red Hat Quay can also help with securing our environments by performing a security scan on any images added to our registry, and advise which ones are potentially fixable.
+Red Hat Quay can also help with securing our environments by performing a container vulnerability scan on any images added to our registry, and advise which ones are potentially fixable.
 
 Use the following procedure to check the security scan results for our Java container image you have uploaded.
 
@@ -247,7 +389,7 @@ IMPORTANT: Please ensure the deploy application are deployed to your cluster bef
 
 Perfect! 
 
-Test it out by running the following
+Test it out by running the following:
 
-sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/patient-frontend-app:0.1|" $TUTORIAL_HOME/kubernetes-manifests/patient-portal-acm-skupper-demo/frontend.yml
-oc apply -f $TUTORIAL_HOME/kubernetes-manifests/ --recursive
+sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/frontend:0.1|" $TUTORIAL_HOME/skupper-demo/frontend.yml
+oc apply -f $TUTORIAL_HOME/skupper-demo/frontend.yml --recursive
