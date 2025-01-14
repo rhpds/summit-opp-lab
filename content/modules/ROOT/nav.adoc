@@ -7,10 +7,14 @@
 ** xref:module-01.adoc#demo-applications[Demo applications setup]
 
 * xref:module-02.adoc[2. Red Hat Quay]
-** xref:module-02.adoc#access-quay[Accessing Red Hat Quay]
-** xref:module-02.adoc#navigating-the-registry[Navigating the registry]
-** xref:module-02.adoc#vulnerability-scanning-with-quay[Vulnerability Scanning with Quay]
-** xref:module-02.adoc#deploy-the-java-application[Deploy the Java application]
+** xref:module-02.adoc#build-app[Develop your app]
+*** xref:module-02.adoc#quay-login[Login to Quay from the CLI]
+*** xref:module-02.adoc#golden-image[Create a golden image]
+*** xref:module-02.adoc#dev-app[Add your code and containerize]
+** xref:module-02.adoc#quay[Red Hat Quay]
+*** xref:module-02.adoc#access-quay[Accessing Red Hat Quay]
+*** xref:module-02.adoc#navigating-the-registry[Navigating the registry]
+*** xref:module-02.adoc#vulnerability-scanning-with-quay[Vulnerability Scanning with Quay]
 
 * xref:module-03.adoc[3. Red Hat Advanced Cluster Management for Kubernetes]
 ** xref:module-03.adoc#cluster-lifecycle[Working with Kubernetes Clusters and Cluster Lifecycle]

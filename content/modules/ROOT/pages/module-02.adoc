@@ -2,6 +2,10 @@
 
 In this module we will be acting as the devloper.(UPDATE STORY)
 
+[[build-app]]
+
+[[quay-login]]
+
 ==== Login to Quay from the CLI
 
 *Procedure*
@@ -72,6 +76,8 @@ Login Succeeded!
 
 Beautiful! We're logged in. Now you can download build and push images directly to your quay repository.
 
+[[golden-image]]
+
 === Create our developer golden image
 
 Imagine a base image as a blank canvas, providing a reliable foundation like a minimal operating system or runtime environment. Developers add the essential configurations, libraries, and tools needed to fit their application's unique demands. By tagging this customized creation as a golden image, developers ensure every deployment uses the same standardized, consistent setup, simplifying workflows and avoiding unexpected surprises.
@@ -139,6 +145,8 @@ Writing manifest to image destination
 ----
 
 Perfect! 
+
+[[dev-app[]]]
 
 === Create the applications frontend, and upload it to Quay
 
@@ -252,6 +260,8 @@ Writing manifest to image destination
 ----
 
 NOTE: Quay will automatically create a private registry to store our TBD application since we have admin access. To deploy the app, you'll need to make the repository public so you can pull the image without credentials.
+
+[[quay]]
 
 == Access Quay 
 
@@ -383,7 +393,6 @@ Congratulations, you now know how to examine images in your registry for potenti
 
 IMPORTANT: Please ensure the deploy application are deployed to your cluster before moving onto the next module. 
 
-[[deploy-the-java-application]]
 
 ==== Deploy the Application with RHACM
 
