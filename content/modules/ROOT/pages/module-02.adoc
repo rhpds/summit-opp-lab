@@ -428,3 +428,5 @@ oc get routes | grep frontend-patient-route | awk '{print "http://" $2}'
 ----
 
 Ensure access to application. Watch out for browser certificates.  
+
+Add Quay repo as an integration
