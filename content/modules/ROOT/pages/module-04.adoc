@@ -257,7 +257,7 @@ image::04-workload-3.png[link=self, window=blank, width=100%]
 
 image::04-workload-4.png[link=self, window=blank, width=100%]
 
-You will notice that an extra filter was added to the default filters, showing only the single deployment that the "Developer" built in the Quay module
+You will notice that an extra filter was added to the default filters, showing only the single deployment that the "Developer" built in the Quay module.
 
 [start=3]
 . Click the *CVE* tab
@@ -395,12 +395,12 @@ image::https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWJ0ZWRjZ3g0OTUyOGE5MDV
 
 However, you don't have to wait until Monday to view the report.
 
-[start=16]
+[start=15]
 . Click the vertical ellipses on the right side of the UI and click *Generate Download*
 
 image::04-vr-9.png[link=self, window=blank, width=100%]
 
-[start=17]
+[start=16]
 . Download the report and take a look if you have the time.
 
 Awesome!
@@ -490,19 +490,10 @@ IMPORTANT: Make sure to save the policy changes! If you do not save the policy, 
 
 Next, we will use tmux to watch OpenShift events while running the test so you can see how RHACS enforces the policy at runtime.
 
-IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
-
-[source,sh,subs="attributes",role=execute]
-
-----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
-----
-
-Make sure you use the password '{bastion_ssh_password}' when prompted.
-
+*Procedure*
 [start=1]
 
-. On your Bastion VM, ssh over to the *Bastion* host, and start tmux with two panes:
+. start tmux with two panes:
 
 [source,sh,role=execute]
 ----
@@ -515,7 +506,7 @@ tmux new-session \; split-window -v \; attach
 
 [source,sh,role=execute]
 ----
-oc get events -w
+oc get events -n patient-portal -w
 ----
 
 [start=3]
@@ -539,6 +530,7 @@ oc exec -n patient-portal $POD -i --tty -- /bin/sh
 
 NOTE: If you see */home/fritz $* you've confirmed you have a shell and access to the frontend application.
 
+[start=5]
 . Run the alpine package manager in this shell:
 
 [source,sh,role=execute]
@@ -557,200 +549,227 @@ ERROR: Failed to open apk database: Permission denied
 [demo-user@bastion ~]$ 
 ----
 
+[start=6]
 . Examine the oc get events tmux pane (The pane on the bottom), and note that it shows that RHACS detected the package manager invocation and deleted the pod:
 
 [source,texinfo,subs="attributes"]
 ----
-0s          Normal    Killing                  pod/frontend-6db858448f-hz6j2    Stopping container ctf-web-container
-0s          Normal    AddedInterface           pod/frontend-6db858448f-qp85v    Add eth0 [10.128.2.162/23] from ovn-kubernetes
-0s          Normal    Pulling                  pod/frontend-6db858448f-qp85v    Pulling image "quay.io/jechoisec/frontend-01"
-0s          Normal    Pulled                   pod/frontend-6db858448f-qp85v    Successfully pulled image "quay.io/jechoisec/frontend-01" in 262ms (263ms including waiting)
-0s          Normal    Created                  pod/frontend-6db858448f-qp85v    Created container ctf-web-container
-0s          Normal    Started                  pod/frontend-6db858448f-qp85v    Started container ctf-web-container
+^C^C[demo-user@bastion ~]$ oc get events -n patient-portal -w
+LAST SEEN   TYPE      REASON                 OBJECT                           MESSAGE
+50s         Normal    Killing                pod/frontend-8667d5c56b-f9fcj    Stopping container frontend
+50s         Normal    Scheduled              pod/frontend-8667d5c56b-s6dph    Successfully assigned patient-portal/frontend-8667d5c56b-s6dph to ip-10-0-61-109.us-east-2.compute.internal
+49s         Normal    AddedInterface         pod/frontend-8667d5c56b-s6dph    Add eth0 [10.131.0.167/23] from ovn-kubernetes
+49s         Normal    Pulling                pod/frontend-8667d5c56b-s6dph    Pulling image "quay-czscm.apps.cluster-czscm.czscm.sandbox478.opentlc.com/quayadmin/frontend:0.1"
+49s         Normal    Pulled                 pod/frontend-8667d5c56b-s6dph    Successfully pulled image "quay-czscm.apps.cluster-czscm.czscm.sandbox478.opentlc.com/quayadmin/frontend:0.1" in 46ms (46ms including waiting). Image size: 117738460 bytes.
+49s         Normal    Created                pod/frontend-8667d5c56b-s6dph    Created container frontend
+49s         Normal    Started                pod/frontend-8667d5c56b-s6dph    Started container frontend
+50s         Normal    SuccessfulCreate       replicaset/frontend-8667d5c56b   Created pod: frontend-8667d5c56b-s6dph
+50s         Warning   StackRox enforcement   deployment/frontend              A pod (frontend-8667d5c56b-f9fcj) violated StackRox policy "Alpine Linux Package Manager Execution - Enforce" and was killed
 ----
 
 NOTE: After a few seconds, you can see the pod is deleted and recreated. In your tmux shell pane, note that your shell session has terminated and that you are returned to the Bastion VM command line.
 
-Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged! We will triage our violations after we look at deploy time policies.
+[start=7]
 
-NOTE: type exit in the terminal, use ctrl+c to stop the 'watch' command, and type exit one more time to get back to the default terminal.
+. Type exit in the terminal, use ctrl+c to stop the 'watch' command, and type exit one more time to get back to the default terminal.
+
+Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged! We will triage our violations after we look at deploy time policies.
 
 [[deploy-enforce]]
 
-== Introduction to *Deploy-Time* policy enforcement
+== Introduction to *Deploy-Time & Build-time* policy enforcement
 
-Deploy-Time policy referes to enforcing configuration controls in the cluster and before deployment in the CI/CD process. In this example we want to stop the Ubuntu Package Manager from ever making it into the default namespace in the first place. 
+=== Deploy-Time policy enforcement
 
-There are two approaches to enforcing deploy-time policies in RHACS:
+Deploy-time policies enforce configuration controls within the cluster and during the CI/CD process to prevent misconfigurations before deployment. In this example, we'll ensure the Ubuntu Package Manager never makes it into the default namespace.
 
-- In clusters with **listen** and **enforce** AdmissionController options enabled, RHACS uses the admission controller to reject deployments that violate policy.
-- In clusters where the admission controller option is disabled, RHACS scales pod replicas to zero for deployments that violate policy.
+RHACS provides two ways to enforce deploy-time policies:
 
-In the next example, we are going to configure a *Deploy-Time* policy to block applications from deploying into the default namespace with the *apt|dpkg* application in the image.
+1. With Admission Controller Enabled (Listen and Enforce Mode). RHACS rejects deployments that violate policy before they are created.
+Without Admission Controller Enabled:
 
-== Prevent the Ubuntu Package Manager in the frontend image from being deployed
+2. RHACS scales the pod replicas to zero, effectively preventing the deployment from running. 
 
-. Navigate to Platform Configuration → Policy Management
-. On the *Policy Management* page, type *Policy* then *Ubuntu* into the filter bar at the top.
+In the next example, we’ll configure a Deploy-Time policy to block the frontend application from deploying into the patient-portal namespace if the image contains the alpine package manager.
+
+=== Build-Time policy enforcement
+
+Build-time policies in RHACS help prevent misconfigurations or vulnerabilities from being introduced during the build process, before deployment even occurs. These policies are focused on ensuring that the code and images being built meet security and configuration standards.
+
+RHACS provides two ways to enforce build-time policies:
+
+With Build Scanning Enabled (Enforce Mode): RHACS scans the container image for vulnerabilities or policy violations during the build process. If any issues are detected, the build is rejected, preventing the image from being pushed to the registry.
+
+Without Build Scanning Enabled: RHACS allows the image to be built, but after scanning, it marks the image as non-compliant and provides a warning. The image can still be pushed to the registry, but it’s flagged for review before deployment.
+
+== Prevent the Alpine Package Manager in the frontend image from being deployed
+
+*Procedure*
+
+. Navigate to *Platform Configuration → Policy Management*.
+
+. On the *Policy Management* page, type *Policy* then *alpine* into the filter bar at the top.
 
 NOTE: This time we are going to edit a different policy. Specifically related to the *Build & Deploy* phases.
 
+image::04-acs-deploy.png[link=self, window=blank, width=100%]
+
 [start=3]
 
-. Click on the *Ubuntu Package Manager in Image* options (The three dots on the right side of the screen) and select *Clone policy*
+. Click on the *Alpine Linux Package Manager (apk) in Image* options (The three dots on the right side of the screen) and select *Clone policy*
 
 IMPORTANT: Make sure to *CLONE* the policy
 
-image::04-acs-deploy-00.png[link=self, window=blank, width=100%]
+image::04-acs-deploy-1.png[link=self, window=blank, width=100%]
 
 [start=4]
 
-. Give the policy a new name. Something you will remember. The best practice would be to add a description for future policy enforcers as well. For example;
+. Give the policy a new name. For example: Alpine Linux Package Manager (apk) in Image - Enforce Build and Deploy.
 
-image::04-acs-deploy-01.png[link=self, window=blank, width=100%]
+IMPORTANT: Since this is a "Build and Deploy" lifecycle policy, when you begin enforcing the policy it will be enforce in BOTH lifecycle phases. You will enable enforcement in both to save time since the next section will review the build phase of 
 
 [start=5]
 
-. Next, update the policy to *inform and enforce* while clicking on the deploy stage only.
+Now, we want to target the frontend deployment by it's namespace
 
-IMPORTANT: Make sure to unselect the *Build* lifecycle before moving forward.
+. Click on the *Policy behavior -> Scope* tab.
+. Click on *Add inclusion scope.
+. Select *Cluster=Production* & *Namespace=patient-portal* & app=frontend
 
-image::04-acs-deploy-02.png[link=self, window=blank, width=100%]
+image::04-acs-deploy-2.png[link=self, window=blank, width=100%]
 
-[start=6]
+[start=8]
 
-Now, we want to target our specific deployment with an image label.
+. Next, head to *Policy behavior -> Actions*.
+. Update the policy to *inform and enforce*
 
-. Click on the *Policy criteria* tab.
-. Click on the *Deployment metadata* dropdown on the right side of the browser.
-. Find the *Namespace* label and drag it to the default policy criteria.
-. Type *default* under the namespace criteria
-
-Your policy should look like this,
-
-image::04-acs-deploy-04.png[link=self, window=blank, width=100%]
+image::04-acs-deploy-3.png[link=self, window=blank, width=100%]
 
 [start=10]
 
 . Lastly, go to the *Review Policy* tab
-. Review the changes
 
-NOTE: There is a preview tab on the right side of the page that will show you all of the affected applications with the introduction of this policy.
+Your policy should look like this,
 
-image::04-acs-deploy-05.png[link=self, window=blank, width=100%]
+image::04-acs-deploy-4.png[link=self, window=blank, width=100%]
 
-[start=12]
+NOTE: There is a preview tab on the right side of the page that will show you all of the affected applications with the introduction of this policy. Because you targeted the frontend app specifically you will only see that container. 
 
+[start=11]
 . Click Save
 
 Congrats! You're now enforcing at runtime and deploy time. In the last step in this module. We will review
 
-== Report and Resolve Violations
+=== Enforcement
 
-In this last section. We will resolve a few of the issues that we have created.
+Let's go through what the developer will now see when building and redeploying the frontend application.
 
-*Procedure*
+Procedure
 
-. Navigate to the *Violations* page.
-. Filter by the policy violation *Ubuntu Package Manager Execution* OR by the most recent policy violations. You will see a policy violation that has been enforced 1 time.
-. Click the most recent violation and explore the list of the violation events:
-
-image::04-acs-violations-00.png[link=self, window=blank, width=100%, Violations Menu]
-
-If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
-
-After this issue is addressed, in this case by the RHACS product using the runtime enforcement action, you can remove it from the list by marking it as *Resolved*.
-
-[start=4]
-
-. Lastly, hover over the violation in the list to see the resolution options and resolve this issue.
-
-image::04-acs-violations-01.png[link=self, window=blank, width=100%, Resolve Violations]
-
-For more information about integration with SIEM tools, see the RHACS help documentation on external tools.
-
-IMPORTANT: If you want to enforce on deploy-time you will need to use the roxctl CLI at deploy time. There are a few commands after the conclusion if you have time.
-
-=== Deploy-Time enforcement
-
-IMPORTANT: You will need to complete the following commands in the *Bastion VM* Please SSH to it (If you have not already) by using the following command:
-
-[source,sh,subs="attributes",role=execute]
-
-----
-ssh {bastion_ssh_user_name}@{bastion_public_hostname}
-----
-
-Make sure you use the password '{bastion_ssh_password}' when prompted.
-
-*Procedure*
-
-. Set variables to connect to RHACS Central.
+. Tag and push the updated image to the Quay registry.
 
 [source,sh,subs="attributes",role=execute]
 ----
-export ROX_CENTRAL_ADDRESS={acs_route}
-cd ~/
-export TUTORIAL_HOME="$(pwd)/demo-apps"
+podman tag $QUAY_URL/$QUAY_USER/frontend:0.1 $QUAY_URL/$QUAY_USER/frontend:0.2
+podman push $QUAY_URL/$QUAY_USER/frontend:0.2 --remove-signatures
 ----
 
 [start=2]
-
-. Verify the frontend application against the policies you've created.
+. Perform an image security scan using roxctl to check for policy violations.
 
 [source,sh,subs="attributes",role=execute]
 ----
-roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file $TUTORIAL_HOME/kubernetes-manifests/frontend/ctf-w2s.yml --insecure-skip-tls-verify
+roxctl -e $ROX_CENTRAL_ADDRESS:443 image check --image $QUAY_URL/$QUAY_USER/frontend:0.2
 ----
 
-*Sample output*
-[source,bash]
-----
-[demo-user@bastion ~]$ roxctl -e $ROX_CENTRAL_ADDRESS:443 deployment check --file $TUTORIAL_HOME/kubernetes-manifests/frontend/ctf-w2s.yml --insecure-skip-tls-verify
-Policy check results for deployments: [frontend]
-(TOTAL: 7, LOW: 4, MEDIUM: 2, HIGH: 1, CRITICAL: 0)
+[start=3]
+. Review the output of the scan to identify any security policy violations.
 
-+--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
-|             POLICY             | SEVERITY | BREAKS DEPLOY |    DEPLOYMENT     |          DESCRIPTION           |           VIOLATION            |          REMEDIATION           |
-+--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
-+--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
-|   Ubuntu Package Manager in    |   LOW    |       -       | frontend |      Alert on deployments      |          - Container           |    Run `dpkg -r --force-all    |
-|             Image              |          |               |                   |     with components of the     |  'ctf-web-container' includes  |     apt apt-get && dpkg -r     |
-|                                |          |               |                   |     Debian/Ubuntu package      |    component 'apt' (version    |  --force-all debconf dpkg` in  |
-|                                |          |               |                   |    management system in the    |             1.4.9)             | the image build for production |
-|                                |          |               |                   |             image.             |                                |          containers.           |
-|                                |          |               |                   |                                |          - Container           |                                |
-|                                |          |               |                   |                                |  'ctf-web-container' includes  |                                |
-|                                |          |               |                   |                                |   component 'dpkg' (version    |                                |
-|                                |          |               |                   |                                |            1.18.25)            |                                |
-+--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
-|   Ubuntu Package Manager in    |   LOW    |       X       | frontend |      Alert on deployments      |          - Container           |    Run `dpkg -r --force-all    |
-|   Image - Default namespace    |          |               |                   |     with components of the     |  'ctf-web-container' includes  |     apt apt-get && dpkg -r     |
-|                                |          |               |                   |     Debian/Ubuntu package      |    component 'apt' (version    |  --force-all debconf dpkg` in  |
-|                                |          |               |                   |    management system in the    |             1.4.9)             | the image build for production |
-|                                |          |               |                   |             image.             |                                |          containers.           |
-|                                |          |               |                   |                                |          - Container           |                                |
-|                                |          |               |                   |                                |  'ctf-web-container' includes  |                                |
-|                                |          |               |                   |                                |   component 'dpkg' (version    |                                |
-|                                |          |               |                   |                                |            1.18.25)            |                                |
-|                                |          |               |                   |                                |                                |                                |
-|                                |          |               |                   |                                | - Namespace has name 'default' |                                |
-+--------------------------------+----------+---------------+-------------------+--------------------------------+--------------------------------+--------------------------------+
-WARN:   A total of 7 policies have been violated
-ERROR:  failed policies found: 1 policies violated that are failing the check
-ERROR:  Policy "Ubuntu Package Manager in Image - Default namespace" within Deployment "frontend" - Possible remediation: "Run `dpkg -r --force-all apt apt-get && dpkg -r --force-all debconf dpkg` in the image build for production containers."
-ERROR:  checking deployment failed after 3 retries: breaking policies found: failed policies found: 1 policies violated that are failing the check
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+|  Alpine Linux Package Manager  |   LOW    |      -       | Alert on deployments with the  |   - Image includes component   |      Run apk --purge del      |
+|         (apk) in Image         |          |              |  Alpine Linux package manager  |      'apk-tools' (version      | apk-tools in the image build  |
+|                                |          |              |         (apk) present          |           2.14.6-r2)           |   for production containers.   |
++--------------------------------+----------+--------------+--------------------------------+--------------------------------+--------------------------------+
+WARN:   A total of 3 policies have been violated
+ERROR:  failed policies found: 2 policies violated that are failing the check
+ERROR:  Policy "Fixable Severity at least Important" - Possible remediation: "Use your package manager to update to a fixed version in future builds or speak with your security team to mitigate the vulnerabilities."
+ERROR:  Policy "Alpine Linux Package Manager (apk) in Image - Enforce Build and Deploy" - Possible remediation: "Run apk --purge del apk-tools in the image build for production containers."
+ERROR:  checking image failed: failed policies found: 2 policies violated that are failing the check
 ----
 
-You should see one of the policies you've create breaking the deploy process while the others are in inform only mode. 
+[start=4]
+. Update the frontend deployment manifest with the new image and apply the changes.
 
-[[conclusion]]
+[source,sh,subs="attributes",role=execute]
+----
+sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/frontend:0.2|" $TUTORIAL_HOME/skupper-demo/frontend.yml
+oc apply -f $TUTORIAL_HOME/skupper-demo/frontend.yml
+----
+
+[start=5]
+. Observe the deployment error due to policy enforcement.
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Resource: "apps/v1, Resource=deployments", GroupVersionKind: "apps/v1, Kind=Deployment"
+Name: "frontend", Namespace: "patient-portal"
+for: "/home/demo-user/demo-apps/skupper-demo/frontend.yml": error when patching "/home/demo-user/demo-apps/skupper-demo/frontend.yml": admission webhook "policyeval.stackrox.io" denied the request:
+The attempted operation violated 1 enforced policy, described below:
+
+Policy: Alpine Linux Package Manager (apk) in Image - Enforce Build and Deploy
+
+Description:
+➛ Alert on deployments with the Alpine Linux package manager (apk) present
+
+Rationale:
+➛ Package managers make it easier for attackers to use compromised containers,
+since they can easily add software.
+
+Remediation:
+➛ Run apk --purge del apk-tools in the image build for production containers.
+
+Violations:
+
+Container 'frontend' includes component 'apk-tools' (version 2.14.6-r2)
+
+In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "ticket-1234"} to your deployment with an updated ticket number
+----
+
+== Report and Resolve Violations
+
+In this section, you will resolve a few of the issues that we have created.
+
+*Procedure*
+
+. Navigate to the Violations page.
+. Filter by the policy violation Policy - Name - r/apk OR by the most recent policy violations. You will see a policy violation that has been enforced.
+. Click the most recent violation and explore the list of the violation events.
+
+image::04-acs-violations.png[link=self, window=blank, width=100%, Violations Menu]
+
+If configured, each violation record is pushed to a Security Information and Event Management (SIEM) integration and is available to be retrieved via the API. The forensic data shown in the UI is recorded, including the timestamp, process user IDs, process arguments, process ancestors, and enforcement action.
+
+IMPORTANT: You must resolve the issue before it can be marked as resolved.
+
+[start=4]
+. Remove the deployment that violates the policy.
+
+[source,sh,subs="attributes",role=execute]
+----
+oc delete -f $TUTORIAL_HOME/skupper-demo/frontend.yml
+----
+
+[start=5]
+. After addressing the issue, mark the violation as resolved.
+
+image::04-acs-resolve.png[link=self, window=blank, width=100%]
 
 == Conclusion
 
-In summary, we made use of the features provided by Red Hat Advanced Cluster Security for Kubernetes to display potential security violations in your cluster in a central dashboard. You crafted both deploy-time and runtime policies to help prevent malicious events from occurring in our cluster. Hopefully this lab has helped demonstrate to you the immense value provided by RHACS and OpenShift Platform Plus. Please feel free to continue and explore the RHACS lab environment.
+In this lab, we used Red Hat Advanced Cluster Security for Kubernetes (RHACS) to identify potential security violations in your cluster through a central dashboard. You created both deploy-time and runtime policies to help prevent malicious activities from occurring.
 
-Thank you for joining and have fun in Denver!
-
-
-
+This lab aimed to demonstrate the significant value RHACS and OpenShift Platform Plus provide in enhancing cluster security. Feel free to continue exploring the RHACS lab environment to deepen your understanding.
