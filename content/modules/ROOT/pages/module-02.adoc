@@ -146,7 +146,7 @@ Writing manifest to image destination
 
 Perfect! 
 
-[[dev-app[]]]
+[[dev-app]]
 
 === Create the applications frontend, and upload it to Quay
 
@@ -178,6 +178,13 @@ cat $TUTORIAL_HOME/app-images/frontend/Dockerfile
 FROM python:3.12-alpine AS build
 
 RUN pip install --no-cache-dir httpx psycopg psycopg_binary psycopg_pool starlette sse_starlette uvicorn
+
+#vulnerable packages
+RUN pip install --no-cache-dir setuptools==39.1.0
+RUN pip install --no-cache-dir Flask==0.5
+RUN pip install --no-cache-dir Django==1.11.29
+RUN pip install --no-cache-dir requests==2.19.0
+RUN pip install --no-cache-dir PyYAML==3.12
 
 FROM python:3.12-alpine AS run
 
@@ -219,10 +226,6 @@ RUN pip install --no-cache-dir
 [source,sh,subs="attributes",role=execute]
 ----
 cd $TUTORIAL_HOME/app-images/frontend/
-----
-
-[source,sh,subs="attributes",role=execute]
-----
 podman build -t $QUAY_URL/$QUAY_USER/frontend:0.1 .
 ----
 
@@ -281,25 +284,13 @@ Administrator login is available with:
 
 == Browse the registry
 
-In the setup module we downloaded built and pushed a insecure java application called *python-alpine-golden*. Now it's time to deploy it to the OpenShift Cluster. To do this we will need to make the registry that we created public. 
+In the setup module we downloaded built and pushed a insecure java application called *frontend*. Now it's time to deploy it to the OpenShift Cluster. To do this we will need to make the registry that we created public. 
 
 Let's take a look at our application in the registry.
 
-image::quay-login.png[link=self, window=blank, width=100%]
+image::02-quay-login.png[link=self, window=blank, width=100%]
 
-. Next, click on the *python-alpine-golden* repository. 
-
-image::quay-repo.png[link=self, window=blank, width=100%]
-
-On the left hand side of the window you should see the following icons labelled in order from top to bottom,
-
-image::quay-sidebar.png[link=self, window=blank, width=100%]
-
-- Information
-- Tags
-- Tag History
-- Usage Logs
-- Settings
+. Next, click on the *frontend* repository. 
 
 The information tab shows you information such as;
 
@@ -307,98 +298,135 @@ The information tab shows you information such as;
 - Repository activity
 - The repository description. 
 
-image::quay-information.png[link=self, window=blank, width=100%]
+image::02-frontend-repo.png[link=self, window=blank, width=100%]
+
+====
+On the left hand side of the window you should see the following icons labelled in order from top to bottom,
+====
+
+image::02-quay-sidebar.png[link=self, window=blank, width=100%]
+
+- Information
+- Tags
+- Tag History
+- Usage Logs
+- Settings
+
 
 [start=2]
 . Click on the *Tags* icon. 
 
-image::quay-tags.png[link=self, window=blank, width=100%]
+image::02-quay-tags.png[link=self, window=blank, width=100%]
 
 This tab displays all of the images and tags that have been upladed, providing information such as fixable vulnerabilities, the image size and allows for bulk changes to images based on the security posture. 
 
-image::quay-tags-security.png[link=self, window=blank, width=100%]
+We will explore this tab a little later in this module.
 
 [start=3]
 . Click on the *Tags History* icon. 
 
-image::quay-tags-history.png[link=self, window=blank, width=100%]
+image::02-quay-history.png[link=self, window=blank, width=100%]
 
 This tab simply displays the container images history over time. 
 
 [start=4]
-. Click on the *Usage Logs* icon. 
+. Click into the SHA256 hash number. 
+
+image::02-image-details.png[link=self, window=blank, width=100%]
+
+From this dashboard you will be able to see the image manifest of that container image.
+
+image::02-image-manifest.png[link=self, window=blank, width=100%]
+
+[start=5]
+. Click the *BACK* icon in the top left of the dashboard then click on the *Usage Logs* icon. 
+
+image::02-quay-back.png[link=self, window=blank, width=100%]
+image::02-quay-usage.png[link=self, window=blank, width=100%]
+
 
 This tab displays the usage over time along with details about who/how the images were pushed to the cluster. 
 
-image::quay-usage-logs.png[link=self, window=blank, width=100%]
-
 ====
-You can see that you (The "quayadmin") pushed an image tagged 0.1 to the repository today. 
+You should see that you (The "quayadmin") pushed an image tagged 0.1 to the repository today. 
 ====
 
-image::quay-usage-logs-admin.png[link=self, window=blank, width=100%]
-[start=5]
+[start=6]
 . Lastly click on the *Settings* icon. 
 
-image::quay-settings.png[link=self, window=blank, width=100%]
+image::02-quay-settings.png[link=self, window=blank, width=100%]
 
 In this tab you can add/remove users and update permissions, alter the privacy of the repository, and even schedule alerts based on found vulnerabilities.
 
 [start=6]
-. Make your repository public before deploying our application in the next step by clicking the *Make Public* button under `Repository Visibility`
+. Make your repository public before deploying our application in the next step by clicking the *Make Public* button under *Repository Visibility*
+
+image::02-quay-public.png[link=self, window=blank, width=100%]
 
 IMPORTANT: Make sure to make the repository public. Otherwise we will not be able to deploy the application in the ACM section.
-
-image::quay-make-public.png[link=self, window=blank, width=100%]
 
 [start=7]
 . Click OK
 
-image::quay-make-public-ok.png[link=self, window=blank, width=100%]
+image::02-quay-public-yes.png[link=self, window=blank, width=100%]
+
+CONTENT
 
 [[vulnerability-scanning-with-quay]]
 
-== Vulnerability Scanning with Quay (NEED TO UPDATE)
+== Vulnerability Scanning with Quay
 
-Red Hat Quay can also help with securing our environments by performing a container vulnerability scan on any images added to our registry, and advise which ones are potentially fixable.
+Red Hat Quay can also help with securing our environments by performing a container vulnerability scan on any images added to our registry, and advise which ones are potentially fixable. This feature is also known as vulnerability scanning at rest.
 
 Use the following procedure to check the security scan results for our Java container image you have uploaded.
 
+*Procedure*
+
 . Click on the *Tags* icon on the left side of the screen like before.
 
-image::quay-tags.png[link=self, window=blank, width=100%]
+image::02-quay-tags.png[link=self, window=blank, width=100%]
 
 NOTE: You may need to click the checkbox near the image you would would like more information on, but the column for *Security Scan* should populate.
 
 [start=2]
 . By default, the security scan color codes the vulnerabilities, you can hover over the security scan for more information.
 
-image::quay-scan-hover.png[link=self, window=blank, width=100%]
+image::02-quay-scan-hover.png[link=self, window=blank, width=100%]
 
-NOTE: The Java container image we are using in this lab shows 12 vulnerabilities, with 1 high vulnerabilities. This number will change with time and will be different between container scanners for a variety of reasons such as reporting mechanisms, vulnerability feeds and operating system support. 
+NOTE: The alpine container image we are using in this lab shows 34 vulnerabilities, with 2 cirtical vulnerabilities. This number will change with time and will be different between container scanners for a variety of reasons such as reporting mechanisms, vulnerability feeds and operating system support. 
 
+[start=3]
 . Click on the list of vulnerabilities to see a more detailed view.
 
-image::quay-security-detailed.png[link=self, window=blank, width=100%, Image Security Details] 
+image::02-quay-security.png[link=self, window=blank, width=100%] 
+image::02-quay-vuln-overview.png[link=self, window=blank, width=100%]
 
-. Click on a vulnerabile package on the left menu to get more information about the vulnerability and see what you have to do to fix the issue.
 
-image::quay-vuln-detailed.png[link=self, window=blank, width=100%]
+[start=4]
+. Click on a vulnerable package on the left menu to get more information about the vulnerability and see what you have to do to fix the issue.
+
+image::02-quay-vuln-detailed.png[link=self, window=blank, width=100%]
 
 NOTE: Toggling for fixable/unfixable vulnerabilities is an excellent way for developers to understand what is within their responsibility for fixing. For example, since we are using an older version of Java, many fixes are available for these common issues. 
 
 Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
-[subs=attributes]
+==== (TESTING ONLY - REMOVE BEFORE LAUNCH) Deploy the application
+
 
 IMPORTANT: Please ensure the deploy application are deployed to your cluster before moving onto the next module. 
-
-
-==== Deploy the Application with RHACM
 
 Perfect! 
 
 Test it out by running the following:
 
+[source,sh,subs="attributes",role=execute]
+----
 sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/frontend:0.1|" $TUTORIAL_HOME/skupper-demo/frontend.yml
-oc apply -f $TUTORIAL_HOME/skupper-demo/frontend.yml --recursive
+oc apply -f $TUTORIAL_HOME/skupper-demo/ --recursive
+oc get routes | grep frontend-patient-route | awk '{print "http://" $2}'
+----
+
+Ensure access to application. Watch out for browser certificates.  
+
+Add Quay repo as an integration
