@@ -14,15 +14,15 @@ Participants will walk through these 4 major use cases:
 * Search, find and modify any VMs across the entire domain Managed by RHACM.
 * Quickly troubleshoot and resolve issues across your VMs with Observability.
 
-- Advanced Application Lifecycle
-* Easily deploy applications at scale leveraging GitOps.
-* See applications work real time from multiple sources.
-* Quickly visualize application relationships across clusters and those that span clusters.
-
 - Policy Driven Governance
 * Centrally set and enforce policies for security, applications, and infrastructure.
 * Quickly visualize detailed auditing on configuration of apps and clusters.
 * Leverage Policy Generator to generate policies at scale.
+
+- Advanced Application Lifecycle
+* Easily deploy applications at scale leveraging GitOps.
+* See applications work real time from multiple sources.
+* Quickly visualize application relationships across clusters and those that span clusters.
 
 Lets get started!
 
@@ -46,7 +46,7 @@ image::102-cluster-view.png[link=self, window=blank, width=100%, View of Cluster
 
 [[hosted-control-planes]]
 
-== Introducing Hosted Control Planes
+== Working with Hosted Control Planes
 
 Hosted Control Planes is a form factor of Red Hat OpenShift Container platform, but it follows a distinct architectural model.
 In standalone OpenShift, the control plane and data plane are coupled in terms of locality. A dedicated group of nodes hosts the control plane with a minimum number to ensure a quorum and the network stack is shared. While functional, this approach may not always meet customers' diverse use cases, especially when it comes to multi-cluster scale deployments.
@@ -198,27 +198,27 @@ image::argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 - Click *Create application, select ArgoCD AppicationSet-Push Model*.
 
 - Enter the following information:
-* Name: dev-vm
-* Namespace: openshift-gitops
-* Click NEXT
+* *Name:* dev-vm
+* *Namespace:* openshift-gitops
+* Click *NEXT*
 
 image::vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
 
 * Under repository types, select the GIT repository
-* URL: https://github.com/jalvarez-rh/kubevirt-gitops.git
-* Revision: main
-* Path: vms
-* Destination: openshift-cnv
+* *URL:* https://github.com/jalvarez-rh/kubevirt-gitops.git
+* *Revision:* main
+* *Path:* vms
+* *Destination:* openshift-cnv
 * Click *NEXT TWICE*
 
 image::vm-app-git.png[link=self, window=blank, width=100%, VM ACM Config]
 
 - Under *Placement* for application deployment, verify that *New Placement* is selected.
-* Cluster set: default
+* *Cluster set:* default
 - Under *Label expressions* click *add label* and select the following
-* Label: name
-* Operator: equals any off
-* Values: local-cluster
+* *Label:* name
+* *Operator:* equals any off
+* *Values:* local-cluster
 
 image::vm-placement-acm.png[link=self, window=blank, width=100%, VM ACM Config 2]
 
@@ -243,76 +243,11 @@ NOTE: Due to time and resource constrains we did not explore the ability to moni
 
 Congratulations, you have successfully deployed a Virtual Machine Leveraing Red Hat GitOps. This approach leveraged a Git repository which housed all of the manifests that defined your VMs. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster for easy management of your resources.
 
-[[deploying-applications]]
-
-== Deploying Applications to Managed Clusters in RHACM
-
-Building on the concepts that we just learned on how to deploy Applications with Red Hat GitOps lets now deploy the application that you loaded to your local Quay Repo earlier in the earlier module.
-
-[[creating-an-application]]
-
-=== Deploying an Application
-
-- Navigate to *Applications* from the left side menu.
-- Click *Create application, select ArgoCD AppicationSet-Push Model*.
-
-- Enter the following information:
-* Name: skupper-patient-demo
-* Argo Server: openshift-gitops
-* Click *NEXT*
-
-image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
-
-* Under repository types, select the GIT repository
-* URL: https://github.com/mfosterrox/skupper-security-demo.git
-* Revision: main
-* Path: skupper-demo
-<<<<<<< HEAD
-* Destination: openshift-cnv
-* Click *NEXT*
-=======
-* Destination: patient-portal
-* Click *NEXT TWICE*
->>>>>>> e73d54e (updates to the namespace and sections.)
-
-image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
-
-- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* and check *Replace resources instead of applying changes from the source repository* 
-
-image::app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
-
-NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
-
-- Under *Placement* for application deployment, verify that *New Placement* is selected.
-* Cluster set: default
-- Under *Label expressions* click *add label* and select the following
-* *Label:* name
-* *Operator:* equals any off
-* *Values:* development
-
-image::app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
-
-- Verify all of the information is correct and click *Submit*.
-
-It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
-
-image::application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
-
-Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in our Hosted Controlled Plane (HCP) CLuster.
-
-image::application-route-git.png[link=self, window=blank, width=100%, Application Route]
-
-== Deploying a new Frontend Application 
-
-Feel free to experiment with the application at your leisure, just make sure to not delete it as we will dive deeper into the security aspects of this application in the next module.
-
-Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
-
 [[policy-driven-governance]]
 
 == Policy Driven Governance
 
-Now that you have a cluster and a deployed application, you need to make sure that they do not drift from their original configurations. This kind of drift is a serious problem, because it can happen from benign and benevolent fixes and changes, as well as malicious activities that you might not notice but can cause significant problems. The solution that RHACM provides for this is the Governance, Risk, and Compliance, or GRC, functionality.
+Now that you have a cluster and a deployed virtual machines, you need to make sure that infrastructure does not drift from their original configurations. This kind of drift is a serious problem, because it can happen from benign and benevolent fixes and changes, as well as malicious activities that you might not notice but can cause significant problems. The solution that RHACM provides for this is the Governance functionality.
 
 === Review GRC Functionality
 
@@ -513,8 +448,123 @@ CAUTION: Feel free to repeat the steps with the *kubeadmin-removed* policy, howe
 
 Now you have successfully created a Policy leveraging the Policy Generator to scan your clusters, if you would like to play with other policies please visit the Policy Repo for more Policies you can test out.
 
+[[deploying-applications]]
+
+== Deploying Applications to Managed Clusters in RHACM
+
+Building on the concepts that we learned earlier on how to deploy Policies and Applications with Red Hat GitOps lets now deploy the application that you loaded to your local Quay Repo, that way we can see all the componets interact together. Later on the lab we will explore this application again with Advanced Cluster Security - ACS.
+
+[[creating-an-application]]
+
+=== Deploying an Application
+
+- Navigate to *Applications* from the left side menu.
+- Click *Create application, select ArgoCD AppicationSet-Push Model*.
+
+- Enter the following information:
+* Name: patient-demo
+* Argo Server: openshift-gitops
+* Click *NEXT*
+
+image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
+
+* Under repository types, select the GIT repository
+* URL: https://github.com/mfosterrox/skupper-security-demo.git
+* Revision: main
+* Path: skupper-demo
+* Remote Namespace: patient-portal
+* Click *NEXT*
+
+image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* 
+- Under *Replace resources instead of applying changes from the source repository* make sure you add a check
+
+image::app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
+
+- Under *Placement* for application deployment, verify that *New Placement* is selected.
+* Cluster set: default
+- Under *Label expressions* click *add label* and select the following
+* *Label:* name
+* *Operator:* equals any off
+* *Values:* local-cluster
+
+image::app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
+
+- Verify all of the information is correct and click *Submit*.
+
+It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
+
+image::application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
+
+Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in the Local Cluster.
+
+image::application-route-git.png[link=self, window=blank, width=100%, Application Route]
+
+image::route-patient.png[link=self, window=blank, width=100%, Application Route]
+
+NOTE: If you get a *Application is not Available* after clicking on the route, check the URL and make sure you are using HTTP and not HTTPS.
+
+
+== Deploying a new Frontend Application 
+
+Lets dive a bit deeper into this application and use our local Quay repo that contains a *frontend* image we built, this image contains a few key security issues that we will explore on the ACS module later on.
+
+- Navigate to *Applications* from the left side menu.
+- Click on *Filter* and under *type* select *Application Set* 
+- Click on the *patient-demo* App and Click *Topology*
+- Click on *deployment* then find *frontend* Click on *frontend*
+
+image::deployment-patient.png[link=self, window=blank, width=100%, Application Deployment]
+
+- Click *Launch resource in Search* a new window will pop up
+
+image::frontend-search.png[link=self, window=blank, width=100%, Application Frontend]
+
+- Under Deployment find *frontend* and click it
+
+image::frontend-search2.png[link=self, window=blank, width=100%, Application Frontend Search]
+
+- Click on the *YAML* tab and under spec:containers find the *image* field
+
+image::frontend-search3.png[link=self, window=blank, width=100%, Application Frontend Search Image]
+
+- Navigate back the Terminal screen and execute the following command
+
+[source,sh,subs="attributes",role=execute]
+----
+echo $QUAY_URL/$QUAY_USER/frontend:0.1
+----
+
+- The output from the terminal will provide an URL we need for the frontend image, copy it from the terminal. Below is an example of an expected output
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+[demo-user@bastion ~]$ echo $QUAY_URL/$QUAY_USER/frontend:0.1
+quay-pjhhr.apps.cluster-pjhhr.pjhhr.sandbox4183.opentlc.com/quayadmin/frontend:0.1
+----
+
+- Navigate back to Search and replace the *image* with the URL you just copy from the terminal. Click *Save*
+
+image::frontend-image.png[link=self, window=blank, width=100%, Application Frontend Image New]
+
+- Navigate back to ACM / Application / Topology View 
+- Click on Deployment / Frontend. Verify that the image url has changed
+
+image::frontend-image2.png[link=self, window=blank, width=100%, Application Frontend Image Toplogy]
+
+
+NOTE: The *Pod* in the Topology View might go RED, this is expected as we are editing this on the ACM side but not the GitOps side so is reporting a difference, you wouldn't do this on a real production environment, this is only for educational purposes.
+
+Congratulations, you have successfully deployed an application to a Kubernetes cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
+
+In the Next Module we will dive deeper into the Security aspects of the Application image we just deployed, we will scan it and explore vulnabilities and much more.
+
 [[acm-conclusion]]
 
 == Conclusion
 
-In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy a Virtual Machine using infrastructure as code with RedHat GitOps, we also deployed a complex application and manage policies across clusters, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM lab environment, or continue on to the next portion of the lab. 
+In summary, we made use of the features provided by Red Hat Advanced Cluster Management for Kubernetes, to deploy a brand new standalone cluster, as well as deploy a Virtual Machine using infrastructure as code with RedHat GitOps, we also deployed governance policies and a complex application with GitOps, making it much easier to build, manage and secure your Kubernetes Clusters. Hopefully this lab has helped demonstrate to you the immense value provided by RHACM and OpenShift Platform Plus. Please feel free to continue and explore the RHACM lab environment, or continue on to the next portion of the lab. 
