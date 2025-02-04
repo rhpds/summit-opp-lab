@@ -148,11 +148,15 @@ Perfect!
 
 [[dev-app]]
 
-=== Create the applications frontend, and upload it to Quay
+=== Create the frontend application, and upload it to Quay
 
-In this section, we will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy and application to the OpenShift Cluster.
+In this section, we will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy an application to the OpenShift Cluster.
 
 TIP: With the variables saved in the ~/.bashrc file you will not have to declare them again in the future. 
+
+*Procedure*
+
+. List the contents of the `frontend` directory inside the `app-images` folder to see the files available for the project.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -165,6 +169,9 @@ ls $TUTORIAL_HOME/app-images/frontend/
 [demo-user@bastion ~]$ ls $TUTORIAL_HOME/app-images/frontend/
 Dockerfile  main.py  static
 ----
+
+[start=2]
+. Display the contents of the `Dockerfile` to understand how the image is built, including installed dependencies and the copied files.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -200,12 +207,17 @@ WORKDIR /home/fritz
 ENTRYPOINT ["python", "main.py"]
 ----
 
-REGEX command to change the Dockerfiles
+
+[start=3]
+. Update the `FROM` statement in the Dockerfile to reference a custom base image hosted in a private registry, using `sed` to modify the line.
 
 [source,sh,subs="attributes",role=execute]
 ----
 sed -i "s|^FROM python:3\.12-alpine AS \(\w\+\)|FROM $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1 AS \1|" $TUTORIAL_HOME/app-images/frontend/Dockerfile
 ----
+
+[start=4]
+. Check the Dockerfile again to verify that the `FROM` statement has been updated correctly.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -222,6 +234,9 @@ RUN pip install --no-cache-dir
 
 ....
 ----
+
+[start=5]
+. Build the Docker image using `podman` from the `frontend` directory. The `-t` flag tags the image with a version (`0.1`) and a registry URL.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -240,6 +255,9 @@ podman build -t $QUAY_URL/$QUAY_USER/frontend:0.1 .
 Successfully tagged quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/frontend:0.1
 46ea42cba3f17c366b0c534164ae088719266df9ab4122532b0bffd1bbefaec9
 ----
+
+[start=6]
+. Upload the built image to a remote registry using `podman push`. The `--remove-signatures` flag ensures that image signatures are not included in the pushed image.
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -262,7 +280,10 @@ Copying config 46ea42cba3 done   |
 Writing manifest to image destination
 ----
 
-NOTE: Quay will automatically create a private registry to store our TBD application since we have admin access. To deploy the app, you'll need to make the repository public so you can pull the image without credentials.
+NOTE: 
+Quay will automatically create a private registry to store the application image because of your admin access. To deploy the application, make sure the repository is set to public so that you can pull the image without needing authentication.
+
+The frontend application is finally built! The next step is to review it in Quay and deploy it to OpenShift using ACM and OpenShift GitOps.
 
 [[quay]]
 
@@ -288,9 +309,11 @@ In the setup module we downloaded built and pushed a insecure java application c
 
 Let's take a look at our application in the registry.
 
-image::02-quay-login.png[link=self, window=blank, width=100%]
+*Procedure*
 
-. Next, click on the *frontend* repository. 
+. First, click on the *frontend* repository. 
+
+image::02-quay-login.png[link=self, window=blank, width=100%]
 
 The information tab shows you information such as;
 
@@ -370,7 +393,7 @@ IMPORTANT: Make sure to make the repository public. Otherwise we will not be abl
 
 image::02-quay-public-yes.png[link=self, window=blank, width=100%]
 
-CONTENT
+Great! The frontend application can now be deployed with ACM without using pull secrets. 
 
 [[vulnerability-scanning-with-quay]]
 
@@ -409,24 +432,9 @@ image::02-quay-vuln-detailed.png[link=self, window=blank, width=100%]
 
 NOTE: Toggling for fixable/unfixable vulnerabilities is an excellent way for developers to understand what is within their responsibility for fixing. For example, since we are using an older version of Java, many fixes are available for these common issues. 
 
+image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzMyaHRsNTdwZWRlejRycGtpNTkxOGlyMjJsODE4OHFiaWd3NjFpNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rVVFWyTINqG7C/giphy.gif[link=self, window=blank, width=100%, class="center"]
+
+=== Summary
+
 Congratulations, you now know how to examine images in your registry for potential vulnerabilities before deploying into your environment.
 
-==== (TESTING ONLY - REMOVE BEFORE LAUNCH) Deploy the application
-
-
-IMPORTANT: Please ensure the deploy application are deployed to your cluster before moving onto the next module. 
-
-Perfect! 
-
-Test it out by running the following:
-
-[source,sh,subs="attributes",role=execute]
-----
-sed -i "s|image: .*|image: ${QUAY_URL}/${QUAY_USER}/frontend:0.1|" $TUTORIAL_HOME/skupper-demo/frontend.yml
-oc apply -f $TUTORIAL_HOME/skupper-demo/ --recursive
-oc get routes | grep frontend-patient-route | awk '{print "http://" $2}'
-----
-
-Ensure access to application. Watch out for browser certificates.  
-
-Add Quay repo as an integration

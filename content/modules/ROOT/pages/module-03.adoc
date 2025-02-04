@@ -267,8 +267,13 @@ image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 * URL: https://github.com/mfosterrox/skupper-security-demo.git
 * Revision: main
 * Path: skupper-demo
+<<<<<<< HEAD
 * Destination: openshift-cnv
 * Click *NEXT*
+=======
+* Destination: patient-portal
+* Click *NEXT TWICE*
+>>>>>>> e73d54e (updates to the namespace and sections.)
 
 image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
 

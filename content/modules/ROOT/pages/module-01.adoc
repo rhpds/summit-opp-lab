@@ -107,9 +107,9 @@ If you have full access you are ready to go!
 
 == Deploy the workshop applications
 
-You now have access to the core OPP applications. Next, you'll deploy a bunch of insecure apps into the OpenShift cluster. Our insecure demo applications come from a variety of public GitHub repositories and sources. These apps will be the main use cases we look at during the workshop and range from some well know Capture the Flag (CTF) applications to log4shell and Apache struts vulnerabilities. 
+You now have access to the core OPP applications. Next, you'll deploy several insecure apps into the OpenShift cluster. Our insecure demo applications come from a variety of public GitHub repositories and sources. These apps will serve as the main use cases we examine during the workshop, ranging from well-known Capture the Flag (CTF) applications to vulnerabilities like Log4Shell and Apache Struts.
 
-After you deploy the applications you'll scan a few of these containers using the *roxctl* CLI to get a feeling about what you will be dealing with when you get to the security section with Red Hat Advanced Cluster Security.
+After deploying the applications, you'll scan some of these containers using the roxctl CLI to get a feel for what you'll be dealing with when you get to the security section with Red Hat Advanced Cluster Security
 
 === Time to deploy
 
@@ -206,22 +206,20 @@ TIP: The following output can be configured using flags. You can configure diffe
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/juice-shop:arm --force -o table 
-Scan results for image: quay.io/mfoster/juice-shop:0.1
+[demo-user@bastion ~]$ roxctl --insecure-skip-tls-verify -e "$ROX_CENTRAL_ADDRESS:443" image scan --image=quay.io/mfoster/dvwa --force -o table 
+Scan results for image: quay.io/mfoster/dvwa
 
 ---------------------------------+------------------+
 |          zlib1g           |     1:1.2.13.dfsg-1     |   CVE-2023-45853    | CRITICAL  |         https://nvd.nist.gov/vuln/detail/CVE-2023-45853         |       -       |
 +---------------------------+                         +---------------------+-----------+-----------------------------------------------------------------+---------------+
 |        zlib1g-dev         |                         |   CVE-2023-45853    | CRITICAL  |         https://nvd.nist.gov/vuln/detail/CVE-2023-45853         |       -       |
 +---------------------------+-------------------------+---------------------+-----------+-----------------------------------------------------------------+---------------+
-WARN:   A total of 813 unique vulnerabilities were found in 94 components
+WARN:   A total of 879 unique vulnerabilities were found in 97 components
 ----
-
-== Summary
 
 image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnY0NDA0ZnJqNXh6cGNqeHNxZGd5Zm5qMnlpOHhrbm1hY2pwcG5ydSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p18ohAgD3H60LSoI1C/giphy.gif[link=self, window=blank, width=100%, class="center"]
 
-*Beautiful!*
+== Summary
 
 In this module, you got access to all of the lab UI's and interfaces including the Showroom lab enviroment (Where you are reading this). You downloaded and deployed some very insecure applications and set up the lab full of examples to dive into. 
 

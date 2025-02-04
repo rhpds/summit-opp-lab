@@ -63,19 +63,6 @@ Administrator login is available with:
 *RHACS Console Password:* | {acs_portal_password} |
 |===
 
-NOTE: You will get a warning page that the webpage is not private. During setup, RHACS can integrate with your specific certification server to avoid these errors.
-
-.Procedure
-
-. Click *Advanced*
-
-image::04-acs-warning.png[]
-
-[start=2]
-. Click "Proceed to central-stackrox...."
-
-image::04-acs-warning-01.png[]
-
 [[acs-nav]]
 
 == Introduction to the RHACS console
@@ -417,7 +404,7 @@ In the next section, you'll focus on identifying and enforcing a runtime policy.
 
 [[runtime-enforce]]
 
-== *Runtime* policy enforcement
+== Runtime policy enforcement
 
 RHACS monitors container processes and collects data to help you create policies that block unwanted behaviors. This data can also be used to build baseline policy configurations for further refinement.
 
