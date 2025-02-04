@@ -611,7 +611,7 @@ image::04-acs-deploy-1.png[link=self, window=blank, width=100%]
 
 [start=4]
 
-. Give the policy a new name. For example: Alpine Linux Package Manager (apk) in Image - Enforce Build and Deploy.
+. Give the policy a new name. For example: *Alpine Linux Package Manager (apk) in Image - Build and Deploy - Enforce*
 
 IMPORTANT: Since this is a "Build and Deploy" lifecycle policy, when you begin enforcing the policy it will be enforce in BOTH lifecycle phases. You will enable enforcement in both to save time since the next section will review the build phase of 
 
@@ -620,8 +620,8 @@ IMPORTANT: Since this is a "Build and Deploy" lifecycle policy, when you begin e
 Now, we want to target the frontend deployment by it's namespace
 
 . Click on the *Policy behavior -> Scope* tab.
-. Click on *Add inclusion scope.
-. Select *Cluster=Production* & *Namespace=patient-portal* & app=frontend
+. Click on *Add inclusion scope*.
+. Select *Cluster=Production* & *Namespace=patient-portal* & *app=frontend*
 
 image::04-acs-deploy-2.png[link=self, window=blank, width=100%]
 
@@ -645,6 +645,9 @@ NOTE: There is a preview tab on the right side of the page that will show you al
 [start=11]
 . Click Save
 
+image::04-acs-deploy-5.png[link=self, window=blank, width=100%]
+
+
 Congrats! You're now enforcing at runtime and deploy time. In the last step in this module. We will review
 
 === Enforcement
@@ -658,7 +661,7 @@ Procedure
 [source,sh,subs="attributes",role=execute]
 ----
 podman tag $QUAY_URL/$QUAY_USER/frontend:0.1 $QUAY_URL/$QUAY_USER/frontend:0.2
-podman push $QUAY_URL/$QUAY_USER/frontend:0.2 --remove-signatures
+podman push $QUAY_URL/$QUAY_USER/frontend:0.2
 ----
 
 [start=2]
@@ -754,6 +757,10 @@ oc delete -f $TUTORIAL_HOME/skupper-demo/frontend.yml
 . After addressing the issue, mark the violation as resolved.
 
 image::04-acs-resolve.png[link=self, window=blank, width=100%]
+
+== Implement Policy-as-Code in ACM with OpenShift GitOps
+
+
 
 == Conclusion
 
