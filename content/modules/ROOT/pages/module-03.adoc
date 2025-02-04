@@ -186,9 +186,9 @@ NOTE: ArgoCD has been deployed in your enviroment however you will need to confi
 - Under the Argo server select *Add Argo Server* 
 
 - Enter the following information:
-* Name: openshift-gitops
-* Namespace: openshift-gitops
-* ClusterSet: default
+* *Name:* openshift-gitops
+* *Namespace:* openshift-gitops
+* *ClusterSet:* default
 
 image::argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 
@@ -268,16 +268,22 @@ image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 * Revision: main
 * Path: skupper-demo
 * Destination: openshift-cnv
-* Click *NEXT TWICE*
+* Click *NEXT*
 
 image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* and check *Replace resources instead of applying changes from the source repository* 
+
+image::app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
 
 - Under *Placement* for application deployment, verify that *New Placement* is selected.
 * Cluster set: default
 - Under *Label expressions* click *add label* and select the following
-* Label: name
-* Operator: equals any off
-* Values: development
+* *Label:* name
+* *Operator:* equals any off
+* *Values:* development
 
 image::app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
 
@@ -290,6 +296,8 @@ image::application-topology-git.png[link=self, window=blank, width=100%, Applica
 Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in our Hosted Controlled Plane (HCP) CLuster.
 
 image::application-route-git.png[link=self, window=blank, width=100%, Application Route]
+
+== Deploying a new Frontend Application 
 
 Feel free to experiment with the application at your leisure, just make sure to not delete it as we will dive deeper into the security aspects of this application in the next module.
 
