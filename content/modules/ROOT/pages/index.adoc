@@ -23,8 +23,8 @@ In this workshop we will demonstrate the value of RHACM with the following activ
 
 . Demonstrate the ease of deploying new clusters in the cloud.
 . Create and Manage Virtual Machines. 
-. Create an application deployment policy across managed clusters.
 . Create a governance policy to help secure our clusters.
+. Create an application deployment policy across managed clusters.
 
 === Red Hat Advanced Cluster Security for Kubernetes (RHACS)
 
