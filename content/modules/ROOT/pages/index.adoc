@@ -22,6 +22,7 @@ Red Hat Advanced Cluster Management for Kubernetes is a multi-cluster management
 In this workshop we will demonstrate the value of RHACM with the following activities:
 
 . Demonstrate the ease of deploying new clusters in the cloud.
+. Create and Manage Virtual Machines. 
 . Create an application deployment policy across managed clusters.
 . Create a governance policy to help secure our clusters.
 

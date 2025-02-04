@@ -20,6 +20,7 @@
 ** xref:module-03.adoc#cluster-lifecycle[Working with Kubernetes Clusters and Cluster Lifecycle]
 ** xref:module-03.adoc#hosted-control-planes[Introducing Hosted Control Planes]
 ** xref:module-03.adoc#create-manage-cluster[Create and Manage Clusters]
+** xref:module-03.adoc#create-manage-vms[Create and Manage Virtual Machines]
 ** xref:module-03.adoc#deploying-applications[Deploying Applications to Managed Clusters in RHACM]
 ** xref:module-03.adoc#creating-an-application[Creating an Application Deployment Policy]
 ** xref:module-03.adoc#policy-driven-governance[Policy Driven Governance]
