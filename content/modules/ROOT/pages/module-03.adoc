@@ -190,7 +190,7 @@ NOTE: ArgoCD has been deployed in your enviroment however you will need to confi
 * *Namespace:* openshift-gitops
 * *ClusterSet:* default
 
-image::argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
+image::04-argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 
 === Deploying an Virtual Machine 
 
@@ -202,7 +202,7 @@ image::argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 * *Namespace:* openshift-gitops
 * Click *NEXT*
 
-image::vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
+image::04-vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
 
 * Under repository types, select the GIT repository
 * *URL:* https://github.com/jalvarez-rh/kubevirt-gitops.git
