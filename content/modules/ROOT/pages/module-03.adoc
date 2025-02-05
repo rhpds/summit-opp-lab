@@ -461,23 +461,118 @@ This Policy Generator description will create 2 configuration policies:
 
 NOTE: Both policies are informative only, and we will only execute them manually to demonstrate how to resolve issues.
 
-In order to deliver these policies we will need to leverage the RHACM Application Engine and the GitOps Subscription model.
+With the ArgoCD resource, you can use Red Hat OpenShift GitOps to manage policy definitions by granting OpenShift GitOps access to create policies on the Red Hat Advanced Cluster Management hub cluster.
+
+==== Prerequisites
+
+We need to create a *ClusterRole* resource for OpenShift GitOps, with access to create, read, update, and delete policies and placements: 
+
+- Create a *ClusterRole* from the OCP Console by Clicking the + Icon on the Top right.
+
+image::04-ocp-console-add.png[link=self, window=blank, width=100%, OCP Console Add]
+
+- Copy and Paste the following YAML, Click *Create*
+
+[source,sh,subs="attributes",role=execute]
+----
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-gitops-policy-admin
+rules:
+  - verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    apiGroups:
+      - policy.open-cluster-management.io
+    resources:
+      - policies
+      - configurationpolicies
+      - certificatepolicies
+      - operatorpolicies
+      - policysets
+      - placementbindings
+  - verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    apiGroups:
+      - apps.open-cluster-management.io
+    resources:
+      - placementrules
+  - verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    apiGroups:
+      - cluster.open-cluster-management.io
+    resources:
+      - placements
+      - placements/status
+      - placementdecisions
+      - placementdecisions/status
+----
+
+- Navigate back to the + sign again, we need the *ClusterRoleBinding* object to grant the OpenShift GitOps service account access to the *openshift-gitops-policy-admin* ClusterRole object. Click *Create* once complete
+
+[source,sh,subs="attributes",role=execute]
+----
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-gitops-policy-admin
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-gitops-policy-admin
+----
+
+- Navigate to the Terminal in the Showroom tab and execute the following command: 
+
+[source,sh,subs="attributes",role=execute]
+----
+oc -n openshift-gitops patch argocd openshift-gitops --type merge --patch "$(curl https://raw.githubusercontent.com/jalvarez-rh/grc-policy-generator-blog/refs/heads/main/openshift-gitops/argocd-patch.yaml)"
+----
+
+- This command will merge and patch the ArgoCD configuration to point to the latest Init Container that will allow us to deploy the Policies 
+
+=== Deploying a Policy with ArgoCD
 
 - Navigate to *Applications*.
-- Click *Create application, select Subscription*.
-- Enter the following information:
+- Click *Create application, select ArgoCD ApplicationSet - Push Model*.
 * Name: policy-generator
-* Namespace: policy-generator
+* Argo server: openshift-gitops
+* Click *NEXT*
 * Under repository types, select the GIT repository
-* URL: https://github.com/levenhagen/demo-policygenerator.git
-* Branch: main
+* URL: https://github.com/jalvarez-rh/demo-policygenerator.git
+* Revision: main
+* Path: dir
+* Remote namespace: policy-generator
+* Click *NEXT* Twice
+
 - Verify that it installs only to the local cluster by setting the following values:
-* *Deploy application resources on clusters with all specified labels*
 * Cluster sets: *default*
-* Label: *local-cluster*
+* Label: *name*
 * Operator: *equals any of*
-* Value: *true*
-- Verify all the information is correct, click *Create*.
+* Value: *local-cluster*
+- Verify all the information is correct, click *Submit*.
 
 It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
 
