@@ -190,7 +190,7 @@ NOTE: ArgoCD has been deployed in your enviroment however you will need to confi
 * *Namespace:* openshift-gitops
 * *ClusterSet:* default
 
-image::04-argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
+image::03-argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 
 === Deploying an Virtual Machine 
 
@@ -202,7 +202,7 @@ image::04-argoconfig.png[link=self, window=blank, width=100%, ArgoCD Config]
 * *Namespace:* openshift-gitops
 * Click *NEXT*
 
-image::04-vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
+image::03-vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
 
 * Under repository types, select the GIT repository
 * *URL:* https://github.com/jalvarez-rh/kubevirt-gitops.git
@@ -211,7 +211,7 @@ image::04-vm-app-acm.png[link=self, window=blank, width=100%, VM Config]
 * *Destination:* openshift-cnv
 * Click *NEXT TWICE*
 
-image::vm-app-git.png[link=self, window=blank, width=100%, VM ACM Config]
+image::03-vm-app-git.png[link=self, window=blank, width=100%, VM ACM Config]
 
 - Under *Placement* for application deployment, verify that *New Placement* is selected.
 * *Cluster set:* default
@@ -220,22 +220,22 @@ image::vm-app-git.png[link=self, window=blank, width=100%, VM ACM Config]
 * *Operator:* equals any off
 * *Values:* local-cluster
 
-image::vm-placement-acm.png[link=self, window=blank, width=100%, VM ACM Config 2]
+image::03-vm-placement-acm.png[link=self, window=blank, width=100%, VM ACM Config 2]
 
 * Click *NEXT - verify that all the information is correct.*
 * Click *Submit* 
 
 It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
 
-image::acm-vm-topology.png[link=self, window=blank, width=100%, Application Topology]
+image::03-acm-vm-topology.png[link=self, window=blank, width=100%, Application Topology]
 
 Under the Infrastructure view, Select the *Virtual Machines* here you will see a list of the available virtual machines, if you completed all of the steps above you should see a VM labeled *rhel9-gitops* 
 
-image::vm-acm-view.png[link=self, window=blank, width=100%, VM View]
+image::03-vm-acm-view.png[link=self, window=blank, width=100%, VM View]
 
 From this point you can interact with the virtual machine directly from ACM. Feel free to click the *Launch* button to see all of the information about the Virtual Machine.
 
-image::vm-actions.png[link=self, window=blank, width=100%, VM View]
+image::03-vm-actions.png[link=self, window=blank, width=100%, VM View]
 
 Feel free to experiment with the virtual machine at your leisure, notice all of the different *day 2 operations* available. 
 
@@ -261,7 +261,7 @@ Building on the concepts that we just learned on how to deploy Applications with
 * Argo Server: openshift-gitops
 * Click *NEXT*
 
-image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
+image::03-app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 
 * Under repository types, select the GIT repository
 * URL: https://github.com/mfosterrox/skupper-security-demo.git
@@ -270,11 +270,11 @@ image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 * Destination: patient-portal
 * Click *NEXT TWICE*
 
-image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
+image::03-app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
 
 - Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* and check *Replace resources instead of applying changes from the source repository* 
 
-image::app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
+image::03-app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
 
 NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
 
@@ -285,17 +285,17 @@ NOTE: These changes are only required as we will be modifying the application YA
 * *Operator:* equals any off
 * *Values:* development
 
-image::app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
+image::03-app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
 
 - Verify all of the information is correct and click *Submit*.
 
 It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
 
-image::application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
+image::03-application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
 
 Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in our Hosted Controlled Plane (HCP) CLuster.
 
-image::application-route-git.png[link=self, window=blank, width=100%, Application Route]
+image::03-application-route-git.png[link=self, window=blank, width=100%, Application Route]
 
 == Deploying a new Frontend Application 
 
@@ -526,7 +526,7 @@ Building on the concepts that we learned earlier on how to deploy Policies and A
 * Argo Server: openshift-gitops
 * Click *NEXT*
 
-image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
+image::03-app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 
 * Under repository types, select the GIT repository
 * URL: https://github.com/mfosterrox/skupper-security-demo.git
@@ -535,12 +535,12 @@ image::app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 * Remote Namespace: patient-portal
 * Click *NEXT*
 
-image::app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
+image::03-app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
 
 - Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* 
 - Under *Replace resources instead of applying changes from the source repository* make sure you add a check
 
-image::app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
+image::03-app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
 
 NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
 
@@ -551,19 +551,19 @@ NOTE: These changes are only required as we will be modifying the application YA
 * *Operator:* equals any off
 * *Values:* local-cluster
 
-image::app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
+image::03-app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
 
 - Verify all of the information is correct and click *Submit*.
 
 It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
 
-image::application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
+image::03-application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
 
 Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in the Local Cluster.
 
-image::application-route-git.png[link=self, window=blank, width=100%, Application Route]
+image::03-application-route-git.png[link=self, window=blank, width=100%, Application Route]
 
-image::route-patient.png[link=self, window=blank, width=100%, Application Route]
+image::03-route-patient.png[link=self, window=blank, width=100%, Application Route]
 
 NOTE: If you get a *Application is not Available* after clicking on the route, check the URL and make sure you are using HTTP and not HTTPS.
 
@@ -577,19 +577,19 @@ Lets dive a bit deeper into this application and use our local Quay repo that co
 - Click on the *patient-demo* App and Click *Topology*
 - Click on *deployment* then find *frontend* Click on *frontend*
 
-image::deployment-patient.png[link=self, window=blank, width=100%, Application Deployment]
+image::03-deployment-patient.png[link=self, window=blank, width=100%, Application Deployment]
 
 - Click *Launch resource in Search* a new window will pop up
 
-image::frontend-search.png[link=self, window=blank, width=100%, Application Frontend]
+image::03-frontend-search.png[link=self, window=blank, width=100%, Application Frontend]
 
 - Under Deployment find *frontend* and click it
 
-image::frontend-search2.png[link=self, window=blank, width=100%, Application Frontend Search]
+image::03-frontend-search2.png[link=self, window=blank, width=100%, Application Frontend Search]
 
 - Click on the *YAML* tab and under spec:containers find the *image* field
 
-image::frontend-search3.png[link=self, window=blank, width=100%, Application Frontend Search Image]
+image::03-frontend-search3.png[link=self, window=blank, width=100%, Application Frontend Search Image]
 
 - Navigate back the Terminal screen and execute the following command
 
@@ -609,12 +609,12 @@ quay-pjhhr.apps.cluster-pjhhr.pjhhr.sandbox4183.opentlc.com/quayadmin/frontend:0
 
 - Navigate back to Search and replace the *image* with the URL you just copy from the terminal. Click *Save*
 
-image::frontend-image.png[link=self, window=blank, width=100%, Application Frontend Image New]
+image::03-frontend-image.png[link=self, window=blank, width=100%, Application Frontend Image New]
 
 - Navigate back to ACM / Application / Topology View 
 - Click on Deployment / Frontend. Verify that the image url has changed
 
-image::frontend-image2.png[link=self, window=blank, width=100%, Application Frontend Image Toplogy]
+image::03-frontend-image2.png[link=self, window=blank, width=100%, Application Frontend Image Toplogy]
 
 
 NOTE: The *Pod* in the Topology View might go RED, this is expected as we are editing this on the ACM side but not the GitOps side so is reporting a difference, you wouldn't do this on a real production environment, this is only for educational purposes.
