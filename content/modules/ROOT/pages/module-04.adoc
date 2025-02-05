@@ -760,7 +760,28 @@ image::04-acs-resolve.png[link=self, window=blank, width=100%]
 
 == Implement Policy-as-Code in ACM with OpenShift GitOps
 
+Your last task is to externally manage ACS policies through OpenShift GitOps. To make this easier, the policies from before have already been exported to a GitHub repository.
 
+link:https://github.com/mfosterrox/skupper-security-demo/tree/main/PaC-custom-policies[PaC Custom Policies on GitHub]
+
+*Procedure*
+
+. Navigate to OpenShift GitOps: Go to the OpenShift Console and search for "OpenShift GitOps"
+. Create a new GitOps Application: In the GitOps dashboard, click on "New Application" to create a new application.
+. Configure the Application:
+Name: Give the application a name, e.g., pac-custom-policies.
+. Select the Argo server, "openshift-gitops"
+. Hit "Next"
+. Enter the URL of the GitHub repository containing the custom policies (https://github.com/mfosterrox/skupper-security-demo.git).
+. Select "Main"
+. Select "PaC-custom-policies"
+. Enter the remote namespace of "stackrox"
+. Make sure the "Replace resources instead of applying changes from the source repository" is selected.
+. *Deploy application resources on clusters with all specified labels*
+* Cluster sets: *default*
+* Label: *local-cluster*
+* Operator: *equals any of*
+* Value: *true*
 
 == Conclusion
 
