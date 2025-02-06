@@ -249,60 +249,6 @@ Congratulations, you have successfully deployed a Virtual Machine Leveraing Red 
 
 Building on the concepts that we just learned on how to deploy Applications with Red Hat GitOps lets now deploy the application that you loaded to your local Quay Repo earlier in the earlier module.
 
-[[creating-an-application]]
-
-=== Deploying an Application
-
-- Navigate to *Applications* from the left side menu.
-- Click *Create application, select ArgoCD AppicationSet-Push Model*.
-
-- Enter the following information:
-* Name: skupper-patient-demo
-* Argo Server: openshift-gitops
-* Click *NEXT*
-
-image::03-app-gitops.png[link=self, window=blank, width=100%, App GitOps]
-
-* Under repository types, select the GIT repository
-* URL: https://github.com/mfosterrox/skupper-security-demo.git
-* Revision: main
-* Path: skupper-demo
-* Destination: patient-portal
-* Click *NEXT TWICE*
-
-image::03-app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
-
-- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* and check *Replace resources instead of applying changes from the source repository* 
-
-image::03-app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
-
-NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
-
-- Under *Placement* for application deployment, verify that *New Placement* is selected.
-* Cluster set: default
-- Under *Label expressions* click *add label* and select the following
-* *Label:* name
-* *Operator:* equals any off
-* *Values:* development
-
-image::03-app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
-
-- Verify all of the information is correct and click *Submit*.
-
-It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
-
-image::03-application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
-
-Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in our Hosted Controlled Plane (HCP) CLuster.
-
-image::03-application-route-git.png[link=self, window=blank, width=100%, Application Route]
-
-== Deploying a new Frontend Application 
-
-Feel free to experiment with the application at your leisure, just make sure to not delete it as we will dive deeper into the security aspects of this application in the next module.
-
-Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
-
 [[policy-driven-governance]]
 
 == Policy Driven Governance
@@ -568,11 +514,12 @@ oc -n openshift-gitops patch argocd openshift-gitops --type merge --patch "$(cur
 * Click *NEXT* Twice
 
 - Verify that it installs only to the local cluster by setting the following values:
+
 * Cluster sets: *default*
-* Label: *name*
+* Label: *local-cluster*
 * Operator: *equals any of*
-* Value: *local-cluster*
-- Verify all the information is correct, click *Submit*.
+* Value: *true*
+- Verify all the information is correct, click *Create*.
 
 It will take a few minutes to deploy the application, *Click on the Topology Tab* to view and verify that *all of the circles are green*.
 
@@ -599,9 +546,63 @@ image::119-policies-enforce-green.png[link=self, window=blank, width=100%, Polic
 
 - Click on the policy and slect *Results* to veify that the gitops operator has been installed.
 
-CAUTION: Feel free to repeat the steps with the *kubeadmin-removed* policy, however if you enforce this you won’t be able to continue this lab and access that cluster through the console as the only account created on these clusters is Kubeadmin.
+CAUTION: CAREFUL implementing the *kubeadmin-removed* policy, if you enforce this you won’t be able to continue this lab and access that cluster through the console as the only account created on these clusters is Kubeadmin.
 
 Now you have successfully created a Policy leveraging the Policy Generator to scan your clusters, if you would like to play with other policies please visit the Policy Repo for more Policies you can test out.
+
+[[creating-an-application]]
+
+=== Deploying an Application
+
+- Navigate to *Applications* from the left side menu.
+- Click *Create application, select ArgoCD AppicationSet-Push Model*.
+
+- Enter the following information:
+* Name: skupper-patient-demo
+* Argo Server: openshift-gitops
+* Click *NEXT*
+
+image::03-app-gitops.png[link=self, window=blank, width=100%, App GitOps]
+
+* Under repository types, select the GIT repository
+* URL: https://github.com/mfosterrox/skupper-security-demo.git
+* Revision: main
+* Path: skupper-demo
+* Destination: patient-portal
+* Click *NEXT TWICE*
+
+image::03-app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* and check *Replace resources instead of applying changes from the source repository* 
+
+image::03-app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
+
+NOTE: These changes are only required as we will be modifying the application YAML on ACM and we don't want it to sync to a Git Repo, you normaly wouldn't uncheck these in a real production enviroment.
+
+- Under *Placement* for application deployment, verify that *New Placement* is selected.
+* Cluster set: default
+- Under *Label expressions* click *add label* and select the following
+* *Label:* name
+* *Operator:* equals any off
+* *Values:* development
+
+image::03-app-placement.png[link=self, window=blank, width=100%, ACM App Placement]
+
+- Verify all of the information is correct and click *Submit*.
+
+It will take a few minutes to deploy the application, click on the *Topology Tab* to view and verify that *all of the circles are green*.
+
+image::03-application-topology-git.png[link=self, window=blank, width=100%, Application Topology]
+
+Under the topology view, Select the *Route* and click on the *Launch Route URL*, this will take you to the Front end for the Patient Portal application, which is now running in our Hosted Controlled Plane (HCP) CLuster.
+
+image::03-application-route-git.png[link=self, window=blank, width=100%, Application Route]
+
+== Deploying a new Frontend Application 
+
+Feel free to experiment with the application at your leisure, just make sure to not delete it as we will dive deeper into the security aspects of this application in the next module.
+
+Congratulations, you have successfully deployed an application to a Hosted Control Plane cluster using RHACM. This approach leveraged a Git repository which housed all of the manifests that defined your application. RHACM was able to take those manifests and use them as deployables, which were then deployed to the target cluster.
 
 [[deploying-applications]]
 
