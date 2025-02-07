@@ -49,7 +49,7 @@ Administrator login is available with:
 
 === roxctl CLI verification 
 
-Next, verify that we have access to the RHACS Central Service.
+Next, verify that you have access to the RHACS Central Service.
 
 *Procedure*
 
@@ -101,13 +101,13 @@ Access:
 	rw WorkflowAdministration
 ----
 
-NOTE: This output is showing that you have unrestricted access to the RHACS product. These permissions can be seen in the **RHACS Access Control** tab that we will review later.
+NOTE: This output is showing that you have unrestricted access to the RHACS product. These permissions can be seen in the **RHACS Access Control** tab that you will review later.
 
 If you have full access you are ready to go!
 
 == Deploy the workshop applications
 
-You now have access to the core OPP applications. Next, you'll deploy several insecure apps into the OpenShift cluster. Our insecure demo applications come from a variety of public GitHub repositories and sources. These apps will serve as the main use cases we examine during the workshop, ranging from well-known Capture the Flag (CTF) applications to vulnerabilities like Log4Shell and Apache Struts.
+You now have access to the core OPP applications. Next, you'll deploy several insecure apps into the OpenShift cluster. Our insecure demo applications come from a variety of public GitHub repositories and sources. These apps will serve as the main use cases you examine during the workshop, ranging from well-known Capture the Flag (CTF) applications to vulnerabilities like Log4Shell and Apache Struts.
 
 After deploying the applications, you'll scan some of these containers using the roxctl CLI to get a feel for what you'll be dealing with when you get to the security section with Red Hat Advanced Cluster Security
 
@@ -157,7 +157,7 @@ route.route.openshift.io/webgoat created
 configmap/webgoat-config created
 ----
 
-NOTE: You should see warnings such as: *Warning: would violate PodSecurity "baseline:latest": privileged (container "proxy" must not set securityContext.privileged=true)*. This is because we are deploying flawed container configurations and vulnerable container applications into the OpenShift cluster.
+NOTE: You should see warnings such as: *Warning: would violate PodSecurity "baseline:latest": privileged (container "proxy" must not set securityContext.privileged=true)*. This is because you are deploying flawed container configurations and vulnerable container applications into the OpenShift cluster.
 
 ====
 The following command will watch all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.

@@ -266,7 +266,7 @@ IMPORTANT: Container OS age and the age of its components are a massive correlat
 
 image::04-workload-7.png[link=self, window=blank, width=100%]
 
-If you're focused on a specific vulnerability, it's very helpful to see all the components it affects. With this dashboard we can see that our response to this vulnerability needs to be targeted, we should reach out directly to the development team that needs that PyYAML package.
+If you're focused on a specific vulnerability, it's very helpful to see all the components it affects. With this dashboard you can see that our response to this vulnerability needs to be targeted, you should reach out directly to the development team that needs that PyYAML package.
 
 
 IMPORTANT: As a security team our next step is to inform the development team about these vulnerabilities. Luckily, they should have already seen these issues in Quay. 
@@ -330,7 +330,7 @@ image::04-vr-4.png[link=self, window=blank, width=100%]
 
 You can create collection rules by deployment, namespace and cluster. The collections are setup this way so that you can easily attach policies, vulnerability reports and notifications by the logical groupings of your organization. 
 
-Since we want to target only a single deployment, let's add the Deployment and Namespace specific to the frontend deployment.
+Since you want to target only a single deployment, let's add the Deployment and Namespace specific to the frontend deployment.
 
 [start=6]
 . Give the collection a name. (ex: frontend)
@@ -449,7 +449,7 @@ image::04-acs-policy-04.png[link=self, window=blank, width=100%]
 [start=6]
 
 . The lifecycle stages don't need to be changed so click *Next*
-. The *rules* don't need to be changed either since we are already targeting the *apk* process. Click *Next*
+. The *rules* don't need to be changed either since you are already targeting the *apk* process. Click *Next*
 
 image::04-acs-policy-05.png[link=self, window=blank, width=100%]
 
@@ -475,7 +475,7 @@ IMPORTANT: Make sure to save the policy changes! If you do not save the policy, 
 
 === Testing the runtime policy
 
-Next, we will use tmux to watch OpenShift events while running the test so you can see how RHACS enforces the policy at runtime.
+Next, you will use tmux to watch OpenShift events while running the test so you can see how RHACS enforces the policy at runtime.
 
 *Procedure*
 [start=1]
@@ -560,7 +560,7 @@ NOTE: After a few seconds, you can see the pod is deleted and recreated. In your
 
 . Type exit in the terminal, use ctrl+c to stop the 'watch' command, and type exit one more time to get back to the default terminal.
 
-Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged! We will triage our violations after we look at deploy time policies.
+Congrats! You have successfully stopped yourself from downloading malicious packages! However, the security investigative process continues, as you have now raised a flag that must be triaged! you will triage our violations after you look at deploy time policies.
 
 [[deploy-enforce]]
 
@@ -597,7 +597,7 @@ Without Build Scanning Enabled: RHACS allows the image to be built, but after sc
 
 . On the *Policy Management* page, type *Policy* then *alpine* into the filter bar at the top.
 
-NOTE: This time we are going to edit a different policy. Specifically related to the *Build & Deploy* phases.
+NOTE: This time you are going to edit a different policy. Specifically related to the *Build & Deploy* phases.
 
 image::04-acs-deploy.png[link=self, window=blank, width=100%]
 
@@ -617,7 +617,7 @@ IMPORTANT: Since this is a "Build and Deploy" lifecycle policy, when you begin e
 
 [start=5]
 
-Now, we want to target the frontend deployment by it's namespace
+Now, you want to target the frontend deployment by it's namespace
 
 . Click on the *Policy behavior -> Scope* tab.
 . Click on *Add inclusion scope*.
@@ -648,7 +648,7 @@ NOTE: There is a preview tab on the right side of the page that will show you al
 image::04-acs-deploy-5.png[link=self, window=blank, width=100%]
 
 
-Congrats! You're now enforcing at runtime and deploy time. In the last step in this module. We will review
+Congrats! You're now enforcing at runtime and deploy time. In the last step in this module. you will review
 
 === Enforcement
 
@@ -731,7 +731,7 @@ In case of emergency, add the annotation {"admission.stackrox.io/break-glass": "
 
 == Report and Resolve Violations
 
-In this section, you will resolve a few of the issues that we have created.
+In this section, you will resolve a few of the issues that you have created.
 
 *Procedure*
 
@@ -785,6 +785,6 @@ Name: Give the application a name, e.g., pac-custom-policies.
 
 == Conclusion
 
-In this lab, we used Red Hat Advanced Cluster Security for Kubernetes (RHACS) to identify potential security violations in your cluster through a central dashboard. You created both deploy-time and runtime policies to help prevent malicious activities from occurring.
+In this lab, you used Red Hat Advanced Cluster Security for Kubernetes (RHACS) to identify potential security violations in your cluster through a central dashboard. You created both deploy-time and runtime policies to help prevent malicious activities from occurring.
 
 This lab aimed to demonstrate the significant value RHACS and OpenShift Platform Plus provide in enhancing cluster security. Feel free to continue exploring the RHACS lab environment to deepen your understanding.

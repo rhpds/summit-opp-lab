@@ -24,7 +24,7 @@
 ** xref:module-03.adoc#policy-driven-governance[Policy Driven Governance]
 ** xref:module-03.adoc#create-grc-policies[Creating GRC Policies in RHACM]
 ** xref:module-03.adoc#deploying-applications[Deploying Applications to Managed Clusters in RHACM]
-** xref:module-03.adoc#creating-an-application[Creating an Application Deployment Policy]
+** xref:module-03.adoc#updating-an-application[Updating the Frontend Image in the Deployed Application]
 ** xref:module-03.adoc#acm-conclusion[Conclusion]
 
 * xref:module-04.adoc[4. Red Hat Advanced Cluster Security for Kubernetes]

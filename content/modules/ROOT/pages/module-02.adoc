@@ -1,6 +1,6 @@
 = Store, Scan and Deploy Applications with Red Hat Quay
 
-In this module we will be acting as the devloper.(UPDATE STORY)
+In this module you will be acting as the devloper.(UPDATE STORY)
 
 [[build-app]]
 
@@ -161,7 +161,7 @@ Perfect!
 
 === Create the frontend application, and upload it to Quay
 
-In this section, we will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy an application to the OpenShift Cluster.
+In this section, you will add the application code to the image, build, tag and push the new image to Quay. Later, we'll use that image to deploy an application to the OpenShift Cluster.
 
 TIP: With the variables saved in the ~/.bashrc file you will not have to declare them again in the future. 
 
@@ -315,7 +315,7 @@ Administrator login is available with:
 
 == Browse the registry
 
-In the setup module we downloaded built and pushed a insecure java application called *frontend*. Now it's time to deploy it to the OpenShift Cluster. To do this we will need to make the registry that we created public. 
+In the setup module you downloaded built and pushed a insecure java application called *frontend*. Now it's time to deploy it to the OpenShift Cluster. To do this you will need to make the registry that you created public. 
 
 Let's take a look at our application in the registry.
 
@@ -396,7 +396,7 @@ In this tab you can add/remove users and update permissions, alter the privacy o
 
 image::02-quay-public.png[link=self, window=blank, width=100%]
 
-IMPORTANT: Make sure to make the repository public. Otherwise we will not be able to deploy the application in the ACM section.
+IMPORTANT: Make sure to make the repository public. Otherwise you will not be able to deploy the application in the ACM section.
 
 [start=7]
 . Click OK
@@ -426,7 +426,7 @@ NOTE: You may need to click the checkbox near the image you would would like mor
 
 image::02-quay-scan-hover.png[link=self, window=blank, width=100%]
 
-NOTE: The alpine container image we are using in this lab shows 34 vulnerabilities, with 2 cirtical vulnerabilities. This number will change with time and will be different between container scanners for a variety of reasons such as reporting mechanisms, vulnerability feeds and operating system support. 
+NOTE: The alpine container image you are using in this lab shows 34 vulnerabilities, with 2 cirtical vulnerabilities. This number will change with time and will be different between container scanners for a variety of reasons such as reporting mechanisms, vulnerability feeds and operating system support. 
 
 [start=3]
 . Click on the list of vulnerabilities to see a more detailed view.
@@ -440,11 +440,11 @@ image::02-quay-vuln-overview.png[link=self, window=blank, width=100%]
 
 image::02-quay-vuln-detailed.png[link=self, window=blank, width=100%]
 
-NOTE: Toggling for fixable/unfixable vulnerabilities is an excellent way for developers to understand what is within their responsibility for fixing. For example, since we are using an older version of Java, many fixes are available for these common issues. 
+NOTE: Toggling for fixable/unfixable vulnerabilities is an excellent way for developers to understand what is within their responsibility for fixing. For example, since you are using an older version of Java, many fixes are available for these common issues. 
 
 === Ensure ACS can pull the image manifest from your Quay instance
 
-There is currently no integration with the Quay repository which means ACS cannot view the manifest layers. You can verify this by running a similar roxctl scan that we ran before.
+There is currently no integration with the Quay repository which means ACS cannot view the manifest layers. You can verify this by running a similar roxctl scan that you ran before.
 
 *Procedure*
 
