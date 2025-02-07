@@ -6,7 +6,7 @@ In this module we will be acting as the devloper.(UPDATE STORY)
 
 [[quay-login]]
 
-==== Login to Quay from the CLI
+== Login to Quay from the CLI
 
 *Procedure*
 
@@ -84,7 +84,7 @@ Imagine a base image as a blank canvas, providing a reliable foundation like a m
 
 *Procedure*
 
-. Run the following commands 
+. Run the following commands in succession
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -106,11 +106,18 @@ Writing manifest to image destination
 451fdb03e17285d3263d88f0f3bed692c82556935490d233096974386cd0381b
 ----
 
+====
+This command tags the python:3.12-alpine image with your Quay repository and username allowing you to accurately push the image in a later step.
+====
+
 [source,sh,subs="attributes",role=execute]
 ----
 podman tag docker.io/library/python:3.12-alpine $QUAY_URL/$QUAY_USER/python-alpine-golden:0.1
 ----
 
+====
+This command shows you the local images available
+====
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -125,6 +132,10 @@ REPOSITORY                                                                      
 quay-w2t4c.apps.cluster-w2t4c.w2t4c.sandbox1647.opentlc.com/quayadmin/python-alpine-golden  0.1          451fdb03e172  5 weeks ago  50.6 MB
 docker.io/library/python                                                                    3.12-alpine  451fdb03e172  5 weeks ago  50.6 MB
 ----
+
+====
+This command pushes the golden image to your repository
+====
 
 [source,sh,subs="attributes",role=execute]
 ----
@@ -280,8 +291,7 @@ Copying config 46ea42cba3 done   |
 Writing manifest to image destination
 ----
 
-NOTE: 
-Quay will automatically create a private registry to store the application image because of your admin access. To deploy the application, make sure the repository is set to public so that you can pull the image without needing authentication.
+NOTE: Quay will automatically create a private registry to store the application image because of your admin access. To deploy the application, make sure the repository is set to public so that you can pull the image without needing authentication.
 
 The frontend application is finally built! The next step is to review it in Quay and deploy it to OpenShift using ACM and OpenShift GitOps.
 
@@ -536,6 +546,6 @@ image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzMyaHRsNTdwZWRlejRycGtp
 
 === Summary
 
-Nice job! Developers can no build and push their images to Quay, access it's vulnerabilities, and use roxctl to scan their images.
+Nice job! Developers can now build and push their images to Quay, view their image vulnerabilities, and use roxctl to scan their images.
 
 Onto the operations team and Red Hat Advanced Cluster Management.

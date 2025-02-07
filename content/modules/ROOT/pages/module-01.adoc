@@ -190,7 +190,7 @@ payments     visa-processor        1/1     1            1           52s
 IMPORTANT: Please ensure the deploy application are deployed and available before moving onto the next module. 
 
 [start=2]
-. Let's take a quick look at some of the applications that you deployed. 
+. Run the following roxctl commands to check on the vulnerability status of the applications you deployed.
 
 ====
 The following command triggers a vulnerability scan by RHACS, roxctl filters the results into a table. The severity flag means only the critical vulnerabilities will be shown. This image is known as the "Damn Vulnerable Wed Application" and it contains A LOT of vulnerabilities.
@@ -214,7 +214,7 @@ Scan results for image: quay.io/mfoster/dvwa
 +---------------------------+                         +---------------------+-----------+-----------------------------------------------------------------+---------------+
 |        zlib1g-dev         |                         |   CVE-2023-45853    | CRITICAL  |         https://nvd.nist.gov/vuln/detail/CVE-2023-45853         |       -       |
 +---------------------------+-------------------------+---------------------+-----------+-----------------------------------------------------------------+---------------+
-WARN:   A total of 879 unique vulnerabilities were found in 97 components
+WARN:   A total of 881 unique vulnerabilities were found in 97 components
 ----
 
 image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnY0NDA0ZnJqNXh6cGNqeHNxZGd5Zm5qMnlpOHhrbm1hY2pwcG5ydSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p18ohAgD3H60LSoI1C/giphy.gif[link=self, window=blank, width=100%, class="center"]

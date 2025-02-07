@@ -633,7 +633,7 @@ image::03-app-gitops.png[link=self, window=blank, width=100%, App GitOps]
 
 image::03-app-gitops-2.png[link=self, window=blank, width=100%, App ACM GitOps]
 
-- Under *Sync Policy* uncheck *Automaticaly sync when cluster state changes* 
+- Under *Sync Policy* uncheck *Automatically sync when cluster state changes* 
 - Under *Replace resources instead of applying changes from the source repository* make sure you add a check
 
 image::03-app-gitops-3.png[link=self, window=blank, width=100%, App ACM GitOps]
