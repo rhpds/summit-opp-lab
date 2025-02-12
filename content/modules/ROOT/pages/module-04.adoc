@@ -104,9 +104,9 @@ A search query consists of two parts:
 - An attribute that identifies the resource type you want to search for.
 - A search term that finds the matching resource.
 
-For example, to find all violations in the *patient-frontend* deployment, the search query is *Deployment:patient-frontend*.
+For example, to find all violations in the *frontend* deployment, the search query is *Deployment:frontend*.
 
-In this search query, Deployment is the attribute, and patient-frontend is the search term.
+In this search query, Deployment is the attribute, and frontend is the search term.
 
 NOTE: The search field in RHACS requires each attribute to be entered fully as a search term. Enter your first attribute, and hit the <tab> key to move along to the following attribute you would like to enter. Results will appear once they match the entered query.
 
