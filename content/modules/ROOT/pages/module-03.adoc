@@ -217,7 +217,7 @@ image::03-vm-app-git.png[link=self, window=blank, width=100%, VM ACM Config]
 * *Cluster set:* default
 - Under *Label expressions* click *add label* and select the following
 * *Label:* name
-* *Operator:* equals any off
+* *Operator:* equals any of
 * *Values:* local-cluster
 
 image::03-vm-placement-acm.png[link=self, window=blank, width=100%, VM ACM Config 2]
