@@ -540,4 +540,4 @@ image::https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzMyaHRsNTdwZWRlejRycGtp
 
 Nice job! Developers can now build and push their images to Quay, view their image vulnerabilities, and use roxctl to scan their images.
 
-Onto the operations team and Red Hat Advanced Cluster Management.
+*Time to hand it off to the Operations team and Red Hat Advanced Cluster Management!*

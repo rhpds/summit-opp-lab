@@ -55,10 +55,10 @@ NOTE: While we won’t use RHODF directly in this workshop, it will be used as t
 == Environment set up and useful information
 The OpenShift 4 cluster for this lab is hosted on AWS and will be your central hub for tasks. The cluster setup includes:
 
-1. One OpenShift cluster (Named: "development") containing:
+1. One OpenShift cluster (Named: "local-cluster") containing:
 * Three control-plane nodes
 * Three worker nodes
 
-2. The secondary cluster in AWS(Named: "local-cluster"), using Hosted Control Planes (HCP)
+2. The secondary cluster in AWS (Named: "development"), using Hosted Control Planes (HCP)
 
 3. You will "provision" a new cluster in the ACM module that will fail during deployment. 
