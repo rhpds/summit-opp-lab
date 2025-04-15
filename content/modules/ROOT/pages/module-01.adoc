@@ -16,8 +16,8 @@ Administrator login is available with:
 
 [cols="1,1"]
 |===
-*Username:* | kubeadmin |
-*Password:* | {openshift_kubeadmin_password} |
+| *Username:* | kubeadmin
+| *Password:* | {openshift_kubeadmin_password}
 |===
 
 [[acs]]
@@ -29,8 +29,8 @@ Administrator login is available with:
 
 [cols="1,1"]
 |===
-*RHACS Console Username:* | {acs_portal_username} |
-*RHACS Console Password:* | {acs_portal_password} |
+| *RHACS Console Username:* | {acs_portal_username} 
+| *RHACS Console Password:* | {acs_portal_password} 
 |===
 
 [[quay]]
@@ -42,10 +42,9 @@ Administrator login is available with:
 
 [cols="1,1"]
 |===
-*Quay Console Username:* | {quay_admin_username} |
-*Quay Console Password:* | {quay_admin_password} |
+| *Quay Console Username:* | {quay_admin_username} 
+| *Quay Console Password:* | {quay_admin_password} 
 |===
-
 
 === roxctl CLI verification 
 
@@ -133,6 +132,7 @@ This command sets the variable TUTORIAL_HOME to equal the working directory, all
 
 [source,sh,subs="attributes",role=execute]
 ----
+echo export GRPC_ENFORCE_ALPN_ENABLED=FALSE >> ~/.bashrc
 echo export TUTORIAL_HOME="$(pwd)/demo-apps" >> ~/.bashrc
 export TUTORIAL_HOME="$(pwd)/demo-apps"
 ----
@@ -160,7 +160,7 @@ configmap/webgoat-config created
 NOTE: You may see warnings like: Warning: would violate PodSecurity "baseline:latest": privileged (container "proxy" must not set securityContext.privileged=true). These warnings appear because you are deploying containers with flawed configurations and known vulnerabilities into the OpenShift cluster.
 
 ====
-The following command will watch all of the applications as they are successfully deployed into the Openshift cluster. You can press ctrl+c to terminate the command.
+The following command will display what applciations have been deployed to the cluster
 ====
 
 [source,bash,role="execute"]
